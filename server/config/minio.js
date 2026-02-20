@@ -11,7 +11,7 @@ const minioClient = new Client({
   secretKey: process.env.MINIO_SECRET_KEY,
 });
 
-export const bucketName = process.env.MINIO_BUCKET || "sapaku-agents";
+export const bucketName = process.env.MINIO_BUCKET || "vlow-agents";
 
 export const initMinio = async () => {
   try {

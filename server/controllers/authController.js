@@ -98,7 +98,7 @@ export const forgotPassword = async (req, res, next) => {
     try {
       await sendEmail({
         email: user.email,
-        subject: "Reset Password - Sapaku.ai",
+        subject: "Reset Password - Vlow.ai",
         html: message,
       });
 

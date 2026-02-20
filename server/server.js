@@ -88,7 +88,7 @@ ConnectedPlatform.belongsTo(User, { foreignKey: "userId" });
 
 // 4. Agent <-> ConnectedPlatform (One-to-One atau One-to-Many tergantung kebutuhan)
 // Skenario: 1 Agent bisa dipakai di banyak nomor? Atau 1 Agent 1 Nomor?
-// Untuk simplifikasi SaaS sapaku.ai: 1 Platform punya 1 Active Agent.
+// Untuk simplifikasi SaaS vlow.ai: 1 Platform punya 1 Active Agent.
 Agent.hasMany(ConnectedPlatform, { foreignKey: "agentId" });
 ConnectedPlatform.belongsTo(Agent, { foreignKey: "agentId" });
 

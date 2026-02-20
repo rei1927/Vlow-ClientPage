@@ -3,7 +3,7 @@
   themes: light --default;
 }
 
-/* ========== Sapaku.ai Theme: Light ========== */
+/* ========== Vlow.ai Theme: Light ========== */
 :root {
   --color-primary: #2563eb;
   --color-primary-hover: #1d4ed8;
@@ -18,7 +18,7 @@
   --sidebar-active: #2563eb;
 }
 
-/* ========== Sapaku.ai Theme: Dark ========== */
+/* ========== Vlow.ai Theme: Dark ========== */
 .dark {
   --color-primary: #38bdf8;
   --color-primary-hover: #0ea5e9;

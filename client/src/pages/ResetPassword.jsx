@@ -78,7 +78,7 @@ const ResetPassword = () => {
         </div>
         <div className="relative z-10">
           <h1 className="text-3xl font-extrabold tracking-wide flex items-center gap-2">
-            Sapaku<span className="text-[#BDE8F5]">.ai</span>
+            Vlow<span className="text-[#BDE8F5]">.ai</span>
           </h1>
         </div>
         <div className="relative z-10 mb-20">
@@ -90,7 +90,7 @@ const ResetPassword = () => {
           </p>
         </div>
         <div className="relative z-10 text-xs text-white/40">
-          © {new Date().getFullYear()} Sapaku.ai Technology.
+          © {new Date().getFullYear()} Vlow.ai Technology.
         </div>
       </div>
       {/* --- KANAN: Form --- */}

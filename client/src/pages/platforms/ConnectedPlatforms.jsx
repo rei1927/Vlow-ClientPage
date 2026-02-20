@@ -10,6 +10,7 @@ import {
 import { getAgents } from "../../features/agents/agentSlice";
 import {
   FaWhatsapp,
+  FaInstagram,
   FaRobot,
   FaPlus,
   FaEllipsisV,
@@ -219,12 +220,35 @@ const ConnectedPlatforms = () => {
             )}
           </p>
         </div>
-        <button
-          onClick={handleOpenCreate}
-          className="btn btn-sm bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white border-none shadow-lg rounded-xl gap-2 px-4 h-9"
-        >
-          <FaPlus size={14} /> Tambah Nomor
-        </button>
+        <div className="dropdown dropdown-end">
+          <label
+            tabIndex={0}
+            className="btn btn-sm bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white border-none shadow-lg rounded-xl gap-2 px-4 h-9"
+          >
+            <FaPlus size={14} /> Koneksi Platform
+          </label>
+          <ul
+            tabIndex={0}
+            className="dropdown-content z-[1] menu p-2 shadow-lg bg-[var(--color-surface)] rounded-xl w-52 border border-[var(--color-border)] mt-2"
+          >
+            <li>
+              <a
+                onClick={handleOpenCreate}
+                className="gap-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-bg)]"
+              >
+                <FaWhatsapp className="text-green-500 text-lg" /> Connect WhatsApp
+              </a>
+            </li>
+            <li>
+              <a
+                onClick={() => toast.success("Fitur Instagram akan segera hadir!", { icon: "🚀" })}
+                className="gap-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-bg)]"
+              >
+                <FaInstagram className="text-pink-500 text-lg" /> Connect Instagram
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
 
       {/* FILTERS - Professional Design */}
@@ -258,7 +282,7 @@ const ConnectedPlatforms = () => {
           <h3 className="text-xl font-bold text-[var(--color-text)]">
             {searchQuery || statusFilter !== "all"
               ? "Tidak ada platform yang sesuai filter"
-              : "Belum ada WhatsApp Terhubung"}
+              : "Belum ada Platform Terhubung"}
           </h3>
           <p className="text-[var(--color-text-muted)] mt-2 max-w-md text-sm">
             {searchQuery || statusFilter !== "all"
@@ -266,12 +290,35 @@ const ConnectedPlatforms = () => {
               : "Hubungkan platform anda dengan AI Agent untuk memulai bekerja."}
           </p>
           {(!searchQuery && statusFilter === "all") && (
-            <button
-              onClick={handleOpenCreate}
-              className="mt-6 btn btn-outline border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-border)]/30 rounded-xl px-8"
-            >
-              Mulai Koneksi
-            </button>
+            <div className="dropdown dropdown-center mt-6">
+              <label
+                tabIndex={0}
+                className="btn btn-outline border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-border)]/30 rounded-xl px-8 gap-2"
+              >
+                <FaPlus size={14} /> Mulai Koneksi
+              </label>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow-lg bg-[var(--color-surface)] rounded-xl w-52 border border-[var(--color-border)] mt-2"
+              >
+                <li>
+                  <a
+                    onClick={handleOpenCreate}
+                    className="gap-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-bg)]"
+                  >
+                    <FaWhatsapp className="text-green-500 text-lg" /> Connect WhatsApp
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={() => toast.success("Fitur Instagram akan segera hadir!", { icon: "🚀" })}
+                    className="gap-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-bg)]"
+                  >
+                    <FaInstagram className="text-pink-500 text-lg" /> Connect Instagram
+                  </a>
+                </li>
+              </ul>
+            </div>
           )}
         </div>
       ) : (
@@ -286,11 +333,10 @@ const ConnectedPlatforms = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm ${
-                        pf.status === "WORKING"
-                          ? "bg-gradient-to-br from-green-400 to-green-600 text-white"
-                          : "bg-[var(--color-border)] text-[var(--color-text-muted)]"
-                      }`}
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm ${pf.status === "WORKING"
+                        ? "bg-gradient-to-br from-green-400 to-green-600 text-white"
+                        : "bg-[var(--color-border)] text-[var(--color-text-muted)]"
+                        }`}
                     >
                       <FaWhatsapp size={28} />
                     </div>

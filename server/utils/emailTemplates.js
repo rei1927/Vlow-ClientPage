@@ -22,13 +22,12 @@ export const getWelcomeTemplate = (name, email, password, loginUrl) => {
   return `
     <div style="${style.container}">
       <div style="${style.header}">
-        <a href="#" style="${style.logoText}">Sapaku.ai</a>
+        <a href="#" style="${style.logoText}">Vlow.ai</a>
       </div>
       <div style="${style.body}">
         <h1 style="${style.h1}">Selamat Datang, ${name}!</h1>
-        <p style="${
-          style.p
-        }">Akun Anda telah berhasil dibuat oleh Administrator. Berikut adalah kredensial login Anda:</p>
+        <p style="${style.p
+    }">Akun Anda telah berhasil dibuat oleh Administrator. Berikut adalah kredensial login Anda:</p>
         
         <div style="${style.highlightBox}">
           <p style="margin: 5px 0; font-size: 14px; color: #64748b;">Email Login:</p>
@@ -38,16 +37,15 @@ export const getWelcomeTemplate = (name, email, password, loginUrl) => {
           <div style="${style.code}">${password}</div>
         </div>
 
-        <p style="${
-          style.p
-        }">Demi keamanan, Anda <strong>diwajibkan mengganti password</strong> ini saat pertama kali login.</p>
+        <p style="${style.p
+    }">Demi keamanan, Anda <strong>diwajibkan mengganti password</strong> ini saat pertama kali login.</p>
 
         <div style="${style.buttonContainer}">
           <a href="${loginUrl}" style="${style.button}">Login Sekarang</a>
         </div>
       </div>
       <div style="${style.footer}">
-        <p>&copy; ${new Date().getFullYear()} Sapaku.ai Platform. All rights reserved.</p>
+        <p>&copy; ${new Date().getFullYear()} Vlow.ai Platform. All rights reserved.</p>
       </div>
     </div>
   `;
@@ -58,24 +56,22 @@ export const getPasswordResetTemplate = (resetUrl) => {
   return `
     <div style="${style.container}">
       <div style="${style.header}">
-        <a href="#" style="${style.logoText}">Sapaku.ai</a>
+        <a href="#" style="${style.logoText}">Vlow.ai</a>
       </div>
       <div style="${style.body}">
         <h1 style="${style.h1}">Permintaan Reset Password</h1>
-        <p style="${
-          style.p
-        }">Kami menerima permintaan untuk mereset password akun Anda. Klik tombol di bawah ini untuk melanjutkan:</p>
+        <p style="${style.p
+    }">Kami menerima permintaan untuk mereset password akun Anda. Klik tombol di bawah ini untuk melanjutkan:</p>
         
         <div style="${style.buttonContainer}">
           <a href="${resetUrl}" style="${style.button}">Reset Password Saya</a>
         </div>
         
-        <p style="${
-          style.p
-        }">Tautan ini hanya berlaku selama 10 menit. Jika Anda tidak merasa melakukan permintaan ini, abaikan saja email ini.</p>
+        <p style="${style.p
+    }">Tautan ini hanya berlaku selama 10 menit. Jika Anda tidak merasa melakukan permintaan ini, abaikan saja email ini.</p>
       </div>
       <div style="${style.footer}">
-        <p>&copy; ${new Date().getFullYear()} Sapaku.ai Platform. All rights reserved.</p>
+        <p>&copy; ${new Date().getFullYear()} Vlow.ai Platform. All rights reserved.</p>
       </div>
     </div>
   `;

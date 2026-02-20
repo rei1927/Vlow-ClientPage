@@ -16,7 +16,7 @@ const debugLogin = async () => {
         await sequelize.authenticate();
         console.log("1. Database Connected.");
 
-        const email = "admin@sapaku.ai";
+        const email = "admin@vlow.ai";
         const password = "password123";
 
         const user = await User.findOne({ where: { email } });

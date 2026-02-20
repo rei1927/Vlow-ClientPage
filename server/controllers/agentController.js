@@ -15,7 +15,7 @@ const uploadToMinio = async (file) => {
   await minioClient.putObject(bucketName, fileName, file.buffer);
 
   // Return Public URL (Sesuaikan dengan ENV Anda)
-  // Contoh: http://localhost:9000/sapaku-agents/gambar.jpg
+  // Contoh: http://localhost:9000/vlow-agents/gambar.jpg
   const minioUrl =
     process.env.MINIO_PUBLIC_URL || `http://localhost:${process.env.MINIO_PORT || 9000}`;
   return `${minioUrl}/${bucketName}/${fileName}`;
@@ -25,7 +25,7 @@ const deleteFromMinio = async (imageUrl) => {
   if (!imageUrl) return;
   try {
     // Extract object name from URL
-    // URL format: http://localhost:9000/sapaku-agents/uuid-filename.jpg
+    // URL format: http://localhost:9000/vlow-agents/uuid-filename.jpg
     const urlParts = imageUrl.split(`/${bucketName}/`);
     if (urlParts.length === 2) {
       const objectName = urlParts[1];

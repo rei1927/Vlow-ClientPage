@@ -32,7 +32,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
         <div>
           <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 bg-black/10">
             <h1 className="text-2xl font-extrabold tracking-tight">
-              Sapaku<span className="text-[var(--sidebar-accent)]">.ai</span>
+              Vlow<span className="text-[var(--sidebar-accent)]">.ai</span>
             </h1>
             {/* Tombol Close di Mobile */}
             <button onClick={toggleSidebar} className="lg:hidden text-white/70 hover:text-white">
