@@ -57,13 +57,13 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
         name: sessionId,
         config: {
           proxy: null,
-          webhooks: [
+          webhooks: webhookUrl ? [
             {
               url: webhookUrl, // <--- INI KUNCINYA (Dikirim ke n8n User)
               events: ["message", "session.status"],
               hmac: null,
             },
-          ],
+          ] : [],
         },
       };
 
@@ -80,7 +80,7 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
     }
   } catch (error) {
     console.error("WAHA Service Error:", error?.response?.data || error.message);
-    throw new AppError("Gagal menghubungkan ke Server WhatsApp Engine.", 502);
+    throw new AppError("Gagal menghubungkan ke Server WhatsApp Engine.", 400);
   }
 };
 
