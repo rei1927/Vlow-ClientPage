@@ -20,6 +20,7 @@ import {
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 
+import axiosInstance from "../../api/axiosInstance";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import AgentListLoading from "../../components/agents/AgentListLoading";
 
@@ -87,22 +88,19 @@ const ConnectedPlatforms = () => {
 
   const sendMetaCodeToBackend = async (code) => {
     try {
-      const response = await fetch("/api/whatsapp/connect", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code }),
-      });
+      const response = await axiosInstance.post("/platforms/whatsapp/connect", { code });
 
-      if (response.ok) {
+      if (response.data && response.data.success) {
         toast.success("WhatsApp berhasil terhubung melalui Meta!");
         dispatch(getPlatforms({ limit: 100 }));
+        if (response.data.data) {
+          setActivePlatformId(response.data.data.id);
+        }
       } else {
         toast.error("Gagal menghubungkan WhatsApp. Silakan coba lagi.");
       }
     } catch (error) {
-      toast.error("Terjadi kesalahan jaringan.");
+      toast.error(error.response?.data?.message || "Terjadi kesalahan jaringan.");
     }
   };
 
@@ -270,8 +268,8 @@ const ConnectedPlatforms = () => {
                 key={pf.id}
                 onClick={() => setActivePlatformId(pf.id)}
                 className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${activePlatformId === pf.id
-                    ? "bg-blue-50/50 dark:bg-[var(--color-primary)]/10 border-blue-200 dark:border-[var(--color-primary)]/30 shadow-sm"
-                    : "bg-[var(--color-surface)] border-[var(--color-border)] hover:border-gray-300 dark:hover:border-gray-600 shadow-sm hover:shadow-md"
+                  ? "bg-blue-50/50 dark:bg-[var(--color-primary)]/10 border-blue-200 dark:border-[var(--color-primary)]/30 shadow-sm"
+                  : "bg-[var(--color-surface)] border-[var(--color-border)] hover:border-gray-300 dark:hover:border-gray-600 shadow-sm hover:shadow-md"
                   }`}
               >
                 <div className="flex gap-3.5 items-center overflow-hidden">

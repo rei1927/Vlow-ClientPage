@@ -18,7 +18,7 @@ export const createPlatform = async (req, res, next) => {
 
     // 2. Cek Webhook URL User dan Subscription (untuk customer)
     const user = await User.findByPk(req.user.id);
-    
+
     // Check subscription for customer
     if (user.role === "customer") {
       if (!user.subscriptionExpiry) {
@@ -296,3 +296,57 @@ export const deletePlatform = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Connect Meta WhatsApp (Embedded Signup)
+// @route   POST /api/platforms/whatsapp/connect
+export const connectMetaWhatsApp = async (req, res, next) => {
+  try {
+    const { code } = req.body;
+
+    if (!code) {
+      return next(new AppError("Meta Auth Code tidak ditemukan", 400));
+    }
+
+    const user = await User.findByPk(req.user.id);
+    const targetWebhookUrl = user.n8nWebhookUrl;
+
+    // --- LOGIKA UNTUK WAHA ---
+    const isWahaCore = process.env.WAHA_EDITION === "CORE";
+    let finalSessionId;
+
+    if (isWahaCore) {
+      finalSessionId = "default";
+      const existingPlatform = await ConnectedPlatform.findOne({
+        where: { sessionId: "default" },
+      });
+      if (existingPlatform) {
+        await wahaService.stopWahaSession("default");
+        await existingPlatform.destroy();
+      }
+    } else {
+      finalSessionId = `meta${req.user.id.split("-")[0]}_${Date.now()}`;
+    }
+
+    // CREATE PLATFORM
+    const newPlatform = await ConnectedPlatform.create({
+      userId: req.user.id,
+      name: "WhatsApp Meta Inbox",
+      agentId: null,
+      sessionId: finalSessionId,
+      status: "SCANNING",
+      provider: "waha",
+    });
+
+    // Start Session di WAHA
+    await wahaService.startWahaSession(finalSessionId, targetWebhookUrl);
+
+    res.status(201).json({
+      success: true,
+      message: "Sukses mengkoneksikan WhatsApp Meta",
+      data: newPlatform,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

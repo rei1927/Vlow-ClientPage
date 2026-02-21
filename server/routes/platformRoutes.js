@@ -7,11 +7,14 @@ import {
   getPlatformStatus,
   deletePlatform,
   updatePlatform,
+  connectMetaWhatsApp,
 } from "../controllers/platformController.js";
 
 const router = express.Router();
 
 router.use(protect);
+
+router.post("/whatsapp/connect", connectMetaWhatsApp);
 
 router.route("/").get(getMyPlatforms).post(createPlatform);
 
