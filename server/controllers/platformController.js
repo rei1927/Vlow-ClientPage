@@ -3,6 +3,7 @@ import Agent from "../models/Agent.js";
 import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import * as wahaService from "../services/wahaService.js";
+import * as metaService from "../services/metaService.js";
 import { Op } from "sequelize";
 
 // @desc    Init Connection (Create Session)
@@ -102,6 +103,10 @@ export const getPlatformQR = async (req, res, next) => {
 
     if (!platform) return next(new AppError("Platform tidak ditemukan", 404));
 
+    if (platform.provider === "meta_cloud") {
+      return res.status(200).json({ success: true, message: "Meta Cloud API tidak butuh QR Code", qr: null });
+    }
+
     // Pastikan session sudah mulai (auto-start jika STOPPED)
     const wahaStatus = await wahaService.getWahaStatus(platform.sessionId);
     if (["STOPPED", "STARTING", "FAILED"].includes(wahaStatus)) {
@@ -135,6 +140,15 @@ export const getPlatformStatus = async (req, res, next) => {
     });
 
     if (!platform) return next(new AppError("Platform tidak ditemukan", 404));
+
+    if (platform.provider === "meta_cloud") {
+      return res.status(200).json({
+        success: true,
+        status: "WORKING",
+        rawStatus: "WORKING",
+        isConnected: true,
+      });
+    }
 
     // 1. Ambil status mentah dari WAHA
     // Kemungkinan output WAHA: 'STOPPED', 'STARTING', 'SCAN_QR_CODE', 'WORKING', 'FAILED'
@@ -286,8 +300,10 @@ export const deletePlatform = async (req, res, next) => {
     });
     if (!platform) return next(new AppError("Platform not found", 404));
 
-    // Stop di WAHA
-    await wahaService.stopWahaSession(platform.sessionId);
+    if (platform.provider === "waha") {
+      // Stop di WAHA
+      await wahaService.stopWahaSession(platform.sessionId);
+    }
     // Hapus di DB
     await platform.destroy();
 
@@ -308,41 +324,47 @@ export const connectMetaWhatsApp = async (req, res, next) => {
     }
 
     const user = await User.findByPk(req.user.id);
-    const targetWebhookUrl = user.n8nWebhookUrl;
 
-    // --- LOGIKA UNTUK WAHA ---
-    const isWahaCore = process.env.WAHA_EDITION === "CORE";
-    let finalSessionId;
+    // 1. Tanya Meta Token
+    const tokenData = await metaService.exchangeAuthCode(code);
+    const accessToken = tokenData.access_token;
 
-    if (isWahaCore) {
-      finalSessionId = "default";
-      const existingPlatform = await ConnectedPlatform.findOne({
-        where: { sessionId: "default" },
-      });
-      if (existingPlatform) {
-        await wahaService.stopWahaSession("default");
-        await existingPlatform.destroy();
-      }
-    } else {
-      finalSessionId = `meta${req.user.id.split("-")[0]}_${Date.now()}`;
+    // 2. Ambil WABA ID dan Phone Numbers
+    const wabas = await metaService.getWhatsAppBusinessAccounts(accessToken);
+    if (!wabas || wabas.length === 0) {
+      return next(new AppError("Tidak ada WhatsApp Business Account yang tersedia di Meta Anda.", 404));
     }
+
+    const wabaId = wabas[0].id;
+    const phoneNumbers = await metaService.getPhoneNumbers(wabaId, accessToken);
+    if (!phoneNumbers || phoneNumbers.length === 0) {
+      return next(new AppError("Tidak ada Nomor Telepon yang terdaftar pada WABA ini.", 404));
+    }
+
+    // Ambil nomor pertama sebagai default
+    const phoneNumberId = phoneNumbers[0].id;
+    const phoneNumberDisplay = phoneNumbers[0].display_phone_number;
+
+    // 3. (Opsional) Subscribe ke Webhook App Vlow ke WABA Meta
+    // asalkan webhook server ini sudah lolos review Meta.
+    // await metaService.subscribeAppToWABA(wabaId, accessToken);
 
     // CREATE PLATFORM
     const newPlatform = await ConnectedPlatform.create({
       userId: req.user.id,
-      name: "WhatsApp Meta Inbox",
+      name: `Meta Inbox (${phoneNumberDisplay})`,
       agentId: null,
-      sessionId: finalSessionId,
-      status: "SCANNING",
-      provider: "waha",
+      sessionId: `meta_${phoneNumberId}`,
+      wabaId: wabaId,
+      phoneNumberId: phoneNumberId,
+      systemUserAccessToken: accessToken,
+      status: "WORKING",
+      provider: "meta_cloud",
     });
-
-    // Start Session di WAHA
-    await wahaService.startWahaSession(finalSessionId, targetWebhookUrl);
 
     res.status(201).json({
       success: true,
-      message: "Sukses mengkoneksikan WhatsApp Meta",
+      message: "Sukses mengkoneksikan WhatsApp Meta Cloud API",
       data: newPlatform,
     });
   } catch (error) {

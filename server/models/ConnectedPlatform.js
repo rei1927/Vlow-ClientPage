@@ -11,9 +11,8 @@ const ConnectedPlatform = sequelize.define("ConnectedPlatform", {
     type: DataTypes.STRING,
     allowNull: false, // Contoh: "Admin Toko Pusat"
   },
-  // Kita kunci ke WAHA saja karena roadmap kita fokus QR Code WA
   provider: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM("waha", "meta_cloud"),
     defaultValue: "waha",
     allowNull: false,
   },
@@ -21,8 +20,20 @@ const ConnectedPlatform = sequelize.define("ConnectedPlatform", {
   // Ini adalah nama session unik di Server WAHA (misal: "uid_123_time_456")
   sessionId: {
     type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
+    allowNull: true, // Berubah jadi true karena Meta Cloud mungkin butuh / tidak butuh ID session, tapi kita pakai phoneNumberId
+  },
+  // --- META CLOUD API FIELDS ---
+  wabaId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  phoneNumberId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  systemUserAccessToken: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   },
   // Status koneksi real-time
   status: {

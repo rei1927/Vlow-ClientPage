@@ -18,6 +18,7 @@ import agentRoutes from "./routes/agentRoutes.js";
 import platformRoutes from "./routes/platformRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import webhookRoutes from "./routes/webhookRoutes.js";
 
 // Models
 import User from "./models/User.js";
@@ -65,6 +66,7 @@ app.use("/api/agents", agentRoutes);
 app.use("/api/platforms", platformRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/chats", chatRoutes);
+app.use("/api/webhooks", webhookRoutes);
 
 // --- Error Handling Middleware ---
 // HAPUS blok app.use((err...)) yang lama (manual).
