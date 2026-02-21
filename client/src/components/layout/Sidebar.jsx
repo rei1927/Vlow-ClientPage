@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { FaHome, FaUsers, FaRobot, FaNetworkWired, FaTimes, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaUsers, FaRobot, FaNetworkWired, FaTimes, FaSignOutAlt, FaComments } from "react-icons/fa";
 
 const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
   const { user } = useSelector((state) => state.auth);
@@ -72,6 +72,15 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
             {/* Menu Khusus Customer (Nanti di Fase 3 & 4) */}
             {user && user.role !== "admin" && (
               <>
+                <li>
+                  <Link
+                    to="/chat"
+                    onClick={handleMenuClick}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${isActive("/chat")}`}
+                  >
+                    <FaComments className="w-5 h-5" /> Live Chat
+                  </Link>
+                </li>
                 <li>
                   <Link
                     to="/ai-agents"

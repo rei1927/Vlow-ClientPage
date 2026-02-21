@@ -18,6 +18,7 @@ import {
   FaPen,
   FaExclamationTriangle,
   FaQrcode,
+  FaFacebook,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import useDebounce from "../../hooks/useDebounce";
@@ -62,6 +63,32 @@ const ConnectedPlatforms = () => {
     dispatch(getAgents());
   }, [dispatch]);
 
+  // Load FB SDK
+  useEffect(() => {
+    if (!window.FB) {
+      window.fbAsyncInit = function () {
+        window.FB.init({
+          appId: "1191217912806430", // Facebook App ID
+          cookie: true,
+          xfbml: true,
+          version: "v22.0",
+        });
+      };
+
+      (function (d, s, id) {
+        var js,
+          fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+          return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+      })(document, "script", "facebook-jssdk");
+    }
+  }, []);
+
   // Fetch platforms with filters
   useEffect(() => {
     const fetchPlatforms = async () => {
@@ -100,6 +127,69 @@ const ConnectedPlatforms = () => {
     }
   }, [isError, message, dispatch]);
 
+  const sendMetaCodeToBackend = async (code) => {
+    try {
+      console.log("Mengirim kode Meta ke backend...", code);
+      const response = await fetch("/api/whatsapp/connect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("✅ Sukses menghubungkan WhatsApp:", data);
+        toast.success("WhatsApp berhasil terhubung melalui Meta!");
+        dispatch(
+          getPlatforms({
+            page: currentPage,
+            limit: ITEMS_PER_PAGE,
+            search: debouncedSearchQuery || undefined,
+            status: statusFilter !== "all" ? statusFilter : undefined,
+            sortBy,
+            sortOrder,
+          }),
+        );
+      } else {
+        const errorText = await response.text();
+        console.error("❌ Gagal menghubungkan WhatsApp:", errorText);
+        toast.error("Gagal menghubungkan WhatsApp. Silakan coba lagi.");
+      }
+    } catch (error) {
+      console.error("❌ Terjadi kesalahan saat fetch ke backend:", error);
+      toast.error("Terjadi kesalahan jaringan.");
+    }
+  };
+
+  const handleConnectWhatsApp = () => {
+    if (typeof window.FB === "undefined") {
+      toast.error("Meta SDK belum dimuat. Silakan tunggu sebentar.");
+      console.error("Meta SDK belum siap.");
+      return;
+    }
+
+    console.log("Membuka pop-up Meta Embedded Signup...");
+    window.FB.login(
+      (response) => {
+        if (response.authResponse && response.authResponse.code) {
+          const code = response.authResponse.code;
+          console.log("✅ Login berhasil! Mendapatkan auth code:", code);
+          sendMetaCodeToBackend(code);
+        } else {
+          console.warn("⚠️ Login dibatalkan atau pop-up ditutup oleh user.", response);
+          toast.error("Login Meta dibatalkan.");
+        }
+      },
+      {
+        config_id: "3086707608181836",
+        response_type: "code",
+        override_default_response_type: true,
+      }
+    );
+  };
+
   const handleOpenCreate = () => {
     setSelectedPlatform(null);
     setIsModalOpen(true);
@@ -136,6 +226,34 @@ const ConnectedPlatforms = () => {
         }),
       );
     }
+  };
+
+  const handleConnectFB = () => {
+    if (!window.FB) {
+      toast.error("Facebook SDK belum dimuat atau masih loading");
+      return;
+    }
+    window.FB.login(
+      (response) => {
+        if (response.authResponse) {
+          console.log("FB Login Success", response.authResponse);
+          toast.success("Berhasil login FB Page!");
+          // TODO: Send response.authResponse.code to your backend
+        } else {
+          toast.error("Login Facebook dibatalkan atau gagal");
+        }
+      },
+      {
+        config_id: "3086707608181836",
+        response_type: "code",
+        override_default_response_type: true,
+        extras: {
+          setup: {},
+          featureType: "",
+          sessionInfoVersion: "3",
+        },
+      }
+    );
   };
 
   // Handler Create/Update
@@ -233,10 +351,18 @@ const ConnectedPlatforms = () => {
           >
             <li>
               <a
-                onClick={handleOpenCreate}
+                onClick={handleConnectWhatsApp}
                 className="gap-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-bg)]"
               >
                 <FaWhatsapp className="text-green-500 text-lg" /> Connect WhatsApp
+              </a>
+            </li>
+            <li>
+              <a
+                onClick={handleConnectFB}
+                className="gap-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-bg)]"
+              >
+                <FaFacebook className="text-blue-500 text-lg" /> Connect FB Page (Embed Login)
               </a>
             </li>
             <li>
@@ -303,10 +429,18 @@ const ConnectedPlatforms = () => {
               >
                 <li>
                   <a
-                    onClick={handleOpenCreate}
+                    onClick={handleConnectWhatsApp}
                     className="gap-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-bg)]"
                   >
                     <FaWhatsapp className="text-green-500 text-lg" /> Connect WhatsApp
+                  </a>
+                </li>
+                <li>
+                  <a
+                    onClick={handleConnectFB}
+                    className="gap-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-bg)]"
+                  >
+                    <FaFacebook className="text-blue-500 text-lg" /> Connect FB Page (Embed Login)
                   </a>
                 </li>
                 <li>

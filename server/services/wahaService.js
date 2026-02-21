@@ -138,3 +138,51 @@ export const stopWahaSession = async (sessionId) => {
     console.error("WAHA Stop Error:", error.message);
   }
 };
+
+// --- WAHA CHAT AND MESSAGING ---
+
+export const getChats = async (sessionId) => {
+  try {
+    const response = await axios.get(`${WAHA_URL}/api/chats`, {
+      params: { session: sessionId },
+      headers: HEADERS,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("WAHA Get Chats Error:", error?.response?.data || error.message);
+    throw new AppError("Gagal mengambil daftar pesan dari WhatsApp.", 502);
+  }
+};
+
+export const getMessages = async (sessionId, chatId, limit = 50) => {
+  try {
+    const response = await axios.get(`${WAHA_URL}/api/chats/${chatId}/messages`, {
+      params: {
+        session: sessionId,
+        limit: limit,
+      },
+      headers: HEADERS,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("WAHA Get Messages Error:", error?.response?.data || error.message);
+    throw new AppError("Gagal mengambil riwayat pesan.", 502);
+  }
+};
+
+export const sendTextMessage = async (sessionId, chatId, text) => {
+  try {
+    const payload = {
+      session: sessionId,
+      chatId: chatId,
+      text: text,
+    };
+    const response = await axios.post(`${WAHA_URL}/api/sendText`, payload, {
+      headers: HEADERS,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("WAHA Send Message Error:", error?.response?.data || error.message);
+    throw new AppError("Gagal mengirim pesan ke WhatsApp.", 502);
+  }
+};

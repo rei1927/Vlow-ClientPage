@@ -18,6 +18,7 @@ const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 const AgentList = lazy(() => import("./pages/agents/AgentList"));
 const AgentBuilder = lazy(() => import("./pages/agents/AgentBuilder"));
 const ConnectedPlatforms = lazy(() => import("./pages/platforms/ConnectedPlatforms"));
+const ChatDashboard = lazy(() => import("./pages/chat/ChatDashboard"));
 
 const AUTH_PATHS = ["/login", "/forgot-password", "/reset-password"];
 function isAuthPath(pathname) {
@@ -69,6 +70,7 @@ function App() {
                 <Route path="/ai-agents/create" element={<AgentBuilder />} />
                 <Route path="/ai-agents/:id" element={<AgentBuilder />} />
 
+                <Route path="/chat" element={<ChatDashboard />} />
                 <Route path="/platforms" element={<ConnectedPlatforms />} />
               </Route>
             </Route>
