@@ -37,6 +37,9 @@ services:
       # JWT
       - JWT_SECRET=${JWT_SECRET:-rahasia_aman}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
+      # WAHA Connectivity
+      - WAHA_BASE_URL=${WAHA_BASE_URL:-http://72.62.121.97:7575}
+      - WAHA_API_KEY=${WAHA_API_KEY}
     depends_on:
       - minio
 
