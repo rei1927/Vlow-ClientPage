@@ -24,7 +24,7 @@ export const exchangeAuthCode = async (code) => {
         // response.data berisi: { access_token, token_type, expires_in }
         return response.data;
     } catch (error) {
-        console.error("Meta Token Exchange Error:", error?.response?.data || error.message);
+        console.error("Meta Token Exchange Error FULL:", JSON.stringify(error?.response?.data || error.message, null, 2));
         throw new AppError("Gagal menukar Meta Auth Code dengan Access Token. Silakan coba lagi.", 400);
     }
 };
@@ -39,7 +39,7 @@ export const getWhatsAppBusinessAccounts = async (accessToken) => {
 
         return wabaResponse.data.data; // Array of WABA objects
     } catch (error) {
-        console.error("Meta WABA Fetch Error:", error?.response?.data || error.message);
+        console.error("Meta WABA Fetch Error FULL:", JSON.stringify(error?.response?.data || error.message, null, 2));
         throw new AppError("Gagal mengambil data WhatsApp Business Account dari profil Anda.", 400);
     }
 };
