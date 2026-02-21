@@ -44,6 +44,13 @@ services:
       - META_APP_ID=${META_APP_ID}
       - META_APP_SECRET=${META_APP_SECRET}
       - META_WEBHOOK_VERIFY_TOKEN=${META_WEBHOOK_VERIFY_TOKEN:-vlow_meta_webhook_secret_2024}
+      # Email Configuration (AWS SES)
+      - SMTP_HOST=${SMTP_HOST:-email-smtp.ap-southeast-1.amazonaws.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_EMAIL=${SMTP_EMAIL}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - FROM_NAME=${FROM_NAME:-Vlow System Admin}
+      - FROM_EMAIL=${FROM_EMAIL:-no-reply@vlow.ai}
     depends_on:
       - minio
 
