@@ -12,9 +12,12 @@ const ConnectedPlatform = sequelize.define("ConnectedPlatform", {
     allowNull: false, // Contoh: "Admin Toko Pusat"
   },
   provider: {
-    type: DataTypes.ENUM("waha", "meta_cloud"),
+    type: DataTypes.STRING,
     defaultValue: "waha",
     allowNull: false,
+    validate: {
+      isIn: [['waha', 'meta_cloud']]
+    }
   },
   // SYSTEM GENERATED - User tidak perlu input ini
   // Ini adalah nama session unik di Server WAHA (misal: "uid_123_time_456")
