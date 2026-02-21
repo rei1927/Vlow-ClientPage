@@ -183,7 +183,7 @@ const ConnectedPlatforms = () => {
         }
       },
       {
-        config_id: "3086707608181836",
+        config_id: "1600827654394475",
         response_type: "code",
         override_default_response_type: true,
       }
@@ -244,7 +244,7 @@ const ConnectedPlatforms = () => {
         }
       },
       {
-        config_id: "3086707608181836",
+        config_id: "1600827654394475",
         response_type: "code",
         override_default_response_type: true,
         extras: {
