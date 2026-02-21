@@ -40,6 +40,10 @@ services:
       # WAHA Connectivity
       - WAHA_BASE_URL=${WAHA_BASE_URL:-https://waha-plus.dayamedialangit.co.id}
       - WAHA_API_KEY=${WAHA_API_KEY}
+      # Meta Cloud API
+      - META_APP_ID=${META_APP_ID}
+      - META_APP_SECRET=${META_APP_SECRET}
+      - META_WEBHOOK_VERIFY_TOKEN=${META_WEBHOOK_VERIFY_TOKEN:-vlow_meta_webhook_secret_2024}
     depends_on:
       - minio
 
