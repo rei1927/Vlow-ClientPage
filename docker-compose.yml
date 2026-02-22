@@ -42,6 +42,8 @@ services:
       # WAHA Connectivity
       - WAHA_BASE_URL=${WAHA_BASE_URL:-https://waha-plus.dayamedialangit.co.id}
       - WAHA_API_KEY=${WAHA_API_KEY}
+      # Simulator
+      - N8N_SIMULATOR_URL=${N8N_SIMULATOR_URL}
       # Meta Cloud API
       - META_APP_ID=${META_APP_ID}
       - META_APP_SECRET=${META_APP_SECRET}
