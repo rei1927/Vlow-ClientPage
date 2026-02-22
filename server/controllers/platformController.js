@@ -13,8 +13,8 @@ export const createPlatform = async (req, res, next) => {
     const { name, agentId } = req.body;
 
     // 1. Validasi Input
-    if (!name || !agentId) {
-      return next(new AppError("Nama Platform dan Agent wajib dipilih", 400));
+    if (!name) {
+      return next(new AppError("Nama Platform wajib diisi", 400));
     }
 
     // 2. Cek Webhook URL User dan Subscription (untuk customer)

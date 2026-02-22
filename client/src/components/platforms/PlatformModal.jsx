@@ -88,7 +88,20 @@ const PlatformModal = ({ isOpen, onClose, onSubmit, initialData, agents }) => {
         if (status === "WORKING") {
           stopAllPolling();
           // Delay sedikit biar user lihat status connected
-          setTimeout(() => onClose(), 2000);
+          setTimeout(() => {
+            onClose();
+            // Show notification to assign agent
+            setTimeout(() => {
+              toast.error("Silakan pilih AI Agent untuk membalas pesan di nomor ini dari halaman pengaturan platform.", {
+                icon: "🤖",
+                duration: 6000,
+                style: {
+                  background: '#1f2937',
+                  color: '#fff',
+                },
+              });
+            }, 500);
+          }, 2000);
         }
       });
     }, 3000);
