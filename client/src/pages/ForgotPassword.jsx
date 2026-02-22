@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom"; // Tambah useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import { forgotPasswordUser, reset } from "../features/auth/authSlice";
 import toast from "react-hot-toast";
-import { FaEnvelope, FaArrowLeft, FaCircleNotch, FaPaperPlane } from "react-icons/fa";
+import { FaEnvelope, FaCircleNotch } from "react-icons/fa";
 import InfoModal from "../components/InfoModal";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
-  const navigate = useNavigate(); // Init hook
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isLoading, isError, isSuccess, message } = useSelector((state) => state.auth);
 
   useEffect(() => {
+    setIsVisible(true);
     dispatch(reset());
   }, [dispatch]);
 
@@ -38,15 +40,14 @@ const ForgotPassword = () => {
     dispatch(forgotPasswordUser(email));
   };
 
-  // --- LOGIC BARU: Handle Tutup Modal -> Redirect Login ---
   const handleCloseModal = () => {
     setShowModal(false);
-    navigate("/login"); // Arahkan user ke login agar tidak bingung
+    navigate("/login");
   };
 
   return (
-    <div className="min-h-screen flex bg-[var(--color-bg)] font-sans overflow-hidden">
-      {/* Update onClose disini */}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#4facfe] to-[#4481eb] p-6 relative overflow-hidden font-sans">
+
       <InfoModal
         isOpen={showModal}
         onClose={handleCloseModal}
@@ -55,84 +56,79 @@ const ForgotPassword = () => {
         type="success"
       />
 
-      {/* ... SISA KODE TAMPILAN SAMA PERSIS SEPERTI SEBELUMNYA ... */}
-      <div className="hidden lg:flex w-5/12 bg-[var(--color-primary)] relative flex-col justify-between p-12 text-white">
-        {/* ... Branding ... */}
-        <div className="relative z-10">
-          <Link
-            to="/login"
-            className="text-3xl font-extrabold tracking-wide flex items-center gap-2"
-          >
-            Vlow<span className="text-[#BDE8F5]">.ai</span>
-          </Link>
+      {/* Background Shapes */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-[15%] -left-[10%] w-[500px] h-[500px] opacity-10 flex items-center justify-center">
+          <div className="w-[80%] h-[80%] border-[40px] border-white rounded-full"></div>
+          <div className="absolute w-[40%] h-[40%] bg-white rounded-full"></div>
         </div>
-        {/* ... Content Kiri ... */}
-        <div className="relative z-10 mb-20">
-          <h2 className="text-4xl font-bold leading-tight mb-4">
-            Lupa Password? <br /> <span className="text-[#BDE8F5]">Jangan Khawatir.</span>
-          </h2>
-          <p className="text-lg text-white/80 max-w-sm border-l-4 border-[#BDE8F5] pl-4 py-1">
-            Kami akan membantu mengembalikan akses akun Anda dalam beberapa langkah mudah.
-          </p>
+        <div className="absolute -bottom-[20%] right-0 w-[600px] h-[600px] opacity-10 flex items-center justify-center">
+          <div className="w-[70%] h-[70%] border-[30px] border-white rounded-[100px] rotate-45"></div>
         </div>
-        <div className="relative z-10 text-xs text-white/40">
-          © {new Date().getFullYear()} Vlow.ai Technology.
-        </div>
+        <div className="absolute bottom-[5%] -left-[5%] w-[100px] h-[300px] bg-white opacity-10 rounded-full"></div>
       </div>
 
-      <div className="w-full lg:w-7/12 flex items-center justify-center p-6 md:p-12 bg-[var(--color-surface)]">
-        <div className="w-full max-w-md bg-[var(--color-bg)] p-10 rounded-3xl shadow-xl border border-[var(--color-border)] animate-[fadeInUp_0.8s_ease-out]">
-          <Link
-            to="/login"
-            className="inline-flex items-center text-sm text-[var(--color-text-muted)] hover:text-[var(--color-primary)] mb-6 transition-colors"
-          >
-            <FaArrowLeft className="mr-2" /> Kembali ke Login
-          </Link>
+      <div className={`w-full max-w-md bg-white p-8 md:p-10 rounded-2xl shadow-2xl relative z-10 transition-all duration-1000 ease-out transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
 
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-[var(--color-primary)]">Reset Password</h2>
-            <p className="text-[var(--color-text-muted)] mt-2">
-              Masukkan email yang terdaftar untuk menerima link reset.
-            </p>
+        {/* Logo Area */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-extrabold text-[#4481eb] flex items-center justify-center gap-2">
+            <img src="/vlow-icon.png" alt="Vlow Logo" className="h-12 w-auto" />
+            Vlow<span className="text-[#4facfe]">.ai</span>
+          </h1>
+        </div>
+
+        <div className="mb-8 text-center mt-2">
+          <h2 className="text-2xl font-bold text-gray-800">Forgot Password</h2>
+          <p className="text-gray-400 text-sm mt-1">To continue, please enter your email first</p>
+        </div>
+
+        <form onSubmit={onSubmit} className="space-y-4">
+
+          <div className="form-control">
+            <div className="relative flex items-center bg-[#F3F6FB] rounded-xl border border-transparent focus-within:border-[#82b4ff] transition-all px-4 py-1 h-12">
+              <FaEnvelope className="text-gray-400 mr-3 text-sm" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="bg-transparent w-full text-sm text-gray-700 outline-none placeholder-gray-400"
+              />
+            </div>
           </div>
 
-          <form onSubmit={onSubmit} className="space-y-6">
-            <div className="form-control group">
-              <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute z-10 inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[var(--color-text-muted)] group-focus-within:text-[var(--color-primary)] transition-colors">
-                  <FaEnvelope size={18} />
-                </div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
-                  className="input input-bordered w-full pl-12 py-6 bg-[var(--color-surface)] focus:bg-[var(--color-bg)] focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary)]/10 rounded-xl transition-all border-[var(--color-border)] text-[var(--color-text)]"
-                />
-              </div>
-            </div>
+          <button
+            type="submit"
+            className="w-full bg-[#7bacff] hover:bg-[#689fff] text-white font-semibold text-sm h-12 rounded-xl mt-6 transition-colors shadow-none flex items-center justify-center gap-2 active:scale-[0.98]"
+            disabled={isLoading}
+            style={{ marginTop: '24px' }}
+          >
+            {isLoading ? (
+              <><FaCircleNotch className="animate-spin" /> Mengirim...</>
+            ) : (
+              "Submit"
+            )}
+          </button>
+        </form>
 
-            <button
-              type="submit"
-              className="btn w-full bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white border-none shadow-lg normal-case text-lg font-bold py-3 rounded-xl transition-all disabled:opacity-50"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <FaCircleNotch className="animate-spin" /> Mengirim...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  Kirim Link Reset <FaPaperPlane size={14} />
-                </span>
-              )}
-            </button>
-          </form>
+        <div className="mt-8 text-center text-sm text-gray-600">
+          Remembered your password?{" "}
+          <Link
+            to="/login"
+            className="font-semibold text-[#689fff] hover:underline transition-colors"
+          >
+            Sign In
+          </Link>
         </div>
       </div>
+
+      <div className={`mt-10 text-center max-w-xl relative z-10 px-4 transition-all duration-1000 delay-300 ease-out transform ${isVisible ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"}`}>
+        <p className="text-white/90 text-sm leading-relaxed drop-shadow-sm font-medium">
+          Serve your customers 24/7 with AI agents that work on autopilot. Boost sales, improve support, and grow your business faster. All in one powerful AI + Omnichannel CRM platform.
+        </p>
+      </div>
+
     </div>
   );
 };
