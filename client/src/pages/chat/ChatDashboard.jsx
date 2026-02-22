@@ -85,7 +85,8 @@ const ChatDashboard = () => {
         if (!activeChat || !selectedPlatform) return;
         setIsFetchingMessages(true);
         try {
-            const res = await axiosInstance.get(`/chats/${selectedPlatform.id}/${activeChat.id}/messages`, {
+            const safeChatId = typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id;
+            const res = await axiosInstance.get(`/chats/${selectedPlatform.id}/${safeChatId}/messages`, {
                 params: { limit: 50 }
             });
             if (res.data?.success) {
@@ -119,7 +120,8 @@ const ChatDashboard = () => {
 
         setIsSending(true);
         try {
-            const res = await axiosInstance.post(`/chats/${selectedPlatform.id}/${activeChat.id}/messages`, {
+            const safeChatId = typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id;
+            const res = await axiosInstance.post(`/chats/${selectedPlatform.id}/${safeChatId}/messages`, {
                 text: textToSend
             });
             if (res.data?.success) {
