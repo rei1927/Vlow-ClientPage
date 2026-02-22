@@ -81,9 +81,9 @@ const ChatDashboard = () => {
         }
     };
 
-    const fetchMessages = async () => {
+    const fetchMessages = async (showLoading = true) => {
         if (!activeChat || !selectedPlatform) return;
-        setIsFetchingMessages(true);
+        if (showLoading) setIsFetchingMessages(true);
         try {
             const safeChatId = typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id;
             const res = await axiosInstance.get(`/chats/${selectedPlatform.id}/${safeChatId}/messages`, {
@@ -97,7 +97,7 @@ const ChatDashboard = () => {
             console.error("Error fetching messages:", error);
             toast.error(error.response?.data?.message || "Gagal memuat isi pesan");
         } finally {
-            setIsFetchingMessages(false);
+            if (showLoading) setIsFetchingMessages(false);
         }
     };
 
@@ -125,8 +125,8 @@ const ChatDashboard = () => {
                 text: textToSend
             });
             if (res.data?.success) {
-                // Refresh messages after sending
-                fetchMessages();
+                // Refresh messages after sending silently
+                fetchMessages(false);
             }
         } catch (error) {
             console.error("Error sending message:", error);
