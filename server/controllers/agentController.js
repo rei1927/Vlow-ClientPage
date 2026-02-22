@@ -528,8 +528,9 @@ export const testChatAgent = async (req, res, next) => {
     if (!message) return next(new AppError("Pesan tidak boleh kosong.", 400));
     if (!systemInstruction) return next(new AppError("System Instruction harus diisi.", 400));
 
-    const N8N_SIMULATOR_URL = process.env.N8N_SIMULATOR_URL;
-    if (!N8N_SIMULATOR_URL) return next(new AppError("Server AI belum dikonfigurasi.", 500));
+    const user = await User.findByPk(req.user.id);
+    const N8N_SIMULATOR_URL = user?.n8nSimulatorWebhookUrl || process.env.N8N_SIMULATOR_URL;
+    if (!N8N_SIMULATOR_URL) return next(new AppError("Server AI (Simulator) belum dikonfigurasi.", 500));
 
     const uniqueSession = sessionId || `preview-${Date.now()}`;
 

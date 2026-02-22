@@ -23,6 +23,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
     isActive: true,
     subscriptionMonths: "",
     n8nWebhookUrl: "",
+    n8nSimulatorWebhookUrl: "",
   });
 
   useEffect(() => {
@@ -37,6 +38,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
           isActive: initialData.isActive,
           subscriptionMonths: "", // Empty for edit - admin will set extension months
           n8nWebhookUrl: initialData.n8nWebhookUrl || "",
+          n8nSimulatorWebhookUrl: initialData.n8nSimulatorWebhookUrl || "",
         });
       } else {
         setFormData({
@@ -46,6 +48,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
           isActive: true,
           subscriptionMonths: "",
           n8nWebhookUrl: "",
+          n8nSimulatorWebhookUrl: "",
         });
       }
     }
@@ -66,6 +69,16 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
       }
       if (!isValidWebhookUrl(url)) {
         toast.error("URL Webhook n8n harus berupa link URL yang valid (contoh: https://...).");
+        return;
+      }
+
+      const simUrl = (formData.n8nSimulatorWebhookUrl || "").trim();
+      if (!simUrl) {
+        toast.error("URL Webhook Simulator n8n wajib diisi untuk customer baru.");
+        return;
+      }
+      if (!isValidWebhookUrl(simUrl)) {
+        toast.error("URL Webhook Simulator n8n harus berupa link URL yang valid (contoh: https://...).");
         return;
       }
     }
@@ -163,9 +176,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
                     Status Akun
                   </label>
                   <select
-                    className={`select select-bordered w-full rounded-xl font-bold bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] ${
-                      formData.isActive ? "text-green-600" : "text-red-500"
-                    }`}
+                    className={`select select-bordered w-full rounded-xl font-bold bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] ${formData.isActive ? "text-green-600" : "text-red-500"
+                      }`}
                     value={formData.isActive}
                     onChange={(e) =>
                       setFormData({
@@ -241,6 +253,33 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
                 </div>
                 <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
                   *Wajib diisi. Harus berupa link URL (http atau https) untuk webhook n8n.
+                </span>
+              </div>
+            )}
+
+            {/* n8n Simulator Webhook URL - Only for Customer */}
+            {formData.role === "customer" && (
+              <div className="form-control">
+                <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                  URL Webhook Simulator n8n <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                    <FaLink />
+                  </div>
+                  <input
+                    type="url"
+                    className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
+                    placeholder="https://n8n.example.com/webhook-test/simulator-chat"
+                    value={formData.n8nSimulatorWebhookUrl}
+                    onChange={(e) => setFormData({ ...formData, n8nSimulatorWebhookUrl: e.target.value })}
+                    required={!initialData && formData.role === "customer"}
+                    pattern="https?://.+"
+                    title="Masukkan URL yang valid (contoh: https://n8n.example.com/webhook-test/...)"
+                  />
+                </div>
+                <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
+                  *Wajib diisi. Khusus untuk testing di AI Simulator Dashboard Vlow.
                 </span>
               </div>
             )}

@@ -9,7 +9,7 @@ import { getWelcomeTemplate } from "../utils/emailTemplates.js";
 // @route   POST /api/users
 export const createUser = async (req, res, next) => {
   try {
-    const { name, email, role, subscriptionMonths, n8nWebhookUrl } = req.body;
+    const { name, email, role, subscriptionMonths, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -48,6 +48,7 @@ export const createUser = async (req, res, next) => {
       isFirstLogin: true,
       isActive: true,
       n8nWebhookUrl: n8nWebhookUrl || null,
+      n8nSimulatorWebhookUrl: n8nSimulatorWebhookUrl || null,
       subscriptionExpiry: subscriptionExpiry,
     });
 
@@ -83,6 +84,7 @@ export const createUser = async (req, res, next) => {
         isActive: user.isActive,
         subscriptionExpiry: user.subscriptionExpiry,
         n8nWebhookUrl: user.n8nWebhookUrl,
+        n8nSimulatorWebhookUrl: user.n8nSimulatorWebhookUrl,
         createdAt: user.createdAt,
       },
     });
@@ -170,6 +172,7 @@ export const getUserById = async (req, res, next) => {
     const userData = user.toJSON();
     if (userData.role === "customer") {
       delete userData.n8nWebhookUrl;
+      delete userData.n8nSimulatorWebhookUrl;
     }
 
     res.status(200).json({
@@ -185,7 +188,7 @@ export const getUserById = async (req, res, next) => {
 // @route   PUT /api/users/:id
 export const updateUser = async (req, res, next) => {
   try {
-    const { name, role, isActive, subscriptionMonths, n8nWebhookUrl } = req.body;
+    const { name, role, isActive, subscriptionMonths, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
 
     const user = await User.findByPk(req.params.id);
     if (!user) {
@@ -202,6 +205,7 @@ export const updateUser = async (req, res, next) => {
     if (role) user.role = role;
     if (isActive !== undefined) user.isActive = isActive;
     if (n8nWebhookUrl !== undefined) user.n8nWebhookUrl = n8nWebhookUrl || null;
+    if (n8nSimulatorWebhookUrl !== undefined) user.n8nSimulatorWebhookUrl = n8nSimulatorWebhookUrl || null;
 
     // Handle subscription expiry (only for customer)
     if (role === "customer" && subscriptionMonths !== undefined) {
@@ -253,6 +257,7 @@ export const updateUser = async (req, res, next) => {
         isActive: user.isActive,
         subscriptionExpiry: user.subscriptionExpiry,
         n8nWebhookUrl: user.n8nWebhookUrl,
+        n8nSimulatorWebhookUrl: user.n8nSimulatorWebhookUrl,
       },
     });
   } catch (error) {

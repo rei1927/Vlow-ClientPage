@@ -33,6 +33,10 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    n8nSimulatorWebhookUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     subscriptionExpiry: {
       type: DataTypes.DATE,
       allowNull: true,
