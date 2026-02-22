@@ -4,6 +4,7 @@ services:
   # Client (Frontend)
   client:
     build: ./client
+    image: custom_vlow_client:v2
     container_name: vlow_client
     restart: always
     ports:
@@ -14,6 +15,7 @@ services:
   # Server (Backend)
   server:
     build: ./server
+    image: custom_vlow_server:v2
     container_name: vlow_server
     restart: always
     ports:
