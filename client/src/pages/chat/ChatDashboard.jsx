@@ -60,14 +60,28 @@ const ChatDashboard = () => {
         }
     }, [activeChat, selectedPlatform]);
 
+    // Background Long-Polling for "Real-time" feel (every 10 seconds)
+    useEffect(() => {
+        let pollInterval;
+        if (activeChat && selectedPlatform) {
+            pollInterval = setInterval(() => {
+                fetchChats(false); // Update sidebar silently
+                fetchMessages(false); // Update chat window silently
+            }, 10000); // 10 seconds
+        }
+        return () => {
+            if (pollInterval) clearInterval(pollInterval);
+        };
+    }, [activeChat, selectedPlatform]);
+
     // Scroll to bottom when messages update
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    const fetchChats = async () => {
+    const fetchChats = async (showLoading = true) => {
         if (!selectedPlatform) return;
-        setIsFetchingChats(true);
+        if (showLoading) setIsFetchingChats(true);
         try {
             const res = await axiosInstance.get(`/chats/${selectedPlatform.id}`);
             if (res.data?.success) {
@@ -77,7 +91,7 @@ const ChatDashboard = () => {
             console.error("Error fetching chats:", error);
             toast.error(error.response?.data?.message || "Gagal memuat daftar pesan");
         } finally {
-            setIsFetchingChats(false);
+            if (showLoading) setIsFetchingChats(false);
         }
     };
 
