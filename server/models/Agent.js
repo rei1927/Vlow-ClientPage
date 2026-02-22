@@ -21,6 +21,11 @@ const Agent = sequelize.define("Agent", {
     allowNull: true,
     defaultValue: "Kamu adalah asisten virtual yang membantu.",
   },
+  knowledgeBase: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    comment: "Penyimpanan teks / referensi RAG / link file MinIO untuk wawasan AI",
+  },
   // --- WELCOME MESSAGE ---
   welcomeMessage: {
     type: DataTypes.TEXT,
