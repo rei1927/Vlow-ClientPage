@@ -56,12 +56,10 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
       const payload = {
         name: sessionId,
         config: {
-          proxy: null,
           webhooks: webhookUrl ? [
             {
               url: webhookUrl, // <--- INI KUNCINYA (Dikirim ke n8n User)
               events: ["message", "session.status"],
-              hmac: null,
             },
           ] : [],
         },

@@ -62,7 +62,7 @@ export const createPlatform = async (req, res, next) => {
     } else {
       // MODE PRODUCTION (WAHA PLUS): Gunakan nama customer
       const safeName = user.name ? user.name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() : 'customer';
-      finalSessionId = `${safeName}_${req.user.id.split("-")[0]}`;
+      finalSessionId = `${safeName}_${req.user.id.split("-")[0]}_${Date.now()}`;
     }
     // ----------------------------------------------
 
@@ -78,7 +78,13 @@ export const createPlatform = async (req, res, next) => {
 
     // 4. Start Session di WAHA
     // Param ke-2: Webhook URL n8n
-    await wahaService.startWahaSession(finalSessionId, targetWebhookUrl);
+    try {
+      await wahaService.startWahaSession(finalSessionId, targetWebhookUrl);
+    } catch (err) {
+      // Rollback database if WAHA fails to prevent zombie platform rows
+      await newPlatform.destroy();
+      throw err;
+    }
 
     const platformWithAgent = await ConnectedPlatform.findOne({
       where: { id: newPlatform.id },
