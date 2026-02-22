@@ -9,7 +9,7 @@ import { getWelcomeTemplate } from "../utils/emailTemplates.js";
 // @route   POST /api/users
 export const createUser = async (req, res, next) => {
   try {
-    const { name, email, role, subscriptionMonths, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
+    const { name, email, role, subscriptionExpiry, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -21,23 +21,11 @@ export const createUser = async (req, res, next) => {
     const tempPassword = `${randomHex}Vlow!`; // Contoh: a1b2c3d4Vlow!
 
     // Calculate subscription expiry date (only for customer)
-    let subscriptionExpiry = null;
-    if (role === "customer" && subscriptionMonths) {
-      const months = parseInt(subscriptionMonths);
-      // TESTING: Handle opsi 1 hari untuk testing (value = 0)
-      // HAPUS atau KOMENTARI bagian ini setelah testing selesai
-      if (months === 0) {
-        // Set subscription expiry ke 1 hari dari sekarang untuk testing
-        const expiryDate = new Date();
-        expiryDate.setDate(expiryDate.getDate() + 1);
-        expiryDate.setHours(23, 59, 59, 999); // Set ke akhir hari
-        subscriptionExpiry = expiryDate;
-      } else if (months >= 1 && months <= 12) {
-        // END TESTING
-        const expiryDate = new Date();
-        expiryDate.setMonth(expiryDate.getMonth() + months);
-        subscriptionExpiry = expiryDate;
-      }
+    let finalExpiry = null;
+    if (role === "customer" && subscriptionExpiry) {
+      const expiryDate = new Date(subscriptionExpiry);
+      expiryDate.setHours(23, 59, 59, 999); // Set ke akhir hari dari tanggal yang dipilih
+      finalExpiry = expiryDate;
     }
 
     const user = await User.create({
@@ -49,7 +37,7 @@ export const createUser = async (req, res, next) => {
       isActive: true,
       n8nWebhookUrl: n8nWebhookUrl || null,
       n8nSimulatorWebhookUrl: n8nSimulatorWebhookUrl || null,
-      subscriptionExpiry: subscriptionExpiry,
+      subscriptionExpiry: finalExpiry,
     });
 
     // Kirim Email Welcome
@@ -188,7 +176,7 @@ export const getUserById = async (req, res, next) => {
 // @route   PUT /api/users/:id
 export const updateUser = async (req, res, next) => {
   try {
-    const { name, role, isActive, subscriptionMonths, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
+    const { name, role, isActive, subscriptionExpiry, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
 
     const user = await User.findByPk(req.params.id);
     if (!user) {
@@ -208,30 +196,11 @@ export const updateUser = async (req, res, next) => {
     if (n8nSimulatorWebhookUrl !== undefined) user.n8nSimulatorWebhookUrl = n8nSimulatorWebhookUrl || null;
 
     // Handle subscription expiry (only for customer)
-    if (role === "customer" && subscriptionMonths !== undefined) {
-      if (subscriptionMonths && subscriptionMonths !== "") {
-        const months = parseInt(subscriptionMonths);
-        // TESTING: Handle opsi 1 hari untuk testing (value = 0)
-        // HAPUS atau KOMENTARI bagian ini setelah testing selesai
-        if (months === 0) {
-          // Set subscription expiry ke 1 hari dari sekarang (atau dari expiry date yang ada jika masih valid)
-          const baseDate = user.subscriptionExpiry && new Date(user.subscriptionExpiry) > new Date()
-            ? new Date(user.subscriptionExpiry)
-            : new Date();
-          const expiryDate = new Date(baseDate);
-          expiryDate.setDate(expiryDate.getDate() + 1);
-          expiryDate.setHours(23, 59, 59, 999); // Set ke akhir hari
-          user.subscriptionExpiry = expiryDate;
-        } else if (months >= 1 && months <= 12) {
-          // END TESTING
-          // If user already has subscription, extend from current expiry or from now
-          const baseDate = user.subscriptionExpiry && new Date(user.subscriptionExpiry) > new Date()
-            ? new Date(user.subscriptionExpiry)
-            : new Date();
-          const expiryDate = new Date(baseDate);
-          expiryDate.setMonth(expiryDate.getMonth() + months);
-          user.subscriptionExpiry = expiryDate;
-        }
+    if (role === "customer" && subscriptionExpiry !== undefined) {
+      if (subscriptionExpiry && subscriptionExpiry !== "") {
+        const expiryDate = new Date(subscriptionExpiry);
+        expiryDate.setHours(23, 59, 59, 999); // Set ke akhir hari
+        user.subscriptionExpiry = expiryDate;
       } else {
         // Clear subscription if empty
         user.subscriptionExpiry = null;
