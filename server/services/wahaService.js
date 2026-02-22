@@ -145,11 +145,13 @@ export const getChats = async (sessionId) => {
     const response = await axios.get(`${WAHA_URL}/api/chats`, {
       params: { session: sessionId },
       headers: HEADERS,
+      timeout: 15000,
     });
     return response.data;
   } catch (error) {
-    console.error("WAHA Get Chats Error:", error?.response?.data || error.message);
-    throw new AppError("Gagal mengambil daftar pesan dari WhatsApp.", 502);
+    const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
+    console.error("WAHA Get Chats Error:", rawError);
+    throw new AppError(`Gagal mengambil chat: ${rawError}`, 502);
   }
 };
 
@@ -161,11 +163,13 @@ export const getMessages = async (sessionId, chatId, limit = 50) => {
         limit: limit,
       },
       headers: HEADERS,
+      timeout: 15000,
     });
     return response.data;
   } catch (error) {
-    console.error("WAHA Get Messages Error:", error?.response?.data || error.message);
-    throw new AppError("Gagal mengambil riwayat pesan.", 502);
+    const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
+    console.error("WAHA Get Messages Error:", rawError);
+    throw new AppError(`Gagal mengambil pesan: ${rawError}`, 502);
   }
 };
 
@@ -178,10 +182,12 @@ export const sendTextMessage = async (sessionId, chatId, text) => {
     };
     const response = await axios.post(`${WAHA_URL}/api/sendText`, payload, {
       headers: HEADERS,
+      timeout: 15000,
     });
     return response.data;
   } catch (error) {
-    console.error("WAHA Send Message Error:", error?.response?.data || error.message);
-    throw new AppError("Gagal mengirim pesan ke WhatsApp.", 502);
+    const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
+    console.error("WAHA Send Message Error:", rawError);
+    throw new AppError(`Gagal mengirim pesan: ${rawError}`, 502);
   }
 };
