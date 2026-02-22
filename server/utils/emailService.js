@@ -29,7 +29,7 @@ const sendEmail = async (options) => {
     logger.info(`Email sent: ${info.messageId}`);
   } catch (error) {
     logger.error(`Email send error: ${error.message}`);
-    throw new Error("Email could not be sent");
+    throw new Error(`Email could not be sent: ${error.message}`);
   }
 };
 
