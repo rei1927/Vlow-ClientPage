@@ -77,8 +77,9 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
       if (!recoverable) throw error;
     }
   } catch (error) {
-    console.error("WAHA Service Error:", error?.response?.data || error.message);
-    throw new AppError("Gagal menghubungkan ke Server WhatsApp Engine.", 400);
+    const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
+    console.error("WAHA Service Error:", rawError);
+    throw new AppError(`Gagal menghubungkan ke WAHA: ${rawError}`, 400);
   }
 };
 
