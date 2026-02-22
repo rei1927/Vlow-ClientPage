@@ -139,14 +139,36 @@ const ChatDashboard = () => {
 
     const formatTime = (timestamp) => {
         if (!timestamp) return "";
-        const date = new Date(timestamp * 1000);
-        return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        try {
+            let date;
+            if (typeof timestamp === 'string' && timestamp.includes('T')) {
+                date = new Date(timestamp);
+            } else {
+                const numTs = Number(timestamp);
+                date = new Date(numTs > 9999999999 ? numTs : numTs * 1000);
+            }
+            if (isNaN(date.getTime())) return "";
+            return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+            return "";
+        }
     };
 
     const formatDateLabel = (timestamp) => {
         if (!timestamp) return "";
-        const date = new Date(timestamp * 1000);
-        return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        try {
+            let date;
+            if (typeof timestamp === 'string' && timestamp.includes('T')) {
+                date = new Date(timestamp);
+            } else {
+                const numTs = Number(timestamp);
+                date = new Date(numTs > 9999999999 ? numTs : numTs * 1000);
+            }
+            if (isNaN(date.getTime())) return "";
+            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        } catch (e) {
+            return "";
+        }
     };
 
     const wahaChats = chats || [];
@@ -228,7 +250,7 @@ const ChatDashboard = () => {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-baseline mb-1">
-                                        <h3 className="font-bold text-[var(--color-text)] text-sm truncate">{chat.name || chat.id.split('@')[0]}</h3>
+                                        <h3 className="font-bold text-[var(--color-text)] text-sm truncate">{chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0]}</h3>
                                         <span className="text-xs text-[var(--color-text-muted)]">{formatTime(chat.timestamp)}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
@@ -258,9 +280,9 @@ const ChatDashboard = () => {
                             <div className="flex items-center gap-3">
                                 <FaUserCircle className="text-4xl text-gray-400" />
                                 <div>
-                                    <h2 className="font-bold text-[var(--color-text)]">{activeChat.name || activeChat.id.split('@')[0]}</h2>
+                                    <h2 className="font-bold text-[var(--color-text)]">{activeChat.name || String(typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id).split('@')[0]}</h2>
                                     <p className="text-xs text-[var(--color-text-muted)] max-w-xs truncate">
-                                        {activeChat.id}
+                                        {String(typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id)}
                                     </p>
                                 </div>
                             </div>
