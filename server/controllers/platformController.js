@@ -308,8 +308,9 @@ export const deletePlatform = async (req, res, next) => {
     if (!platform) return next(new AppError("Platform not found", 404));
 
     if (platform.provider === "waha") {
-      // Stop di WAHA
+      // Stop & Delete di WAHA
       await wahaService.stopWahaSession(platform.sessionId);
+      await wahaService.deleteWahaSession(platform.sessionId);
     }
     // Hapus di DB
     await platform.destroy();

@@ -143,6 +143,14 @@ export const stopWahaSession = async (sessionId) => {
   }
 };
 
+export const deleteWahaSession = async (sessionId) => {
+  try {
+    await axios.delete(`${WAHA_URL}/api/sessions/${sessionId}`, { headers: HEADERS });
+  } catch (error) {
+    console.error("WAHA Delete Session Error:", error.message);
+  }
+};
+
 // --- WAHA CHAT AND MESSAGING ---
 
 export const getChats = async (sessionId) => {
