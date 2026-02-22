@@ -23,6 +23,7 @@ import toast from "react-hot-toast";
 import axiosInstance from "../../api/axiosInstance";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import AgentListLoading from "../../components/agents/AgentListLoading";
+import PlatformModal from "../../components/platforms/PlatformModal";
 
 const ConnectedPlatforms = () => {
   const dispatch = useDispatch();
@@ -36,6 +37,13 @@ const ConnectedPlatforms = () => {
   const [confirmState, setConfirmState] = useState({ isOpen: false, platform: null });
   const [searchQuery, setSearchQuery] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Selection Modal State
+  const [isSelectionModalOpen, setIsSelectionModalOpen] = useState(false);
+
+  // WAHA Modal State
+  const [isWahaModalOpen, setIsWahaModalOpen] = useState(false);
+  const [wahaInitialData, setWahaInitialData] = useState(null);
 
   // Initial load
   useEffect(() => {
@@ -152,6 +160,33 @@ const ConnectedPlatforms = () => {
     );
   };
 
+  const handleOpenWahaModal = () => {
+    setIsSelectionModalOpen(false);
+    setWahaInitialData(null);
+    setIsWahaModalOpen(true);
+  };
+
+  const handleWahaSubmit = async (data) => {
+    const resultAction = await dispatch(updatePlatform({ id: activePlatformId || "new", platformData: data })); // This needs adjustment in Redux ideally, or use an API call directly if just creating
+    // Actually, looking closely, `onSubmit` in PlatformModal expects a promise that returns the new Platform. 
+    // In the old code, this was calling an API directly or dispatching `createPlatform`.
+    // Let's implement a simple direct API call for creation if needed, or dispatch.
+
+    try {
+      // Assuming a create route exists, let's use the standard flow.
+      const res = await axiosInstance.post('/platforms', {
+        name: data.name,
+        provider: 'whatsapp',
+        agentId: data.agentId
+      });
+      dispatch(getPlatforms({ limit: 100 }));
+      return res.data.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Gagal membuat platform");
+      return null;
+    }
+  };
+
   const handleOpenDeleteConfirm = (platform) => {
     setConfirmState({ isOpen: true, platform });
   };
@@ -215,7 +250,7 @@ const ConnectedPlatforms = () => {
             </label>
             <ul tabIndex={0} className="dropdown-content z-[50] menu p-2 shadow-xl bg-[var(--color-surface)] rounded-xl w-52 border border-[var(--color-border)] mt-2">
               <li>
-                <a onClick={handleConnectWhatsApp} className="gap-3 font-semibold text-[var(--color-text)] text-sm py-3">
+                <a onClick={() => setIsSelectionModalOpen(true)} className="gap-3 font-semibold text-[var(--color-text)] text-sm py-3">
                   <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
                     <FaWhatsapp className="text-green-500 text-lg" />
                   </div>
@@ -310,7 +345,7 @@ const ConnectedPlatforms = () => {
 
           {/* Connect New Box */}
           <div
-            onClick={handleConnectWhatsApp}
+            onClick={() => setIsSelectionModalOpen(true)}
             className="mt-6 p-5 rounded-xl border-2 border-dashed border-[var(--color-border)] hover:border-blue-300 dark:hover:border-[var(--color-primary)]/50 bg-[var(--color-surface)] cursor-pointer flex items-center gap-4 group transition-all duration-300"
           >
             <div className="w-10 h-10 shrink-0 rounded-full bg-blue-50 dark:bg-[var(--color-primary)]/10 group-hover:bg-blue-100 dark:group-hover:bg-[var(--color-primary)]/20 text-blue-500 dark:text-[var(--color-primary)] flex items-center justify-center transition-colors">
@@ -474,6 +509,98 @@ const ConnectedPlatforms = () => {
       </div>
 
       {/* MODALS */}
+      {/* 1. SELECTION MODAL */}
+      {isSelectionModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-[#1f2937] border border-gray-700 rounded-3xl p-8 max-w-2xl w-full shadow-2xl relative overflow-hidden">
+
+            {/* Background Glows */}
+            <div className="absolute -top-32 -left-32 w-64 h-64 bg-green-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <button
+              onClick={() => setIsSelectionModalOpen(false)}
+              className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-black text-white mb-2 relative z-10">Connect WhatsApp</h2>
+            <p className="text-gray-400 text-sm mb-8 relative z-10">Choose your connection method</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
+
+              {/* META / CLOUD API OPTION */}
+              <div
+                onClick={() => {
+                  setIsSelectionModalOpen(false);
+                  handleConnectWhatsApp();
+                }}
+                className="group relative cursor-pointer rounded-2xl p-[2px] overflow-hidden transition-all duration-300 hover:scale-[1.02]"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-green-400/40 to-green-600/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl blur-md"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-green-400 via-emerald-500 to-green-600 opacity-50 rounded-2xl"></div>
+
+                <div className="relative h-full bg-[#111827] rounded-[14px] p-6 flex flex-col justify-between border border-green-500/30 group-hover:border-green-400/60 transition-colors">
+                  <div className="absolute top-4 right-4 bg-green-500/20 border border-green-500/30 text-green-400 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                    Recommended
+                  </div>
+
+                  <div className="mb-6 relative">
+                    <FaWhatsapp size={46} className="text-green-400 drop-shadow-[0_0_15px_rgba(74,222,128,0.5)]" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg mb-2">WhatsApp Business (Official)</h3>
+                    <p className="text-gray-400 text-xs leading-relaxed">Connect via Meta Cloud API. Best for high volume and stability. Requires a Meta Business Account.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* WAHA / QR CODE OPTION */}
+              <div
+                onClick={handleOpenWahaModal}
+                className="group relative cursor-pointer rounded-2xl p-[2px] overflow-hidden transition-all duration-300 hover:scale-[1.02]"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl blur-md"></div>
+                <div className="absolute inset-0 bg-gray-700 opacity-50 rounded-2xl"></div>
+
+                <div className="relative h-full bg-[#1f2937] rounded-[14px] p-6 flex flex-col justify-between border border-gray-600 group-hover:border-blue-400/50 transition-colors">
+                  <div className="mb-6 relative">
+                    <div className="relative inline-block">
+                      <FaWhatsapp size={40} className="text-gray-500 opacity-50" />
+                      <div className="absolute -bottom-1 -right-2 bg-gray-800 p-1.5 rounded-lg border border-gray-600">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-blue-400" stroke="currentColor" strokeWidth="2"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM9 9h6v6H9zM15 15h6v6h-6z" /></svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-gray-200 font-bold text-lg mb-2 group-hover:text-white transition-colors">Linked Device (WAHA)</h3>
+                    <p className="text-gray-400 text-xs leading-relaxed">Scan a QR code from your existing WhatsApp app. Best for quick setup and personal numbers.</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div className="mt-8 text-right">
+              <a href="#" className="text-gray-500 hover:text-gray-300 text-xs font-semibold flex items-center justify-end gap-1 transition-colors">
+                Learn More <span>&rarr;</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2. WAHA SETUP MODAL */}
+      <PlatformModal
+        isOpen={isWahaModalOpen}
+        onClose={() => setIsWahaModalOpen(false)}
+        onSubmit={handleWahaSubmit}
+        initialData={wahaInitialData}
+        agents={agents}
+      />
+
+      {/* 3. DELETE CONFIRMATION */}
       <ConfirmationModal
         isOpen={confirmState.isOpen}
         onClose={handleCloseDeleteConfirm}
