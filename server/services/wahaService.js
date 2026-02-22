@@ -92,26 +92,24 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
 
 export const getWahaScreenshot = async (sessionId) => {
   try {
-    const response = await axios.get(`${WAHA_URL}/api/screenshot`, {
-      params: {
-        session: sessionId,
-        // Selector ini penting! Jika elemen ini belum ada, WAHA akan throw error/404
-        // sehingga masuk ke catch block, dan kita return null (loading).
-        selector: 'canvas[aria-label="Scan me!"]',
+    const response = await axios.get(`${WAHA_URL}/api/${sessionId}/auth/qr`, {
+      responseType: "arraybuffer", // Kita minta response berupa data binary (gambar riil)
+      headers: {
+        ...HEADERS,
+        "Accept": "image/png"
       },
-      responseType: "arraybuffer",
-      headers: HEADERS,
+      timeout: 10000,
     });
 
+    // Jika response berhasil, ubah data binary menjadi base64 string
     const base64Image = Buffer.from(response.data, "binary").toString("base64");
 
-    // Validasi tambahan: Jika string terlalu pendek, anggap gagal (bukan gambar valid)
     if (base64Image.length < 100) return null;
 
     return `data:image/png;base64,${base64Image}`;
   } catch (error) {
-    // Jangan log error heboh, cukup tahu bahwa WAHA sedang booting
-    // console.log("WAHA QR not ready yet...");
+    // 404 artinya QR code belum siap (session masih booting/STARTING)
+    // 400 artinya QR code sudah di-scan (session WORKING)
     return null;
   }
 };
