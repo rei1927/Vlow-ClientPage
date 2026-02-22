@@ -89,7 +89,8 @@ const ChatDashboard = () => {
                 params: { limit: 50 }
             });
             if (res.data?.success) {
-                setMessages(res.data.data.reverse()); // Asumsi WAHA return newest first, kita butuh oldest first untuk UI chat
+                const fetchedMsgs = Array.isArray(res.data.data) ? res.data.data : (Array.isArray(res.data.data?.docs) ? res.data.data.docs : []);
+                setMessages([...fetchedMsgs].reverse()); // Asumsi WAHA return newest first, kita butuh oldest first untuk UI chat
             }
         } catch (error) {
             console.error("Error fetching messages:", error);
@@ -284,12 +285,24 @@ const ChatDashboard = () => {
                                     Kirim pesan untuk memulai percakapan
                                 </div>
                             ) : (
-                                messages.map((msg, idx) => {
+                                (Array.isArray(messages) ? messages : []).map((msg, idx) => {
+                                    if (!msg) return null;
                                     const isMe = msg.fromMe;
-                                    const showDate = idx === 0 || formatDateLabel(msg.timestamp) !== formatDateLabel(messages[idx - 1].timestamp);
+                                    const prevTimestamp = idx > 0 ? messages[idx - 1]?.timestamp : null;
+                                    const showDate = idx === 0 || formatDateLabel(msg.timestamp) !== formatDateLabel(prevTimestamp);
+
+                                    // AMAN: hindari error "Objects are not valid as React child" 
+                                    const msgId = typeof msg.id === 'object' ? (msg.id?._serialized || msg.id?.id || `msg-${idx}`) : (msg.id || `msg-${idx}`);
+
+                                    let safeBody = msg.body;
+                                    if (typeof safeBody === 'object' && safeBody !== null) {
+                                        safeBody = "(Pesan Format Interaktif/Sticker/Lokasi)";
+                                    } else if (safeBody !== null && safeBody !== undefined && typeof safeBody !== 'string') {
+                                        safeBody = String(safeBody);
+                                    }
 
                                     return (
-                                        <React.Fragment key={msg.id || idx}>
+                                        <React.Fragment key={msgId}>
                                             {showDate && (
                                                 <div className="flex justify-center mb-6 relative z-10">
                                                     <span className="bg-[var(--color-surface)] border border-[var(--color-border)] text-[var(--color-text-muted)] text-xs py-1 px-3 rounded-lg shadow-sm">
@@ -301,7 +314,7 @@ const ChatDashboard = () => {
                                             <div className={`flex relative z-10 ${isMe ? 'justify-end' : 'justify-start'}`}>
                                                 <div className={`max-w-[85%] md:max-w-[75%] rounded-lg p-3 shadow-sm relative ${isMe ? 'bg-[#d9fdd3] dark:bg-[#005c4b] text-[#111b21] dark:text-[#e9edef] rounded-tr-none' : 'bg-white dark:bg-[#202c33] text-[#111b21] dark:text-[#e9edef] rounded-tl-none'}`}>
 
-                                                    <p className="text-sm whitespace-pre-wrap">{msg.body || (msg.hasMedia && "(Ada Media)")}</p>
+                                                    <p className="text-sm whitespace-pre-wrap">{safeBody || (msg.hasMedia && "(Pilih Media)") || ""}</p>
 
                                                     <div className="flex justify-end items-center gap-1 mt-1">
                                                         <span className="text-[10px] opacity-70">{formatTime(msg.timestamp)}</span>
