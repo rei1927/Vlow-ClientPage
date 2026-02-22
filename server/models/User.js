@@ -37,6 +37,12 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    maxPlatforms: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+      comment: "Batas maksimal sesi Connected Platform (WAHA) yang bisa dibuat pelanggan",
+    },
     subscriptionExpiry: {
       type: DataTypes.DATE,
       allowNull: true,

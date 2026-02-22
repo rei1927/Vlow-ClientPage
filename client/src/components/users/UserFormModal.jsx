@@ -22,6 +22,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
     role: "customer",
     isActive: true,
     subscriptionExpiry: "",
+    maxPlatforms: 1,
     n8nWebhookUrl: "",
     n8nSimulatorWebhookUrl: "",
   });
@@ -37,6 +38,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
           role: initialData.role,
           isActive: initialData.isActive,
           subscriptionExpiry: initialData.subscriptionExpiry ? new Date(initialData.subscriptionExpiry).toISOString().split('T')[0] : "", // Load existing date
+          maxPlatforms: initialData.maxPlatforms || 1,
           n8nWebhookUrl: initialData.n8nWebhookUrl || "",
           n8nSimulatorWebhookUrl: initialData.n8nSimulatorWebhookUrl || "",
         });
@@ -47,6 +49,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
           role: "customer",
           isActive: true,
           subscriptionExpiry: "",
+          maxPlatforms: 1,
           n8nWebhookUrl: "",
           n8nSimulatorWebhookUrl: "",
         });
@@ -215,6 +218,33 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
                 </div>
                 <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
                   *Tentukan tanggal batas akhir langganan (Otomatis ditutup pada 23:59)
+                </span>
+              </div>
+            )}
+
+            {/* Max Platforms Limit - Only for Customer */}
+            {formData.role === "customer" && (
+              <div className="form-control">
+                <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                  Batas Maksimal Sesi WhatsApp
+                </label>
+                <div className="relative">
+                  <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                    <span className="font-bold">#</span>
+                  </div>
+                  <input
+                    type="number"
+                    min="1"
+                    className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
+                    value={formData.maxPlatforms}
+                    onChange={(e) =>
+                      setFormData({ ...formData, maxPlatforms: parseInt(e.target.value) || 1 })
+                    }
+                    require={formData.role === "customer"}
+                  />
+                </div>
+                <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
+                  *Berapa banyak nomor WA yang boleh dihubungkan oleh pengguna ini? (Default: 1)
                 </span>
               </div>
             )}

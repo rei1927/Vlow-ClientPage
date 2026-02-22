@@ -37,6 +37,20 @@ export const createPlatform = async (req, res, next) => {
       return next(new AppError("Admin belum setup Workflow URL untuk user ini.", 403));
     }
 
+    // 3. Cek Batas Maksimal Platform (WAHA)
+    const existingPlatformCount = await ConnectedPlatform.count({
+      where: { userId: req.user.id },
+    });
+
+    if (existingPlatformCount >= user.maxPlatforms) {
+      return next(
+        new AppError(
+          `Batas kuota perangkat terpenuhi. Anda maksimal hanya dapat menghubungkan ${user.maxPlatforms} nomor WhatsApp.`,
+          403
+        )
+      );
+    }
+
     // --- WAHA SESSION ID LOGIC ---
     let finalSessionId;
     const isWahaCore = process.env.WAHA_EDITION === "CORE";

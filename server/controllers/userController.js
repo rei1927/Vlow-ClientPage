@@ -9,7 +9,7 @@ import { getWelcomeTemplate } from "../utils/emailTemplates.js";
 // @route   POST /api/users
 export const createUser = async (req, res, next) => {
   try {
-    const { name, email, role, subscriptionExpiry, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
+    const { name, email, role, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -35,6 +35,7 @@ export const createUser = async (req, res, next) => {
       role: role || "customer",
       isFirstLogin: true,
       isActive: true,
+      maxPlatforms: parseInt(maxPlatforms) || 1,
       n8nWebhookUrl: n8nWebhookUrl || null,
       n8nSimulatorWebhookUrl: n8nSimulatorWebhookUrl || null,
       subscriptionExpiry: finalExpiry,
@@ -70,6 +71,7 @@ export const createUser = async (req, res, next) => {
         role: user.role,
         isFirstLogin: user.isFirstLogin,
         isActive: user.isActive,
+        maxPlatforms: user.maxPlatforms,
         subscriptionExpiry: user.subscriptionExpiry,
         n8nWebhookUrl: user.n8nWebhookUrl,
         n8nSimulatorWebhookUrl: user.n8nSimulatorWebhookUrl,
@@ -176,7 +178,7 @@ export const getUserById = async (req, res, next) => {
 // @route   PUT /api/users/:id
 export const updateUser = async (req, res, next) => {
   try {
-    const { name, role, isActive, subscriptionExpiry, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
+    const { name, role, isActive, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
 
     const user = await User.findByPk(req.params.id);
     if (!user) {
@@ -192,6 +194,7 @@ export const updateUser = async (req, res, next) => {
     if (name) user.name = name;
     if (role) user.role = role;
     if (isActive !== undefined) user.isActive = isActive;
+    if (maxPlatforms !== undefined) user.maxPlatforms = parseInt(maxPlatforms) || 1;
     if (n8nWebhookUrl !== undefined) user.n8nWebhookUrl = n8nWebhookUrl || null;
     if (n8nSimulatorWebhookUrl !== undefined) user.n8nSimulatorWebhookUrl = n8nSimulatorWebhookUrl || null;
 
@@ -224,6 +227,7 @@ export const updateUser = async (req, res, next) => {
         email: user.email,
         role: user.role,
         isActive: user.isActive,
+        maxPlatforms: user.maxPlatforms,
         subscriptionExpiry: user.subscriptionExpiry,
         n8nWebhookUrl: user.n8nWebhookUrl,
         n8nSimulatorWebhookUrl: user.n8nSimulatorWebhookUrl,
