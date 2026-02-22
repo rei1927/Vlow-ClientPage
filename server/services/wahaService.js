@@ -142,7 +142,7 @@ export const stopWahaSession = async (sessionId) => {
 
 export const getChats = async (sessionId) => {
   try {
-    const response = await axios.get(`${WAHA_URL}/api/chats`, {
+    const response = await axios.get(`${WAHA_URL}/api/session/chats`, {
       params: { session: sessionId },
       headers: HEADERS,
       timeout: 15000,
@@ -157,7 +157,7 @@ export const getChats = async (sessionId) => {
 
 export const getMessages = async (sessionId, chatId, limit = 50) => {
   try {
-    const response = await axios.get(`${WAHA_URL}/api/chats/${chatId}/messages`, {
+    const response = await axios.get(`${WAHA_URL}/api/session/chats/${chatId}/messages`, {
       params: {
         session: sessionId,
         limit: limit,
