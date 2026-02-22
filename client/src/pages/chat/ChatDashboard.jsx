@@ -94,7 +94,7 @@ const ChatDashboard = () => {
             }
         } catch (error) {
             console.error("Error fetching messages:", error);
-            toast.error("Gagal memuat isi pesan");
+            toast.error(error.response?.data?.message || "Gagal memuat isi pesan");
         } finally {
             setIsFetchingMessages(false);
         }
@@ -128,7 +128,7 @@ const ChatDashboard = () => {
             }
         } catch (error) {
             console.error("Error sending message:", error);
-            toast.error("Gagal mengirim pesan");
+            toast.error(error.response?.data?.message || "Gagal mengirim pesan");
             // Remove optimistic message on fail
             setMessages(prev => prev.filter(m => m.id !== tempMsg.id));
             setInputText(textToSend); // restore input
