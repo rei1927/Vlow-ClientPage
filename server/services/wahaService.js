@@ -59,7 +59,14 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
           webhooks: webhookUrl ? [
             {
               url: webhookUrl, // <--- INI KUNCINYA (Dikirim ke n8n User)
-              events: ["message", "session.status"],
+              events: [
+                "message",
+                "message.any",
+                "session.status",
+                "label.deleted",
+                "label.chat.added",
+                "label.chat.deleted"
+              ],
             },
           ] : [],
         },
