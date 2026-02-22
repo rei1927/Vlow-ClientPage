@@ -31,7 +31,8 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
       >
         <div>
           <div className="h-20 flex items-center justify-between px-6 border-b border-white/10 bg-black/10">
-            <h1 className="text-2xl font-extrabold tracking-tight">
+            <h1 className="text-2xl font-extrabold tracking-tight flex items-center gap-2">
+              <img src="/vlow-icon.png" alt="Logo" className="h-8 w-auto" />
               Vlow<span className="text-[var(--sidebar-accent)]">.ai</span>
             </h1>
             {/* Tombol Close di Mobile */}

@@ -77,8 +77,8 @@ const Login = () => {
 
         {/* Logo Area */}
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-extrabold text-[#4481eb] flex items-center justify-center gap-1">
-            <span className="bg-[#4481eb] text-white px-2 py-0.5 rounded-full text-xl mr-1">V</span>
+          <h1 className="text-3xl font-extrabold text-[#4481eb] flex items-center justify-center gap-2">
+            <img src="/vlow-icon.png" alt="Vlow Logo" className="h-12 w-auto" />
             Vlow<span className="text-[#4facfe]">.ai</span>
           </h1>
         </div>
