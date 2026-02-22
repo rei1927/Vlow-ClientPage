@@ -31,6 +31,7 @@ const ConnectedPlatforms = () => {
     (state) => state.platforms,
   );
   const { agents } = useSelector((state) => state.agents);
+  const { user } = useSelector((state) => state.auth);
 
   const [activePlatformId, setActivePlatformId] = useState(null);
   const [selectedAgentId, setSelectedAgentId] = useState("");
@@ -160,31 +161,43 @@ const ConnectedPlatforms = () => {
     );
   };
 
-  const handleOpenWahaModal = () => {
+  const handleSelectWaha = async () => {
     setIsSelectionModalOpen(false);
-    setWahaInitialData(null);
-    setIsWahaModalOpen(true);
+
+    // Auto-create session in the background
+    const toastId = toast.loading("Memulai sesi WhatsApp baru...");
+    try {
+      const res = await axiosInstance.post('/platforms', {
+        name: `${user?.name || 'Customer'} - Device`,
+        provider: 'whatsapp',
+        agentId: null
+      });
+
+      toast.dismiss(toastId);
+      toast.success("Sesi berhasil dibuat, menyiapkan QR Code...");
+
+      // Update Redux state so the left pane shows it
+      dispatch(getPlatforms({ limit: 100 }));
+
+      const newPlatform = res.data.data;
+
+      // Open the PlatformModal directly to Step 2 (QR Code phase)
+      setWahaInitialData({ ...newPlatform, status: "SCANNING" });
+      setIsWahaModalOpen(true);
+
+      // After creating successfully, make it the active platform viewed
+      setActivePlatformId(newPlatform.id);
+
+    } catch (err) {
+      toast.dismiss(toastId);
+      toast.error(err.response?.data?.message || "Gagal memulai sesi WAHA");
+    }
   };
 
   const handleWahaSubmit = async (data) => {
-    const resultAction = await dispatch(updatePlatform({ id: activePlatformId || "new", platformData: data })); // This needs adjustment in Redux ideally, or use an API call directly if just creating
-    // Actually, looking closely, `onSubmit` in PlatformModal expects a promise that returns the new Platform. 
-    // In the old code, this was calling an API directly or dispatching `createPlatform`.
-    // Let's implement a simple direct API call for creation if needed, or dispatch.
-
-    try {
-      // Assuming a create route exists, let's use the standard flow.
-      const res = await axiosInstance.post('/platforms', {
-        name: data.name,
-        provider: 'whatsapp',
-        agentId: data.agentId
-      });
-      dispatch(getPlatforms({ limit: 100 }));
-      return res.data.data;
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Gagal membuat platform");
-      return null;
-    }
+    // This handles any manual update from PlatformModal
+    const resultAction = await dispatch(updatePlatform({ id: activePlatformId, platformData: data }));
+    return null;
   };
 
   const handleOpenDeleteConfirm = (platform) => {
@@ -558,7 +571,7 @@ const ConnectedPlatforms = () => {
 
               {/* WAHA / QR CODE OPTION */}
               <div
-                onClick={handleOpenWahaModal}
+                onClick={handleSelectWaha}
                 className="group relative cursor-pointer rounded-2xl p-[2px] overflow-hidden transition-all duration-300 hover:scale-[1.02]"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl blur-md"></div>

@@ -37,7 +37,7 @@ export const createPlatform = async (req, res, next) => {
       return next(new AppError("Admin belum setup Workflow URL untuk user ini.", 403));
     }
 
-    // --- LOGIKA BARU UNTUK WAHA CORE (TESTING) ---
+    // --- WAHA SESSION ID LOGIC ---
     let finalSessionId;
     const isWahaCore = process.env.WAHA_EDITION === "CORE";
 
@@ -60,8 +60,9 @@ export const createPlatform = async (req, res, next) => {
         console.log("Old 'default' session platform deleted for testing.");
       }
     } else {
-      // MODE PRODUCTION (WAHA PLUS): Generate unik
-      finalSessionId = `u${req.user.id.split("-")[0]}_${Date.now()}`;
+      // MODE PRODUCTION (WAHA PLUS): Gunakan nama customer
+      const safeName = user.name ? user.name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase() : 'customer';
+      finalSessionId = `${safeName}_${req.user.id.split("-")[0]}`;
     }
     // ----------------------------------------------
 
