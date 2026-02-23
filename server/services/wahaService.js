@@ -61,7 +61,6 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
               url: webhookUrl, // <--- INI KUNCINYA (Dikirim ke n8n User)
               events: [
                 "message.any",
-                "label.upsert",
                 "label.deleted",
                 "label.chat.added",
                 "label.chat.deleted"
@@ -174,7 +173,7 @@ export const getLabels = async (sessionId) => {
     return response.data;
   } catch (error) {
     console.error("WAHA Get Labels Error:", error.message);
-    return [];
+    return null; // return null to indicate failure (meaning not a WA business or unsupported)
   }
 };
 

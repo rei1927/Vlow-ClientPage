@@ -31,11 +31,19 @@ export const getChatMeta = async (req, res, next) => {
         const platform = await getValidPlatform(platformId, req.user.id);
 
         const me = await wahaService.getMe(platform.sessionId);
-        const isBusiness = me?.isBusiness || false;
+        let isBusiness = me?.isBusiness || false;
 
         let labels = [];
-        if (isBusiness) {
-            labels = await wahaService.getLabels(platform.sessionId);
+
+        // Kita paksa ambil labels. Jika WAHA mengembalikan array atau object bersarang,
+        // itu berarti nomor ini mensupport / memiliki akses ke API labels (Business/Plus).
+        const labelsData = await wahaService.getLabels(platform.sessionId);
+
+        const actualLabels = Array.isArray(labelsData) ? labelsData : (labelsData && Array.isArray(labelsData.docs) ? labelsData.docs : null);
+
+        if (actualLabels) {
+            labels = actualLabels;
+            isBusiness = true; // Forcing it to true since labels API is working
         }
 
         res.status(200).json({
