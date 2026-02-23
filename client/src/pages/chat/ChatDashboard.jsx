@@ -34,6 +34,8 @@ const ChatDashboard = () => {
     const [labels, setLabels] = useState([]);
     const [selectedLabel, setSelectedLabel] = useState("ALL");
     const [searchKeyword, setSearchKeyword] = useState("");
+    const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
+    const [isUpdatingLabel, setIsUpdatingLabel] = useState(false);
 
     const messagesEndRef = useRef(null);
 
@@ -174,6 +176,46 @@ const ChatDashboard = () => {
             setInputText(textToSend); // restore input
         } finally {
             setIsSending(false);
+        }
+    };
+
+    const handleToggleLabel = async (labelId, action) => {
+        if (!activeChat || !selectedPlatform) return;
+        setIsUpdatingLabel(true);
+        try {
+            const safeChatId = typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id;
+            const res = await axiosInstance.post(`/chats/${selectedPlatform.id}/${safeChatId}/labels`, {
+                labelId: labelId,
+                action: action // "add" or "remove"
+            });
+            if (res.data?.success) {
+                toast.success(res.data.message);
+                // Optimistic UI update on the activeChat & chats array
+                const updatedChats = chats.map(c => {
+                    const cId = typeof c.id === 'object' ? (c.id._serialized || c.id.id) : c.id;
+                    if (cId === safeChatId) {
+                        let currentLabels = Array.isArray(c.labels) ? [...c.labels] : [];
+                        if (action === "add") {
+                            const lbl = labels.find(l => l.id === labelId);
+                            if (lbl && !currentLabels.some(l => l.id === labelId)) currentLabels.push(lbl);
+                        } else {
+                            currentLabels = currentLabels.filter(l => l.id !== labelId);
+                        }
+                        return { ...c, labels: currentLabels };
+                    }
+                    return c;
+                });
+                setChats(updatedChats);
+                setActiveChat(updatedChats.find(c => {
+                    const cId = typeof c.id === 'object' ? (c.id._serialized || c.id.id) : c.id;
+                    return cId === safeChatId;
+                }));
+            }
+        } catch (error) {
+            console.error("Error updating label:", error);
+            toast.error(error.response?.data?.message || "Gagal memperbarui label");
+        } finally {
+            setIsUpdatingLabel(false);
         }
     };
 
@@ -397,20 +439,80 @@ const ChatDashboard = () => {
                 {activeChat ? (
                     <>
                         {/* Chat Header */}
-                        <div className="p-4 bg-[var(--color-surface)] border-b border-[var(--color-border)] flex items-center justify-between z-10 shadow-sm">
-                            <div className="flex items-center gap-3">
-                                <FaUserCircle className="text-4xl text-gray-400" />
-                                <div>
-                                    <h2 className="font-bold text-[var(--color-text)]">{activeChat.name || String(typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id).split('@')[0]}</h2>
+                        <div className="p-4 bg-[var(--color-surface)] border-b border-[var(--color-border)] flex items-center justify-between z-10 shadow-sm relative">
+                            <div className="flex items-center gap-3 w-3/4">
+                                <FaUserCircle className="text-4xl text-gray-400 flex-shrink-0" />
+                                <div className="min-w-0">
+                                    <h2 className="font-bold text-[var(--color-text)] truncate">{activeChat.name || String(typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id).split('@')[0]}</h2>
                                     <p className="text-xs text-[var(--color-text-muted)] max-w-xs truncate">
                                         {String(typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id)}
                                     </p>
+
+                                    {/* Small Label Badges under Header Name */}
+                                    {isBusiness && Array.isArray(activeChat.labels) && activeChat.labels.length > 0 && (
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            {activeChat.labels.map((lbl, i) => (
+                                                <span
+                                                    key={i}
+                                                    className="px-1.5 py-0.5 rounded text-[9px] font-medium border whitespace-nowrap"
+                                                    style={{
+                                                        backgroundColor: lbl.color ? `${lbl.color}20` : 'var(--color-bg)',
+                                                        color: lbl.color || 'var(--color-text-muted)',
+                                                        borderColor: lbl.color ? `${lbl.color}50` : 'var(--color-border)'
+                                                    }}
+                                                >
+                                                    {lbl.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            <div className="flex gap-4 text-[var(--color-text-muted)]">
+                            <div className="flex gap-4 text-[var(--color-text-muted)] flex-shrink-0">
                                 <button onClick={fetchMessages} disabled={isFetchingMessages} className="hover:text-[var(--color-primary)] transition-colors"><FaSync className={isFetchingMessages ? "animate-spin" : ""} /></button>
                                 <button className="hover:text-[var(--color-text)]"><FaSearch /></button>
-                                <button className="hover:text-[var(--color-text)]"><FaEllipsisV /></button>
+                                <div className="relative">
+                                    <button onClick={() => setIsLabelModalOpen(!isLabelModalOpen)} className="hover:text-[var(--color-text)]"><FaEllipsisV /></button>
+
+                                    {/* Ellipsis/Menu for Active Chat */}
+                                    {isLabelModalOpen && (
+                                        <div className="absolute right-0 mt-2 w-64 bg-[var(--color-surface)] rounded-xl shadow-lg border border-[var(--color-border)] z-50 p-3">
+                                            {isBusiness ? (
+                                                <>
+                                                    <div className="text-xs font-semibold text-[var(--color-text-muted)] mb-3 pb-2 border-b border-[var(--color-border)] uppercase tracking-wider">
+                                                        Kelola Label Chat
+                                                    </div>
+                                                    {labels.length === 0 ? (
+                                                        <div className="text-xs text-center p-2 text-[var(--color-text-muted)]">Belum ada label di WhatsApp Anda</div>
+                                                    ) : (
+                                                        <div className="max-h-56 overflow-y-auto space-y-2">
+                                                            {labels.map(lbl => {
+                                                                const hasLabel = Array.isArray(activeChat.labels) && activeChat.labels.some(l => l.id === lbl.id);
+                                                                return (
+                                                                    <div key={lbl.id} className="flex items-center justify-between gap-2 p-1 hover:bg-[var(--color-bg)] rounded">
+                                                                        <div className="flex items-center gap-2 overflow-hidden">
+                                                                            <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: lbl.color || '#ccc' }}></span>
+                                                                            <span className="text-sm text-[var(--color-text)] truncate">{lbl.name}</span>
+                                                                        </div>
+                                                                        <button
+                                                                            disabled={isUpdatingLabel}
+                                                                            onClick={() => handleToggleLabel(lbl.id, hasLabel ? 'remove' : 'add')}
+                                                                            className={`text-xs px-2 py-1 rounded border transition-colors ${hasLabel ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100'} ${isUpdatingLabel ? 'opacity-50' : ''}`}
+                                                                        >
+                                                                            {hasLabel ? 'Hapus' : 'Tambahkan'}
+                                                                        </button>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <div className="text-xs text-center p-2 text-[var(--color-text-muted)]">Opsi tambahan belum tersedia</div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
