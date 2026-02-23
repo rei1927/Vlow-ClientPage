@@ -76,3 +76,25 @@ export const receiveMetaWebhook = async (req, res) => {
         console.error("Meta Webhook Processing Error:", error);
     }
 };
+
+// Digunakan untuk menerima data/object dari n8n
+export const receiveN8nWebhook = async (req, res) => {
+    try {
+        const data = req.body;
+
+        console.log("📥 [n8n Webhook] Received payload from n8n:", JSON.stringify(data, null, 2));
+
+        // Sementara hanya melog data dan membalas dengan status 200 OK
+        // Jika perlu menyimpan ke sistem (misal jadi Lead atau Conversation), tambahkan logika di sini
+
+        return res.status(200).json({
+            success: true,
+            message: "Webhook data received successfully from n8n",
+            data: data
+        });
+
+    } catch (error) {
+        console.error("❌ [n8n Webhook] Error processing data:", error);
+        return res.status(500).json({ success: false, message: "Internal server error processing n8n webhook" });
+    }
+};
