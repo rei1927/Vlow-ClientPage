@@ -259,6 +259,13 @@ const ChatDashboard = () => {
     const wahaChats = React.useMemo(() => {
         let list = chats || [];
 
+        // --- DEBUG LOGS MULAI ---
+        if (list.length > 0 && isBusiness) {
+            console.log("DEBUG: list[0] labels prop:", list[0].labels);
+            console.log("DEBUG: master labels[0]:", labels[0]);
+        }
+        // --- DEBUG LOGS SELESAI ---
+
         // Map labels from WAHA API (Syncing WAHA label.items into chat objects)
         if (isBusiness && labels.length > 0 && list.length > 0) {
             list = list.map(chat => {
@@ -405,6 +412,15 @@ const ChatDashboard = () => {
                         </div>
                     )}
                 </div>
+
+                {/* DEBUG BOX */}
+                {isBusiness && chats && chats.length > 0 && labels.length > 0 && (
+                    <div className="p-2 border-b border-[var(--color-border)] text-[8px] sm:text-[10px] text-red-500 bg-red-50 font-mono break-all max-h-32 overflow-y-auto">
+                        <strong>DATA DEBUG:</strong><br />
+                        <b>chats[0].labels:</b> {JSON.stringify(chats[0].labels)} <br />
+                        <b>labels[0]:</b> {JSON.stringify(labels[0])}
+                    </div>
+                )}
 
                 {/* List of Chats */}
                 <div className="flex-1 overflow-y-auto">
