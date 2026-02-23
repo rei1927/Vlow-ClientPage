@@ -214,6 +214,8 @@ const ChatDashboard = () => {
     // Toggle Dropdown State
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+    const wahaChats = chats || [];
+
     return (
         <div className="h-[calc(100vh-100px)] flex flex-col md:flex-row bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] overflow-hidden shadow-sm animate-fade-in">
 
@@ -415,7 +417,7 @@ const ChatDashboard = () => {
                         {/* Chat Messages */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4 relative bg-opacity-50">
                             {/* Fake WhatsApp Web Background Pattern */}
-                            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "url('https://web.whatsapp.com/img/bg-chat-tile-dark_a4be512e7195b6b733d9110b408f075d.png')", backgroundRepeat: 'repeat' }}></div>
+                            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: `url("https://web.whatsapp.com/img/bg-chat-tile-dark_a4be512e7195b6b733d9110b408f075d.png")`, backgroundRepeat: 'repeat' }}></div>
 
                             {isFetchingMessages ? (
                                 <div className="flex justify-center p-4 relative z-10">
