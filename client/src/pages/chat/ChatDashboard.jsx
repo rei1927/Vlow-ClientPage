@@ -359,7 +359,7 @@ const ChatDashboard = () => {
                                         </div>
                                         <div className="flex justify-between items-center mb-1">
                                             <p className="text-xs text-[var(--color-text-muted)] truncate pr-2">
-                                                {chat.lastMessage?.body || "(Pesan)"}
+                                                {chat.lastMessage?.body || chat.lastMessage?.text || chat.lastMessage?.message?.conversation || chat.lastMessage?.message?.extendedTextMessage?.text || "(Pesan)"}
                                             </p>
                                             {chat.unreadCount > 0 && (
                                                 <span className="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">
@@ -437,7 +437,13 @@ const ChatDashboard = () => {
                                     // AMAN: hindari error "Objects are not valid as React child" 
                                     const msgId = typeof msg.id === 'object' ? (msg.id?._serialized || msg.id?.id || `msg-${idx}`) : (msg.id || `msg-${idx}`);
 
-                                    let safeBody = msg.body;
+                                    let safeBody = msg.body || msg.text;
+
+                                    // Fallback for NOWEB engine
+                                    if (!safeBody && msg.message) {
+                                        safeBody = msg.message.conversation || msg.message.extendedTextMessage?.text;
+                                    }
+
                                     if (typeof safeBody === 'object' && safeBody !== null) {
                                         safeBody = "(Pesan Format Interaktif/Sticker/Lokasi)";
                                     } else if (safeBody !== null && safeBody !== undefined && typeof safeBody !== 'string') {
