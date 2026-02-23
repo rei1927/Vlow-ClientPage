@@ -177,6 +177,19 @@ export const getLabels = async (sessionId) => {
   }
 };
 
+export const getChatsByLabel = async (sessionId, labelId) => {
+  try {
+    const response = await axios.get(`${WAHA_URL}/api/${sessionId}/labels/${labelId}/chats`, {
+      headers: HEADERS,
+      timeout: 15000,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`WAHA Get Chats by Label ${labelId} Error:`, error.message);
+    return [];
+  }
+};
+
 export const updateChatLabels = async (sessionId, chatId, labelId, action = "add") => {
   try {
     const payload = {
@@ -224,7 +237,7 @@ export const getChats = async (sessionId) => {
 
 export const getMessages = async (sessionId, chatId, limit = 50) => {
   try {
-    const response = await axios.get(`${WAHA_URL}/api/${sessionId}/chats/${chatId}/messages`, {
+    const response = await axios.get(`${WAHA_URL}/api/${sessionId}/chats/${encodeURIComponent(chatId)}/messages`, {
       params: {
         limit: limit,
       },

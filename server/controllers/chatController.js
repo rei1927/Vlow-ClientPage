@@ -44,6 +44,14 @@ export const getChatMeta = async (req, res, next) => {
         if (actualLabels) {
             labels = actualLabels;
             isBusiness = true; // Forcing it to true since labels API is working
+
+            // Sync: WAHA doesn't put labels in chats nor chats in labels by default
+            // Fetch chats for each label and embed them as `items` so Frontend can map them
+            await Promise.all(labels.map(async (lbl) => {
+                const chatAssociations = await wahaService.getChatsByLabel(platform.sessionId, lbl.id);
+                // Extract just the IDs or the whole objects. We'll put the whole object as returned
+                lbl.items = Array.isArray(chatAssociations) ? chatAssociations : [];
+            }));
         }
 
         res.status(200).json({
