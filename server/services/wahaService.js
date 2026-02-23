@@ -192,27 +192,44 @@ export const getChatsByLabel = async (sessionId, labelId) => {
 
 export const updateChatLabels = async (sessionId, chatId, labelId, action = "add") => {
   try {
+    const encodedChatId = encodeURIComponent(chatId);
+
+    // 1. Fetch current labels for this chat
+    let currentLabels = [];
+    try {
+      const getRes = await axios.get(`${WAHA_URL}/api/${sessionId}/labels/chats/${encodedChatId}/`, {
+        headers: HEADERS,
+        timeout: 10000,
+      });
+      currentLabels = Array.isArray(getRes.data) ? getRes.data : [];
+    } catch (err) {
+      // Jika 404 atau kosong, berarti belum ada label
+      if (err.response?.status !== 404) {
+        console.warn("Could not fetch existing labels for chat, assuming empty.", err.message);
+      }
+    }
+
+    // 2. Modify the array based on action
+    let newLabelsPayload = currentLabels.map(l => ({ id: String(l.id) }));
+
+    if (action === "add") {
+      if (!newLabelsPayload.some(l => l.id === String(labelId))) {
+        newLabelsPayload.push({ id: String(labelId) });
+      }
+    } else if (action === "remove") {
+      newLabelsPayload = newLabelsPayload.filter(l => l.id !== String(labelId));
+    }
+
+    // 3. PUT the new array to overwrite
     const payload = {
-      chatId: chatId,
-      labelId: labelId,
+      labels: newLabelsPayload
     };
 
-    let response;
-    if (action === "add") {
-      // Sesuaikan dengan WAHA swagger: asumsikan PUT/POST ke /api/{session}/labels/chats
-      // WAHA DOC: POST /api/{session}/labels/chats
-      response = await axios.post(`${WAHA_URL}/api/${sessionId}/labels/chats`, payload, {
-        headers: HEADERS,
-        timeout: 10000,
-      });
-    } else {
-      // WAHA DOC: DELETE /api/{session}/labels/chats
-      response = await axios.delete(`${WAHA_URL}/api/${sessionId}/labels/chats`, {
-        data: payload, // Axios delete needs data wrapped like this
-        headers: HEADERS,
-        timeout: 10000,
-      });
-    }
+    const response = await axios.put(`${WAHA_URL}/api/${sessionId}/labels/chats/${encodedChatId}/`, payload, {
+      headers: HEADERS,
+      timeout: 10000,
+    });
+
     return response.data;
   } catch (error) {
     const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
