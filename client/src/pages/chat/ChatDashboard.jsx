@@ -256,7 +256,60 @@ const ChatDashboard = () => {
     // Toggle Dropdown State
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const wahaChats = chats || [];
+    const wahaChats = React.useMemo(() => {
+        let list = chats || [];
+
+        // Map labels from WAHA API (Syncing WAHA label.items into chat objects)
+        if (isBusiness && labels.length > 0 && list.length > 0) {
+            list = list.map(chat => {
+                const safeChatId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id;
+                const computedLabels = [];
+                labels.forEach(lbl => {
+                    const hasItem = lbl.items && Array.isArray(lbl.items) && lbl.items.some(item => {
+                        const iId = typeof item.id === 'object' ? (item.id._serialized || item.id.id) : item.id;
+                        return iId === safeChatId;
+                    });
+
+                    const hasLegacyId = chat.labels && Array.isArray(chat.labels) && chat.labels.some(cl => cl === lbl.id || cl.id === lbl.id);
+
+                    if (hasItem || hasLegacyId) {
+                        computedLabels.push({ ...lbl });
+                    }
+                });
+                return { ...chat, labels: computedLabels };
+            });
+        }
+
+        // Apply Search Filter
+        if (searchKeyword.trim() !== "") {
+            const keyword = searchKeyword.toLowerCase();
+            list = list.filter(chat => {
+                const chatName = (chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0]).toLowerCase();
+                const lastMsg = (chat.lastMessage?.body || chat.lastMessage?.text || chat.lastMessage?.message?.conversation || chat.lastMessage?.message?.extendedTextMessage?.text || "").toLowerCase();
+                return chatName.includes(keyword) || lastMsg.includes(keyword);
+            });
+        }
+
+        // Apply Label Filter
+        if (isBusiness && selectedLabel !== "ALL") {
+            if (selectedLabel === "NONE") {
+                list = list.filter(chat => !chat.labels || chat.labels.length === 0);
+            } else {
+                list = list.filter(chat => chat.labels && chat.labels.some(l => l.id === selectedLabel));
+            }
+        }
+
+        return list;
+    }, [chats, labels, isBusiness, searchKeyword, selectedLabel]);
+
+    const currentActiveChat = React.useMemo(() => {
+        if (!activeChat) return null;
+        const safeActiveId = typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id;
+        return wahaChats.find(c => {
+            const cId = typeof c.id === 'object' ? (c.id._serialized || c.id.id) : c.id;
+            return cId === safeActiveId;
+        }) || activeChat;
+    }, [wahaChats, activeChat]);
 
     return (
         <div className="h-[calc(100vh-100px)] flex flex-col md:flex-row bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] overflow-hidden shadow-sm animate-fade-in">
@@ -368,90 +421,73 @@ const ChatDashboard = () => {
                             Belum ada percakapan.
                         </div>
                     ) : (
-                        wahaChats
-                            .filter(chat => {
-                                // 1. Filter by Search Keyword
-                                const matchesSearch = (chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id)).toLowerCase().includes(searchKeyword.toLowerCase());
-                                if (!matchesSearch) return false;
-
-                                // 2. Filter by Label (if active)
-                                if (!isBusiness || selectedLabel === "ALL") return true;
-
-                                const chatLabels = Array.isArray(chat.labels) ? chat.labels : [];
-
-                                if (selectedLabel === "NONE") {
-                                    return chatLabels.length === 0;
-                                }
-
-                                return chatLabels.some(l => l.id === selectedLabel);
-                            })
-                            .map((chat) => (
-                                <div
-                                    key={typeof chat.id === 'object' ? chat.id._serialized : chat.id}
-                                    onClick={() => setActiveChat(chat)}
-                                    className={`flex items-start gap-3 p-4 cursor-pointer transition-colors border-b border-[var(--color-border)]/50 ${activeChat?.id === chat.id ? 'bg-[var(--color-primary)]/10' : 'hover:bg-[var(--color-surface)]'}`}
-                                >
-                                    <div className="relative mt-1">
-                                        <FaUserCircle className="text-4xl text-gray-400" />
+                        wahaChats.map((chat) => (
+                            <div
+                                key={typeof chat.id === 'object' ? chat.id._serialized : chat.id}
+                                onClick={() => setActiveChat(chat)}
+                                className={`flex items-start gap-3 p-4 cursor-pointer transition-colors border-b border-[var(--color-border)]/50 ${activeChat?.id === chat.id ? 'bg-[var(--color-primary)]/10' : 'hover:bg-[var(--color-surface)]'}`}
+                            >
+                                <div className="relative mt-1">
+                                    <FaUserCircle className="text-4xl text-gray-400" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex justify-between items-baseline mb-1">
+                                        <h3 className="font-bold text-[var(--color-text)] text-sm truncate">{chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0]}</h3>
+                                        <span className="text-xs text-[var(--color-text-muted)] ml-2">{formatTime(chat.timestamp)}</span>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-baseline mb-1">
-                                            <h3 className="font-bold text-[var(--color-text)] text-sm truncate">{chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0]}</h3>
-                                            <span className="text-xs text-[var(--color-text-muted)] ml-2">{formatTime(chat.timestamp)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center mb-1">
-                                            <p className="text-xs text-[var(--color-text-muted)] truncate pr-2">
-                                                {chat.lastMessage?.body || chat.lastMessage?.text || chat.lastMessage?.message?.conversation || chat.lastMessage?.message?.extendedTextMessage?.text || "(Pesan)"}
-                                            </p>
-                                            {chat.unreadCount > 0 && (
-                                                <span className="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">
-                                                    {chat.unreadCount}
-                                                </span>
-                                            )}
-                                        </div>
-                                        {/* Render Badge Label jika isBusiness dan punya label */}
-                                        {isBusiness && Array.isArray(chat.labels) && chat.labels.length > 0 && (
-                                            <div className="flex flex-wrap gap-1 mt-1">
-                                                {chat.labels.map((lbl, i) => (
-                                                    <span
-                                                        key={i}
-                                                        className="px-1.5 py-0.5 rounded text-[9px] font-medium border whitespace-nowrap"
-                                                        style={{
-                                                            backgroundColor: lbl.color ? `${lbl.color}20` : 'var(--color-bg)',
-                                                            color: lbl.color || 'var(--color-text-muted)',
-                                                            borderColor: lbl.color ? `${lbl.color}50` : 'var(--color-border)'
-                                                        }}
-                                                    >
-                                                        {lbl.name}
-                                                    </span>
-                                                ))}
-                                            </div>
+                                    <div className="flex justify-between items-center mb-1">
+                                        <p className="text-xs text-[var(--color-text-muted)] truncate pr-2">
+                                            {chat.lastMessage?.body || chat.lastMessage?.text || chat.lastMessage?.message?.conversation || chat.lastMessage?.message?.extendedTextMessage?.text || "(Pesan)"}
+                                        </p>
+                                        {chat.unreadCount > 0 && (
+                                            <span className="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+                                                {chat.unreadCount}
+                                            </span>
                                         )}
                                     </div>
+                                    {/* Render Badge Label jika isBusiness dan punya label */}
+                                    {isBusiness && Array.isArray(chat.labels) && chat.labels.length > 0 && (
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                            {chat.labels.map((lbl, i) => (
+                                                <span
+                                                    key={i}
+                                                    className="px-1.5 py-0.5 rounded text-[9px] font-medium border whitespace-nowrap"
+                                                    style={{
+                                                        backgroundColor: lbl.color ? `${lbl.color}20` : 'var(--color-bg)',
+                                                        color: lbl.color || 'var(--color-text-muted)',
+                                                        borderColor: lbl.color ? `${lbl.color}50` : 'var(--color-border)'
+                                                    }}
+                                                >
+                                                    {lbl.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
-                            ))
+                            </div>
+                        ))
                     )}
                 </div>
             </div>
 
             {/* Main Chat Area */}
             <div className="w-full md:w-2/3 flex flex-col bg-[#EFEAE2] dark:bg-[#0b141a] relative">
-                {activeChat ? (
+                {currentActiveChat ? (
                     <>
                         {/* Chat Header */}
                         <div className="p-4 bg-[var(--color-surface)] border-b border-[var(--color-border)] flex items-center justify-between z-10 shadow-sm relative">
                             <div className="flex items-center gap-3 w-3/4">
                                 <FaUserCircle className="text-4xl text-gray-400 flex-shrink-0" />
                                 <div className="min-w-0">
-                                    <h2 className="font-bold text-[var(--color-text)] truncate">{activeChat.name || String(typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id).split('@')[0]}</h2>
+                                    <h2 className="font-bold text-[var(--color-text)] truncate">{currentActiveChat.name || String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id).split('@')[0]}</h2>
                                     <p className="text-xs text-[var(--color-text-muted)] max-w-xs truncate">
-                                        {String(typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id)}
+                                        {String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id)}
                                     </p>
 
                                     {/* Small Label Badges under Header Name */}
-                                    {isBusiness && Array.isArray(activeChat.labels) && activeChat.labels.length > 0 && (
+                                    {isBusiness && Array.isArray(currentActiveChat.labels) && currentActiveChat.labels.length > 0 && (
                                         <div className="flex flex-wrap gap-1 mt-1">
-                                            {activeChat.labels.map((lbl, i) => (
+                                            {currentActiveChat.labels.map((lbl, i) => (
                                                 <span
                                                     key={i}
                                                     className="px-1.5 py-0.5 rounded text-[9px] font-medium border whitespace-nowrap"
@@ -487,7 +523,7 @@ const ChatDashboard = () => {
                                                     ) : (
                                                         <div className="max-h-56 overflow-y-auto space-y-2">
                                                             {labels.map(lbl => {
-                                                                const hasLabel = Array.isArray(activeChat.labels) && activeChat.labels.some(l => l.id === lbl.id);
+                                                                const hasLabel = Array.isArray(currentActiveChat?.labels) && currentActiveChat.labels.some(l => l.id === lbl.id);
                                                                 return (
                                                                     <div key={lbl.id} className="flex items-center justify-between gap-2 p-1 hover:bg-[var(--color-bg)] rounded">
                                                                         <div className="flex items-center gap-2 overflow-hidden">
