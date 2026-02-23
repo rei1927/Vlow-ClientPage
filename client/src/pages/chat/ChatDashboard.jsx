@@ -29,6 +29,12 @@ const ChatDashboard = () => {
     const [isFetchingMessages, setIsFetchingMessages] = useState(false);
     const [isSending, setIsSending] = useState(false);
 
+    // WA Business Label Feature State
+    const [isBusiness, setIsBusiness] = useState(false);
+    const [labels, setLabels] = useState([]);
+    const [selectedLabel, setSelectedLabel] = useState("ALL");
+    const [searchKeyword, setSearchKeyword] = useState("");
+
     const messagesEndRef = useRef(null);
 
     // Load platforms on mount
@@ -49,7 +55,12 @@ const ChatDashboard = () => {
     // Fetch chats when platform changes
     useEffect(() => {
         if (selectedPlatform) {
+            fetchChatMeta(); // Cek isBusiness & get labels
             fetchChats();
+        } else {
+            setIsBusiness(false);
+            setLabels([]);
+            setSelectedLabel("ALL");
         }
     }, [selectedPlatform]);
 
@@ -78,6 +89,19 @@ const ChatDashboard = () => {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
+
+    const fetchChatMeta = async () => {
+        if (!selectedPlatform) return;
+        try {
+            const res = await axiosInstance.get(`/chats/${selectedPlatform.id}/meta`);
+            if (res.data?.success) {
+                setIsBusiness(res.data.isBusiness);
+                setLabels(res.data.labels || []);
+            }
+        } catch (error) {
+            console.error("Error fetching chat meta (labels/isBusiness):", error);
+        }
+    };
 
     const fetchChats = async (showLoading = true) => {
         if (!selectedPlatform) return;
@@ -187,7 +211,8 @@ const ChatDashboard = () => {
         }
     };
 
-    const wahaChats = chats || [];
+    // Toggle Dropdown State
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     return (
         <div className="h-[calc(100vh-100px)] flex flex-col md:flex-row bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] overflow-hidden shadow-sm animate-fade-in">
@@ -195,37 +220,62 @@ const ChatDashboard = () => {
             {/* Sidebar - Chat List */}
             <div className="w-full md:w-1/3 border-r border-[var(--color-border)] flex flex-col bg-[var(--color-bg)]">
                 {/* Header Chat List */}
-                <div className="p-4 border-b border-[var(--color-border)] flex flex-col gap-3 bg-[var(--color-surface)]">
+                <div className="p-4 border-b border-[var(--color-border)] flex flex-col gap-3 bg-[var(--color-surface)] relative">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-lg font-bold text-[var(--color-text)]">Live Chat</h2>
+                        <div>
+                            <h2 className="text-lg font-bold text-[var(--color-text)] leading-tight">Live Chat</h2>
+                            {selectedPlatform && (
+                                <p className="text-xs text-[var(--color-text-muted)] truncate max-w-[150px]">
+                                    {selectedPlatform.name}
+                                </p>
+                            )}
+                        </div>
                         <div className="flex gap-2">
-                            <button onClick={fetchChats} disabled={isFetchingChats || !selectedPlatform} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors" title="Refresh">
+                            <button onClick={fetchChats} disabled={isFetchingChats || !selectedPlatform} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors p-2" title="Refresh">
                                 <FaSync className={isFetchingChats ? "animate-spin" : ""} />
                             </button>
-                            <button className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
-                                <FaEllipsisV />
-                            </button>
+                            <div className="relative">
+                                <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-2">
+                                    <FaEllipsisV />
+                                </button>
+
+                                {/* Ellipsis Dropdown for Platform Selection */}
+                                {isDropdownOpen && (
+                                    <div className="absolute right-0 mt-2 w-56 bg-[var(--color-surface)] rounded-xl shadow-lg border border-[var(--color-border)] z-50 p-2">
+                                        <div className="text-xs font-semibold text-[var(--color-text-muted)] mb-2 px-2 uppercase tracking-wider">
+                                            Pilih Akun WhatsApp
+                                        </div>
+                                        {platformsLoading ? (
+                                            <div className="p-2 text-center"><span className="loading loading-spinner loading-xs text-[var(--color-primary)]"></span></div>
+                                        ) : platforms.length === 0 ? (
+                                            <div className="p-2 text-xs text-[var(--color-text-muted)] text-center">Belum ada akun terhubung</div>
+                                        ) : (
+                                            <div className="max-h-48 overflow-y-auto">
+                                                {platforms.map(pf => (
+                                                    <button
+                                                        key={pf.id}
+                                                        disabled={pf.status !== "WORKING"}
+                                                        onClick={() => {
+                                                            setSelectedPlatform(pf);
+                                                            setActiveChat(null);
+                                                            setIsDropdownOpen(false);
+                                                        }}
+                                                        className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors flex items-center gap-2
+                                                            ${selectedPlatform?.id === pf.id ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-medium' : 'hover:bg-[var(--color-bg)] text-[var(--color-text)]'}
+                                                            ${pf.status !== "WORKING" ? 'opacity-50 cursor-not-allowed' : ''}
+                                                        `}
+                                                    >
+                                                        <FaWhatsapp className={pf.status === "WORKING" ? "text-green-500" : "text-gray-400"} />
+                                                        <span className="truncate flex-1">{pf.name}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-
-                    {/* Platform Selector */}
-                    <select
-                        className="select select-sm select-bordered w-full bg-[var(--color-bg)]"
-                        value={selectedPlatform?.id || ""}
-                        onChange={(e) => {
-                            const pf = platforms.find(p => p.id === e.target.value);
-                            setSelectedPlatform(pf);
-                            setActiveChat(null);
-                        }}
-                        disabled={platformsLoading}
-                    >
-                        <option value="" disabled>Pilih Koneksi WhatsApp</option>
-                        {platforms.map(pf => (
-                            <option key={pf.id} value={pf.id} disabled={pf.status !== "WORKING"}>
-                                {pf.name} {pf.status !== "WORKING" ? "(Disconnect)" : ""}
-                            </option>
-                        ))}
-                    </select>
                 </div>
 
                 {/* Search Bar */}
@@ -235,9 +285,28 @@ const ChatDashboard = () => {
                         <input
                             type="text"
                             placeholder="Cari pesan atau kontak..."
+                            value={searchKeyword}
+                            onChange={(e) => setSearchKeyword(e.target.value)}
                             className="w-full pl-10 pr-4 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:border-[var(--color-primary)] text-[var(--color-text)]"
                         />
                     </div>
+                    {/* Add Label Filter if isBusiness is true */}
+                    {isBusiness && labels.length > 0 && (
+                        <div className="mt-2">
+                            <select
+                                className="select select-sm select-bordered w-full bg-[var(--color-bg)]"
+                                value={selectedLabel}
+                                onChange={(e) => setSelectedLabel(e.target.value)}
+                                disabled={isFetchingChats}
+                            >
+                                <option value="ALL">Semua Label</option>
+                                <option value="NONE">Tanpa Label</option>
+                                {labels.map(lbl => (
+                                    <option key={lbl.id} value={lbl.id}>{lbl.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                 </div>
 
                 {/* List of Chats */}
@@ -255,34 +324,68 @@ const ChatDashboard = () => {
                             Belum ada percakapan.
                         </div>
                     ) : (
-                        wahaChats.map((chat) => (
-                            <div
-                                key={chat.id}
-                                onClick={() => setActiveChat(chat)}
-                                className={`flex items-center gap-3 p-4 cursor-pointer transition-colors border-b border-[var(--color-border)]/50 ${activeChat?.id === chat.id ? 'bg-[var(--color-primary)]/10' : 'hover:bg-[var(--color-surface)]'}`}
-                            >
-                                <div className="relative">
-                                    <FaUserCircle className="text-4xl text-gray-400" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="flex justify-between items-baseline mb-1">
-                                        <h3 className="font-bold text-[var(--color-text)] text-sm truncate">{chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0]}</h3>
-                                        <span className="text-xs text-[var(--color-text-muted)]">{formatTime(chat.timestamp)}</span>
+                        wahaChats
+                            .filter(chat => {
+                                // 1. Filter by Search Keyword
+                                const matchesSearch = (chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id)).toLowerCase().includes(searchKeyword.toLowerCase());
+                                if (!matchesSearch) return false;
+
+                                // 2. Filter by Label (if active)
+                                if (!isBusiness || selectedLabel === "ALL") return true;
+
+                                const chatLabels = Array.isArray(chat.labels) ? chat.labels : [];
+
+                                if (selectedLabel === "NONE") {
+                                    return chatLabels.length === 0;
+                                }
+
+                                return chatLabels.some(l => l.id === selectedLabel);
+                            })
+                            .map((chat) => (
+                                <div
+                                    key={typeof chat.id === 'object' ? chat.id._serialized : chat.id}
+                                    onClick={() => setActiveChat(chat)}
+                                    className={`flex items-start gap-3 p-4 cursor-pointer transition-colors border-b border-[var(--color-border)]/50 ${activeChat?.id === chat.id ? 'bg-[var(--color-primary)]/10' : 'hover:bg-[var(--color-surface)]'}`}
+                                >
+                                    <div className="relative mt-1">
+                                        <FaUserCircle className="text-4xl text-gray-400" />
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                        <p className="text-xs text-[var(--color-text-muted)] truncate pr-2">
-                                            {/* WAHA API detail might need extraction, usually chat.lastMessage exists */}
-                                            {chat.lastMessage?.body || "(Pesan Tidak Didukung)"}
-                                        </p>
-                                        {chat.unreadCount > 0 && (
-                                            <span className="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">
-                                                {chat.unreadCount}
-                                            </span>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-baseline mb-1">
+                                            <h3 className="font-bold text-[var(--color-text)] text-sm truncate">{chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0]}</h3>
+                                            <span className="text-xs text-[var(--color-text-muted)] ml-2">{formatTime(chat.timestamp)}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center mb-1">
+                                            <p className="text-xs text-[var(--color-text-muted)] truncate pr-2">
+                                                {chat.lastMessage?.body || "(Pesan)"}
+                                            </p>
+                                            {chat.unreadCount > 0 && (
+                                                <span className="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+                                                    {chat.unreadCount}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {/* Render Badge Label jika isBusiness dan punya label */}
+                                        {isBusiness && Array.isArray(chat.labels) && chat.labels.length > 0 && (
+                                            <div className="flex flex-wrap gap-1 mt-1">
+                                                {chat.labels.map((lbl, i) => (
+                                                    <span
+                                                        key={i}
+                                                        className="px-1.5 py-0.5 rounded text-[9px] font-medium border whitespace-nowrap"
+                                                        style={{
+                                                            backgroundColor: lbl.color ? `${lbl.color}20` : 'var(--color-bg)',
+                                                            color: lbl.color || 'var(--color-text-muted)',
+                                                            borderColor: lbl.color ? `${lbl.color}50` : 'var(--color-border)'
+                                                        }}
+                                                    >
+                                                        {lbl.name}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         )}
                                     </div>
                                 </div>
-                            </div>
-                        ))
+                            ))
                     )}
                 </div>
             </div>

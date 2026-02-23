@@ -22,6 +22,32 @@ const getValidPlatform = async (platformId, userId) => {
     return platform;
 };
 
+// @desc    Get Chat Meta (IsBusiness & Labels)
+// @route   GET /api/chats/:platformId/meta
+// @access  Private
+export const getChatMeta = async (req, res, next) => {
+    try {
+        const { platformId } = req.params;
+        const platform = await getValidPlatform(platformId, req.user.id);
+
+        const me = await wahaService.getMe(platform.sessionId);
+        const isBusiness = me?.isBusiness || false;
+
+        let labels = [];
+        if (isBusiness) {
+            labels = await wahaService.getLabels(platform.sessionId);
+        }
+
+        res.status(200).json({
+            success: true,
+            isBusiness,
+            labels
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // @desc    Get All Chats for a Platform
 // @route   GET /api/chats/:platformId
 // @access  Private

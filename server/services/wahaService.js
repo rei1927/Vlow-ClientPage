@@ -151,6 +151,32 @@ export const deleteWahaSession = async (sessionId) => {
 
 // --- WAHA CHAT AND MESSAGING ---
 
+export const getMe = async (sessionId) => {
+  try {
+    const response = await axios.get(`${WAHA_URL}/api/${sessionId}/me`, {
+      headers: HEADERS,
+      timeout: 15000,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("WAHA Get Me Error:", error.message);
+    return null;
+  }
+};
+
+export const getLabels = async (sessionId) => {
+  try {
+    const response = await axios.get(`${WAHA_URL}/api/${sessionId}/labels`, {
+      headers: HEADERS,
+      timeout: 15000,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("WAHA Get Labels Error:", error.message);
+    return [];
+  }
+};
+
 export const getChats = async (sessionId) => {
   try {
     const response = await axios.get(`${WAHA_URL}/api/${sessionId}/chats`, {
