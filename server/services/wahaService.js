@@ -61,6 +61,7 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
               url: webhookUrl, // <--- INI KUNCINYA (Dikirim ke n8n User)
               events: [
                 "message.any",
+                "label.upsert",
                 "label.deleted",
                 "label.chat.added",
                 "label.chat.deleted"
@@ -174,6 +175,37 @@ export const getLabels = async (sessionId) => {
   } catch (error) {
     console.error("WAHA Get Labels Error:", error.message);
     return [];
+  }
+};
+
+export const updateChatLabels = async (sessionId, chatId, labelId, action = "add") => {
+  try {
+    const payload = {
+      chatId: chatId,
+      labelId: labelId,
+    };
+
+    let response;
+    if (action === "add") {
+      // Sesuaikan dengan WAHA swagger: asumsikan PUT/POST ke /api/{session}/labels/chats
+      // WAHA DOC: POST /api/{session}/labels/chats
+      response = await axios.post(`${WAHA_URL}/api/${sessionId}/labels/chats`, payload, {
+        headers: HEADERS,
+        timeout: 10000,
+      });
+    } else {
+      // WAHA DOC: DELETE /api/{session}/labels/chats
+      response = await axios.delete(`${WAHA_URL}/api/${sessionId}/labels/chats`, {
+        data: payload, // Axios delete needs data wrapped like this
+        headers: HEADERS,
+        timeout: 10000,
+      });
+    }
+    return response.data;
+  } catch (error) {
+    const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
+    console.error(`WAHA ${action} Label Error:`, rawError);
+    throw new AppError(`Gagal update label chat: ${rawError}`, 502);
   }
 };
 

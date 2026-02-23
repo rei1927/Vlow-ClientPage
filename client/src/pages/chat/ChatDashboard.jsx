@@ -539,11 +539,16 @@ const ChatDashboard = () => {
                                     // AMAN: hindari error "Objects are not valid as React child" 
                                     const msgId = typeof msg.id === 'object' ? (msg.id?._serialized || msg.id?.id || `msg-${idx}`) : (msg.id || `msg-${idx}`);
 
-                                    let safeBody = msg.body || msg.text;
+                                    let safeBody = msg.body || msg.text || msg._data?.body;
 
                                     // Fallback for NOWEB engine
                                     if (!safeBody && msg.message) {
-                                        safeBody = msg.message.conversation || msg.message.extendedTextMessage?.text;
+                                        safeBody = msg.message.conversation || msg.message.extendedTextMessage?.text || msg.message.imageMessage?.caption;
+                                    }
+
+                                    if (!safeBody && typeof msg === 'object') {
+                                        const keys = Object.keys(msg).filter(k => !['id', 'timestamp', 'fromMe', 'to', 'from', 'hasMedia', 'ack', 'vcardList'].includes(k));
+                                        safeBody = `(Empty Msg) Keys: ${keys.join(', ')}`;
                                     }
 
                                     if (typeof safeBody === 'object' && safeBody !== null) {

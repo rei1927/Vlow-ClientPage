@@ -114,3 +114,30 @@ export const sendMessage = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc    Assign/Remove Label to a Chat
+// @route   POST /api/chats/:platformId/:chatId/labels
+// @access  Private
+export const assignLabel = async (req, res, next) => {
+    try {
+        const { platformId, chatId } = req.params;
+        const { labelId, action } = req.body; // action: "add" | "remove"
+
+        if (!labelId || !action) {
+            return next(new AppError("Label ID dan aksi (add/remove) harus disertakan", 400));
+        }
+
+        const platform = await getValidPlatform(platformId, req.user.id);
+
+        // Memanggil WAHA service untuk update label
+        const result = await wahaService.updateChatLabels(platform.sessionId, chatId, labelId, action);
+
+        res.status(200).json({
+            success: true,
+            message: `Label berhasil di-${action === 'add' ? 'tambahkan' : 'hapus'}`,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};

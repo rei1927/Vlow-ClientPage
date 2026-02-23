@@ -5,6 +5,7 @@ import {
     getChatMeta,
     getMessages,
     sendMessage,
+    assignLabel,
 } from "../controllers/chatController.js";
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.get("/:platformId/meta", getChatMeta);
 router.get("/:platformId", getChats);
 router.get("/:platformId/:chatId/messages", getMessages);
 router.post("/:platformId/:chatId/messages", sendMessage);
+router.post("/:platformId/:chatId/labels", assignLabel);
 
 export default router;
