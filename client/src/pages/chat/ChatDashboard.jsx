@@ -413,15 +413,6 @@ const ChatDashboard = () => {
                     )}
                 </div>
 
-                {/* DEBUG BOX */}
-                {isBusiness && chats && chats.length > 0 && labels.length > 0 && (
-                    <div className="p-2 border-b border-[var(--color-border)] text-[8px] sm:text-[10px] text-red-500 bg-red-50 font-mono break-all max-h-32 overflow-y-auto">
-                        <strong>DATA DEBUG:</strong><br />
-                        <b>chats[0].labels:</b> {JSON.stringify(chats[0].labels)} <br />
-                        <b>labels[0]:</b> {JSON.stringify(labels[0])}
-                    </div>
-                )}
-
                 {/* List of Chats */}
                 <div className="flex-1 overflow-y-auto">
                     {platformsLoading || isFetchingChats ? (
