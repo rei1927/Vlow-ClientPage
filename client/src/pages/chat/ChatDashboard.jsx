@@ -270,7 +270,7 @@ const ChatDashboard = () => {
                         return iId === safeChatId;
                     });
 
-                    const hasLegacyId = chat.labels && Array.isArray(chat.labels) && chat.labels.some(cl => cl === lbl.id || cl.id === lbl.id);
+                    const hasLegacyId = chat.labels && Array.isArray(chat.labels) && chat.labels.some(cl => String(cl) === String(lbl.id) || String(cl?.id) === String(lbl.id));
 
                     if (hasItem || hasLegacyId) {
                         computedLabels.push({ ...lbl });
