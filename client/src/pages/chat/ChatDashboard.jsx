@@ -539,22 +539,33 @@ const ChatDashboard = () => {
                                     // AMAN: hindari error "Objects are not valid as React child" 
                                     const msgId = typeof msg.id === 'object' ? (msg.id?._serialized || msg.id?.id || `msg-${idx}`) : (msg.id || `msg-${idx}`);
 
-                                    let safeBody = msg.body || msg.text || msg._data?.body;
+                                    let safeBody = msg.body || msg.text || msg._data?.body || "";
 
                                     // Fallback for NOWEB engine
                                     if (!safeBody && msg.message) {
-                                        safeBody = msg.message.conversation || msg.message.extendedTextMessage?.text || msg.message.imageMessage?.caption;
-                                    }
-
-                                    if (!safeBody && typeof msg === 'object') {
-                                        const keys = Object.keys(msg).filter(k => !['id', 'timestamp', 'fromMe', 'to', 'from', 'hasMedia', 'ack', 'vcardList'].includes(k));
-                                        safeBody = `(Empty Msg) Keys: ${keys.join(', ')}`;
+                                        safeBody = msg.message.conversation || msg.message.extendedTextMessage?.text || msg.message.imageMessage?.caption || "";
                                     }
 
                                     if (typeof safeBody === 'object' && safeBody !== null) {
-                                        safeBody = "(Pesan Format Interaktif/Sticker/Lokasi)";
+                                        safeBody = "(Pesan Format Khusus)";
                                     } else if (safeBody !== null && safeBody !== undefined && typeof safeBody !== 'string') {
                                         safeBody = String(safeBody);
+                                    }
+
+                                    // Gunakan msg.type (yg mana adalah getter di bbrp waha engine) apabila body benar-benar kosong
+                                    if (!safeBody || safeBody.trim() === "") {
+                                        if (msg.type === "revoked" || msg.type === "protocol") safeBody = "🚫 Pesan ini telah dihapus";
+                                        else if (msg.type === "image") safeBody = "📷 Gambar";
+                                        else if (msg.type === "video") safeBody = "🎥 Video";
+                                        else if (msg.type === "audio" || msg.type === "ptt") safeBody = "🎵 Pesan Suara";
+                                        else if (msg.type === "document") safeBody = "📄 Dokumen";
+                                        else if (msg.type === "location") safeBody = "📍 Lokasi";
+                                        else if (msg.type === "vcard" || msg.type === "multi_vcard") safeBody = "👤 Kontak";
+                                        else if (msg.type === "sticker") safeBody = "🌟 Stiker";
+                                        else if (msg.type === "call_log") safeBody = "📞 Panggilan Suara/Video";
+                                        else if (msg.hasMedia) safeBody = "📎 Lampiran Media";
+                                        else if (msg.type) safeBody = `(Pesan: ${msg.type})`;
+                                        else safeBody = `(Tidak ada teks pesan)`;
                                     }
 
                                     return (
