@@ -184,7 +184,7 @@ const ChatDashboard = () => {
         setIsUpdatingLabel(true);
         try {
             const safeChatId = typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id;
-            const res = await axiosInstance.post(`/chats/${selectedPlatform.id}/${safeChatId}/labels`, {
+            const res = await axiosInstance.post(`/chats/${selectedPlatform.id}/${encodeURIComponent(safeChatId)}/labels`, {
                 labelId: labelId,
                 action: action // "add" or "remove"
             });
@@ -482,7 +482,7 @@ const ChatDashboard = () => {
                 {currentActiveChat ? (
                     <>
                         {/* Chat Header */}
-                        <div className="p-4 bg-[var(--color-surface)] border-b border-[var(--color-border)] flex items-center justify-between z-10 shadow-sm relative">
+                        <div className="p-4 bg-[var(--color-surface)] border-b border-[var(--color-border)] flex items-center justify-between z-50 shadow-sm relative">
                             <div className="flex items-center gap-3 w-3/4">
                                 <FaUserCircle className="text-4xl text-gray-400 flex-shrink-0" />
                                 <div className="min-w-0">
