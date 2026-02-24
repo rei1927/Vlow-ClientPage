@@ -19,6 +19,7 @@ import platformRoutes from "./routes/platformRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import webhookRoutes from "./routes/webhookRoutes.js";
+import handoverRoutes from "./routes/handoverRoutes.js";
 
 // Models
 import User from "./models/User.js";
@@ -26,6 +27,8 @@ import Agent from "./models/Agent.js";
 import KnowledgeSource from "./models/KnowledgeSource.js";
 import ConversationLog from "./models/ConversationLog.js";
 import ConnectedPlatform from "./models/ConnectedPlatform.js";
+import ChatHandover from "./models/ChatHandover.js";
+import { startHandoverScheduler } from "./utils/handoverScheduler.js";
 
 dotenv.config();
 
@@ -67,6 +70,7 @@ app.use("/api/platforms", platformRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/webhooks", webhookRoutes);
+app.use("/api/handover", handoverRoutes);
 
 // --- Error Handling Middleware ---
 // HAPUS blok app.use((err...)) yang lama (manual).
@@ -104,6 +108,12 @@ ConversationLog.belongsTo(Agent, { foreignKey: "agentId" });
 ConnectedPlatform.hasMany(ConversationLog, { foreignKey: "platformId", onDelete: "SET NULL" });
 ConversationLog.belongsTo(ConnectedPlatform, { foreignKey: "platformId" });
 
+// 7. ChatHandover associations
+Agent.hasMany(ChatHandover, { foreignKey: "agentId", onDelete: "CASCADE" });
+ChatHandover.belongsTo(Agent, { foreignKey: "agentId" });
+ConnectedPlatform.hasMany(ChatHandover, { foreignKey: "platformId", onDelete: "CASCADE" });
+ChatHandover.belongsTo(ConnectedPlatform, { foreignKey: "platformId" });
+
 const startServer = async () => {
   try {
     await sequelize.authenticate();
@@ -111,6 +121,9 @@ const startServer = async () => {
 
     await sequelize.sync({ alter: true });
     logger.info("Database Models Synced.");
+
+    // Start handover auto-release scheduler
+    startHandoverScheduler();
 
     app.listen(PORT, () => {
       logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);

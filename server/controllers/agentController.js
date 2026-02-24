@@ -268,6 +268,7 @@ export const updateAgent = async (req, res, next) => {
       whatsappNumber,
       isActive,
       followupConfig,
+      handoverConfig,
     } = req.body;
 
     if (Array.isArray(transferCondition)) {
@@ -288,6 +289,17 @@ export const updateAgent = async (req, res, next) => {
       }
     }
 
+    // Parse handoverConfig (JSONB)
+    let parsedHandover = null;
+    if (handoverConfig) {
+      try {
+        parsedHandover =
+          typeof handoverConfig === "string" ? JSON.parse(handoverConfig) : handoverConfig;
+      } catch (e) {
+        console.error("Error parsing handoverConfig", e);
+      }
+    }
+
     // Update
     if (name) agent.name = name;
     if (description !== undefined) agent.description = description;
@@ -300,6 +312,11 @@ export const updateAgent = async (req, res, next) => {
     // Update Followup Config (JSONB)
     if (parsedFollowup) {
       agent.followupConfig = parsedFollowup;
+    }
+
+    // Update Handover Config (JSONB)
+    if (parsedHandover) {
+      agent.handoverConfig = parsedHandover;
     }
 
     agent.welcomeImageUrl = newWelcomeImageUrl;
@@ -485,25 +502,30 @@ export const getIntegrationConfig = async (req, res, next) => {
       .map((k) => `[${k.title}]:\n${k.description}`)
       .join("\n\n---\n\n");
 
+    // Use handoverConfig (new JSONB) or fall back to transferCondition (legacy TEXT)
+    const handoffConfig = agent.handoverConfig?.enabled
+      ? agent.handoverConfig
+      : agent.transferCondition;
+
     const finalSystemPrompt = buildAgentSystemPrompt(
       agent.systemInstruction,
-      agent.transferCondition,
+      handoffConfig,
       agent.welcomeMessage,
       agent.welcomeImageUrl,
     );
 
     // 3. Return JSON Config siap pakai untuk n8n
     res.json({
-      agentId: agent.id, // Tambahkan agentId untuk logging
+      agentId: agent.id,
       agentName: agent.name,
       systemInstruction: finalSystemPrompt,
       welcomeMessage: agent.welcomeMessage,
       welcomeImageUrl: agent.welcomeImageUrl,
       knowledgeBase: knowledgeText,
       isActive: agent.isActive,
-      // Sertakan Followup Config juga
       followupConfig: agent.followupConfig || { isEnabled: false },
-      platformId: platform.id, // Tambahkan platformId untuk logging
+      handoverConfig: agent.handoverConfig || { enabled: false },
+      platformId: platform.id,
     });
   } catch (error) {
     console.error("Integration Error:", error);

@@ -9,8 +9,10 @@ import {
     FaRobot,
     FaSmile,
     FaWhatsapp,
-    FaSync
+    FaSync,
+    FaHandPaper,
 } from "react-icons/fa";
+import { FiShield } from "react-icons/fi";
 import { getPlatforms } from "../../features/platforms/platformSlice";
 import axiosInstance from "../../api/axiosInstance";
 import toast from "react-hot-toast";
@@ -36,6 +38,10 @@ const ChatDashboard = () => {
     const [searchKeyword, setSearchKeyword] = useState("");
     const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
     const [isUpdatingLabel, setIsUpdatingLabel] = useState(false);
+
+    // Human Handover State
+    const [handoverStatus, setHandoverStatus] = useState(null); // null | 'ai' | 'human'
+    const [isHandoverLoading, setIsHandoverLoading] = useState(false);
 
     const messagesEndRef = useRef(null);
 
@@ -70,6 +76,9 @@ const ChatDashboard = () => {
     useEffect(() => {
         if (activeChat && selectedPlatform) {
             fetchMessages();
+            fetchHandoverStatus();
+        } else {
+            setHandoverStatus(null);
         }
     }, [activeChat, selectedPlatform]);
 
@@ -91,6 +100,40 @@ const ChatDashboard = () => {
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
+
+    // Fetch handover status for active chat
+    const fetchHandoverStatus = async () => {
+        if (!activeChat || !selectedPlatform) return;
+        try {
+            const chatId = typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id;
+            const res = await axiosInstance.get(`/handover/status/${encodeURIComponent(chatId)}`, {
+                params: { sessionId: selectedPlatform.sessionId }
+            });
+            setHandoverStatus(res.data?.status || 'ai');
+        } catch {
+            setHandoverStatus('ai');
+        }
+    };
+
+    // Toggle handover status
+    const handleHandover = async (action) => {
+        if (!activeChat || !selectedPlatform) return;
+        setIsHandoverLoading(true);
+        try {
+            const chatId = typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id;
+            await axiosInstance.post(`/handover/${action}`, {
+                chatId,
+                sessionId: selectedPlatform.sessionId,
+                triggeredBy: 'manual',
+            });
+            setHandoverStatus(action === 'activate' ? 'human' : 'ai');
+            toast.success(action === 'activate' ? '🙋 Chat dialihkan ke Anda' : '🤖 Chat dikembalikan ke AI');
+        } catch (err) {
+            toast.error('Gagal mengubah status handover');
+        } finally {
+            setIsHandoverLoading(false);
+        }
+    };
 
     const fetchChatMeta = async () => {
         if (!selectedPlatform) return;
@@ -511,7 +554,31 @@ const ChatDashboard = () => {
                                     )}
                                 </div>
                             </div>
-                            <div className="flex gap-4 text-[var(--color-text-muted)] flex-shrink-0">
+                            <div className="flex gap-2 items-center text-[var(--color-text-muted)] flex-shrink-0">
+                                {/* Handover Button */}
+                                {handoverStatus === 'human' ? (
+                                    <button
+                                        onClick={() => handleHandover('release')}
+                                        disabled={isHandoverLoading}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-500 text-white hover:bg-green-600 transition-colors shadow-sm"
+                                        title="Kembalikan ke AI Agent"
+                                    >
+                                        <FaRobot /> Release to AI
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => handleHandover('activate')}
+                                        disabled={isHandoverLoading}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors shadow-sm"
+                                        title="Ambil alih chat dari AI"
+                                    >
+                                        <FaHandPaper /> Take Over
+                                    </button>
+                                )}
+                                {/* Status Badge */}
+                                <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${handoverStatus === 'human' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'}`}>
+                                    {handoverStatus === 'human' ? '👤 Human' : '🤖 AI'}
+                                </span>
                                 <button onClick={fetchMessages} disabled={isFetchingMessages} className="hover:text-[var(--color-primary)] transition-colors"><FaSync className={isFetchingMessages ? "animate-spin" : ""} /></button>
                                 <button className="hover:text-[var(--color-text)]"><FaSearch /></button>
                                 <div className="relative">

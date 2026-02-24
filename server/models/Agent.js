@@ -35,10 +35,23 @@ const Agent = sequelize.define("Agent", {
     type: DataTypes.STRING, // URL gambar dari MinIO
     allowNull: true,
   },
-  // --- TRANSFER CONDITIONS ---
+  // --- TRANSFER CONDITIONS (Legacy) ---
   transferCondition: {
     type: DataTypes.TEXT,
     allowNull: true,
+  },
+  // --- HUMAN HANDOVER CONFIG ---
+  handoverConfig: {
+    type: DataTypes.JSONB,
+    allowNull: false,
+    defaultValue: {
+      enabled: false,
+      keywords: [],
+      responseMessage: "Baik, saya akan menghubungkan Anda dengan tim kami. Mohon tunggu sebentar.",
+      autoReleaseMinutes: 30,
+      handoverLabelId: null,
+      aiLabelId: null,
+    },
   },
   followupConfig: {
     type: DataTypes.JSONB,

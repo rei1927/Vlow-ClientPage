@@ -18,6 +18,7 @@ import {
   FaChartBar,
   FaSpinner,
 } from "react-icons/fa";
+import { FiShield } from "react-icons/fi";
 import toast from "react-hot-toast";
 import {
   getDefaultHandoffConfig,
@@ -30,6 +31,7 @@ import {
 import GeneralTab from "./tabs/GeneralTab";
 import KnowledgeTab from "./tabs/KnowledgeTab";
 import FollowupTab from "./tabs/FollowupTab";
+import HandoverTab from "./tabs/HandoverTab";
 import EvaluationTab from "./tabs/EvaluationTab";
 import ChatPreview from "../../components/agents/ChatPreview";
 import SubscriptionWarning from "../../components/common/SubscriptionWarning";
@@ -71,6 +73,14 @@ const AgentBuilder = () => {
     prompt: "",
   });
   const [handoffConfig, setHandoffConfig] = useState(getDefaultHandoffConfig());
+  const [handoverConfig, setHandoverConfig] = useState({
+    enabled: false,
+    keywords: [],
+    responseMessage: "Baik, saya akan menghubungkan Anda dengan tim kami. Mohon tunggu sebentar.",
+    autoReleaseMinutes: 30,
+    handoverLabelId: null,
+    aiLabelId: null,
+  });
 
   const knowledgeBaseText = useMemo(() => {
     const sources = [];
@@ -141,12 +151,24 @@ const AgentBuilder = () => {
         setFollowupConfig(currentAgent.followupConfig);
       }
       setHandoffConfig(parseHandoffConfig(currentAgent.transferCondition));
+      // Populate handoverConfig from DB
+      if (currentAgent.handoverConfig) {
+        setHandoverConfig(currentAgent.handoverConfig);
+      }
     } else {
       setFollowupConfig({ isEnabled: false, delay: 15, unit: "minutes", prompt: "" });
       setHandoffConfig(getDefaultHandoffConfig());
+      setHandoverConfig({
+        enabled: false,
+        keywords: [],
+        responseMessage: "Baik, saya akan menghubungkan Anda dengan tim kami. Mohon tunggu sebentar.",
+        autoReleaseMinutes: 30,
+        handoverLabelId: null,
+        aiLabelId: null,
+      });
     }
   }, [currentAgent, isEditMode]);
-  
+
   // Separate effect to handle image removal
   useEffect(() => {
     if (shouldRemoveImage) {
@@ -230,6 +252,7 @@ const AgentBuilder = () => {
 
       dataToSend.append("followupConfig", JSON.stringify(followupConfig));
       dataToSend.append("transferCondition", serializeHandoffConfig(handoffConfig));
+      dataToSend.append("handoverConfig", JSON.stringify(handoverConfig));
 
       let agentId = id;
       if (isEditMode) {
@@ -330,11 +353,10 @@ const AgentBuilder = () => {
             <button
               onClick={handleSave}
               disabled={isSaving || isSubscriptionExpired}
-              className={`btn btn-sm border-none rounded-lg shadow-md gap-1.5 px-3 sm:px-5 ${
-                isSubscriptionExpired
+              className={`btn btn-sm border-none rounded-lg shadow-md gap-1.5 px-3 sm:px-5 ${isSubscriptionExpired
                   ? "bg-[var(--color-text-muted)] text-white cursor-not-allowed"
                   : "bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white"
-              }`}
+                }`}
             >
               {isSaving ? <FaSpinner className="animate-spin" /> : <FaSave />}
               <span className="hidden sm:inline">{isEditMode ? "Update" : "Create Agent"}</span>
@@ -359,6 +381,7 @@ const AgentBuilder = () => {
               { id: "general", label: "General", icon: <FaBrain /> },
               { id: "knowledge", label: "Knowledge Resources", icon: <FaDatabase /> },
               { id: "followups", label: "Follow-ups", icon: <FaClock /> },
+              { id: "handover", label: "Handover", icon: <FiShield /> },
               { id: "evaluation", label: "Evaluation", icon: <FaChartBar /> },
             ].map((tab) => (
               <button
@@ -366,11 +389,10 @@ const AgentBuilder = () => {
                 onClick={() => handleTabChange(tab.id)}
                 disabled={isTabLoading}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap
-                            ${
-                              activeTab === tab.id
-                                ? "bg-[var(--color-primary)] text-white shadow-lg"
-                                : "bg-[var(--color-surface)] text-[var(--color-text-muted)] hover:bg-[var(--color-border)] border border-[var(--color-border)]"
-                            } ${isTabLoading ? "opacity-50 cursor-wait" : ""}`}
+                            ${activeTab === tab.id
+                    ? "bg-[var(--color-primary)] text-white shadow-lg"
+                    : "bg-[var(--color-surface)] text-[var(--color-text-muted)] hover:bg-[var(--color-border)] border border-[var(--color-border)]"
+                  } ${isTabLoading ? "opacity-50 cursor-wait" : ""}`}
               >
                 {tab.icon} {tab.label}
               </button>
@@ -411,6 +433,9 @@ const AgentBuilder = () => {
 
                 {activeTab === "followups" && (
                   <FollowupTab config={followupConfig} setConfig={setFollowupConfig} />
+                )}
+                {activeTab === "handover" && (
+                  <HandoverTab config={handoverConfig} setConfig={setHandoverConfig} />
                 )}
                 {activeTab === "evaluation" && <EvaluationTab agentId={id} />}
               </>
