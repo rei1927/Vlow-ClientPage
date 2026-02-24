@@ -60,6 +60,11 @@ const User = sequelize.define(
       defaultValue: 1000,
       comment: "Limit maksimal response AI yang digenerate untuk akun customer",
     },
+    quotaResetDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: "Catatan kapan terakhir kali kuota (Conversation & AI Response) di-reset oleh Admin",
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,

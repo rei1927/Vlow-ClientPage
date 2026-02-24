@@ -278,7 +278,16 @@ export const getUsageStats = async (req, res, next) => {
 
     // 2. Calculate date range for current month
     const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    let startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // Periksa apakah user punya tanggal reset kuota bulan ini yang lebih baru
+    const userObj = await User.findByPk(userId);
+    if (userObj && userObj.quotaResetDate) {
+      const resetDate = new Date(userObj.quotaResetDate);
+      if (resetDate > startDate) {
+        startDate = resetDate; // Mulai hitung token SAJAK poin waktu ini
+      }
+    }
 
     // 3. Fetch logs to calculate tokens
     const logs = await ConversationLog.findAll({
@@ -286,7 +295,7 @@ export const getUsageStats = async (req, res, next) => {
         agentId: { [Op.in]: agentIds },
         mode: "production",
         createdAt: {
-          [Op.gte]: firstDayOfMonth,
+          [Op.gte]: startDate,
         },
       },
       attributes: ["userMessage", "aiResponse"],

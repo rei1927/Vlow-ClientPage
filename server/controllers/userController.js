@@ -178,7 +178,7 @@ export const getUserById = async (req, res, next) => {
 // @route   PUT /api/users/:id
 export const updateUser = async (req, res, next) => {
   try {
-    const { name, role, isActive, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
+    const { name, role, isActive, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl, maxConversations, maxAiResponses, resetQuota } = req.body;
 
     const user = await User.findByPk(req.params.id);
     if (!user) {
@@ -197,6 +197,17 @@ export const updateUser = async (req, res, next) => {
     if (maxPlatforms !== undefined) user.maxPlatforms = parseInt(maxPlatforms) || 1;
     if (n8nWebhookUrl !== undefined) user.n8nWebhookUrl = n8nWebhookUrl || null;
     if (n8nSimulatorWebhookUrl !== undefined) user.n8nSimulatorWebhookUrl = n8nSimulatorWebhookUrl || null;
+
+    // Set Max Limits for Customer
+    if (role === "customer") {
+      if (maxConversations !== undefined) user.maxConversations = parseInt(maxConversations) || 1;
+      if (maxAiResponses !== undefined) user.maxAiResponses = parseInt(maxAiResponses) || 1;
+
+      // Handle Quota Reset
+      if (resetQuota === true) {
+        user.quotaResetDate = new Date(); // Catat tanggal & waktu saat ini untuk titik referensi terbaru
+      }
+    }
 
     // Handle subscription expiry (only for customer)
     if (role === "customer" && subscriptionExpiry !== undefined) {
@@ -220,7 +231,7 @@ export const updateUser = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Data user berhasil diperbarui.",
+      message: resetQuota ? "Data user dan Kuota Pemakaian berhasil di-reset!" : "Data user berhasil diperbarui.",
       data: {
         id: user.id,
         name: user.name,
@@ -229,6 +240,9 @@ export const updateUser = async (req, res, next) => {
         isActive: user.isActive,
         maxPlatforms: user.maxPlatforms,
         subscriptionExpiry: user.subscriptionExpiry,
+        maxConversations: user.maxConversations,
+        maxAiResponses: user.maxAiResponses,
+        quotaResetDate: user.quotaResetDate,
         n8nWebhookUrl: user.n8nWebhookUrl,
         n8nSimulatorWebhookUrl: user.n8nSimulatorWebhookUrl,
       },

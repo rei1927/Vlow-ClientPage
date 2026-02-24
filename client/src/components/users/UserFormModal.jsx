@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaTimes, FaUser, FaEnvelope, FaUserTag, FaCalendarAlt, FaLink } from "react-icons/fa";
+import { FaTimes, FaUser, FaEnvelope, FaUserTag, FaCalendarAlt, FaLink, FaRedo } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 /** Validasi bahwa value adalah URL yang valid (harus http/https) */
@@ -230,46 +230,67 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
 
             {/* Conversation Limits */}
             {formData.role === "customer" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="form-control">
-                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                    Batas Maksimal Conversation
-                  </label>
-                  <div className="relative">
-                    <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                      <span className="font-bold">#</span>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="form-control">
+                    <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                      Batas Maksimal Conversation
+                    </label>
+                    <div className="relative">
+                      <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                        <span className="font-bold">#</span>
+                      </div>
+                      <input
+                        type="number"
+                        min="1"
+                        className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
+                        value={formData.maxConversations}
+                        onChange={(e) =>
+                          setFormData({ ...formData, maxConversations: parseInt(e.target.value) || 1 })
+                        }
+                      />
                     </div>
-                    <input
-                      type="number"
-                      min="1"
-                      className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
-                      value={formData.maxConversations}
-                      onChange={(e) =>
-                        setFormData({ ...formData, maxConversations: parseInt(e.target.value) || 1 })
-                      }
-                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                      Batas Maksimal AI Responses
+                    </label>
+                    <div className="relative">
+                      <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                        <span className="font-bold">#</span>
+                      </div>
+                      <input
+                        type="number"
+                        min="1"
+                        className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
+                        value={formData.maxAiResponses}
+                        onChange={(e) =>
+                          setFormData({ ...formData, maxAiResponses: parseInt(e.target.value) || 1 })
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="form-control">
-                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                    Batas Maksimal AI Responses
-                  </label>
-                  <div className="relative">
-                    <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                      <span className="font-bold">#</span>
-                    </div>
-                    <input
-                      type="number"
-                      min="1"
-                      className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
-                      value={formData.maxAiResponses}
-                      onChange={(e) =>
-                        setFormData({ ...formData, maxAiResponses: parseInt(e.target.value) || 1 })
-                      }
-                    />
+                {/* Tombol Reset Kuota (Hanya muncul jika mode Edit) */}
+                {initialData && (
+                  <div className="flex justify-end pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm("Yakin ingin mereset kuota limit bulan ini menjadi 0 secara permanen?")) {
+                          const updatedData = { ...formData, resetQuota: true };
+                          setFormData(updatedData);
+                          onSubmit(updatedData);
+                        }
+                      }}
+                      className="btn btn-sm bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-800/50 text-red-600 dark:text-red-400 border-none font-bold rounded-lg shadow-sm w-full sm:w-auto"
+                    >
+                      <FaRedo className="mr-2" /> Reset Kuota Bulan Ini
+                    </button>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
