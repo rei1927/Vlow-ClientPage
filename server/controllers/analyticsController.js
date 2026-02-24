@@ -280,8 +280,8 @@ export const getUsageStats = async (req, res, next) => {
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    // 3. Count total conversations (any log counts as 1 conversation)
-    const usedConversations = await ConversationLog.count({
+    // 3. Fetch logs to calculate tokens
+    const logs = await ConversationLog.findAll({
       where: {
         agentId: { [Op.in]: agentIds },
         mode: "production",
@@ -289,24 +289,20 @@ export const getUsageStats = async (req, res, next) => {
           [Op.gte]: firstDayOfMonth,
         },
       },
+      attributes: ["userMessage", "aiResponse"],
     });
 
-    // 4. Count AI Responses (only where aiResponse is not null and not empty)
-    const usedAiResponses = await ConversationLog.count({
-      where: {
-        agentId: { [Op.in]: agentIds },
-        mode: "production",
-        aiResponse: {
-          [Op.and]: [
-            { [Op.not]: null },
-            { [Op.ne]: "" }
-          ]
-        },
-        createdAt: {
-          [Op.gte]: firstDayOfMonth,
-        },
-      },
+    let totalUserChars = 0;
+    let totalAiChars = 0;
+
+    logs.forEach((log) => {
+      if (log.userMessage) totalUserChars += log.userMessage.length;
+      if (log.aiResponse) totalAiChars += log.aiResponse.length;
     });
+
+    // 4. Calculate Tokens (1 token = 4 characters, rounded up)
+    const usedConversations = Math.ceil(totalUserChars / 4);
+    const usedAiResponses = Math.ceil(totalAiChars / 4);
 
     res.status(200).json({
       success: true,
