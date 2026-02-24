@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux"; // Tambah useSelector
+import { useDispatch, useSelector } from "react-redux";
 import { logoutUser, reset } from "../../features/auth/authSlice";
+import axiosInstance from "../../api/axiosInstance";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import ConfirmationModal from "../ConfirmationModal"; // Pastikan path import benar
+import QuotaOverlay from "./QuotaOverlay";
+import ConfirmationModal from "../ConfirmationModal";
 
 const MainLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -13,8 +15,44 @@ const MainLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Ambil status loading dari auth state agar tombol modal bisa loading
-  const { isLoading } = useSelector((state) => state.auth);
+  const { user, isLoading } = useSelector((state) => state.auth);
+
+  // Centralized usage state (shared between Header & QuotaOverlay)
+  const [usage, setUsage] = useState({
+    conversations: 0,
+    aiResponses: 0,
+    maxConversations: 1000,
+    maxAiResponses: 1000,
+    isLoading: true,
+  });
+
+  useEffect(() => {
+    const fetchUsage = async () => {
+      if (user && user.role === "customer") {
+        setUsage((prev) => ({ ...prev, isLoading: true }));
+        try {
+          const res = await axiosInstance.get("/analytics/usage");
+          if (res.data?.success) {
+            setUsage({
+              conversations: res.data.data.usedConversations || 0,
+              aiResponses: res.data.data.usedAiResponses || 0,
+              maxConversations: res.data.data.maxConversations || 1000,
+              maxAiResponses: res.data.data.maxAiResponses || 1000,
+              isLoading: false,
+            });
+          }
+        } catch (error) {
+          console.error("Failed to fetch usage:", error);
+          setUsage((prev) => ({ ...prev, isLoading: false }));
+        }
+      } else {
+        // Admin or no user — no usage data needed
+        setUsage((prev) => ({ ...prev, isLoading: false }));
+      }
+    };
+
+    fetchUsage();
+  }, [user]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -44,8 +82,12 @@ const MainLayout = () => {
           transition-all duration-300 ease-in-out
         "
       >
-        {/* Header: Kita oper fungsi buka modal ke Header */}
-        <Header toggleSidebar={toggleSidebar} onLogout={() => setIsLogoutModalOpen(true)} />
+        {/* Header: pass usage data for coin tooltip */}
+        <Header
+          toggleSidebar={toggleSidebar}
+          onLogout={() => setIsLogoutModalOpen(true)}
+          usage={usage}
+        />
 
         {/* Page Content */}
         <main className="flex-1 px-4 pt-6 pb-21 sm:px-6 lg:px-8 overflow-y-auto bg-[var(--color-bg)]">
@@ -56,6 +98,9 @@ const MainLayout = () => {
         </main>
       </div>
 
+      {/* QUOTA / SUBSCRIPTION OVERLAY (Customer Only) */}
+      <QuotaOverlay user={user} usage={usage} />
+
       {/* GLOBAL LOGOUT MODAL  */}
       <ConfirmationModal
         isOpen={isLogoutModalOpen}
@@ -63,8 +108,8 @@ const MainLayout = () => {
         onConfirm={handleLogoutConfirm}
         title="Konfirmasi Logout"
         message="Apakah kamu ingin keluar dari aplikasi?"
-        variant="danger" // Merah (Visual)
-        confirmText="Keluar" // Teks Tombol Khusus Logout
+        variant="danger"
+        confirmText="Keluar"
         cancelText="Batal"
         isLoading={isLoading}
       />
@@ -73,3 +118,4 @@ const MainLayout = () => {
 };
 
 export default MainLayout;
+

@@ -229,9 +229,6 @@ export const updateUser = async (req, res, next) => {
     // Reload user to get updated data
     await user.reload();
 
-    // DEBUG LOG: verify saved values
-    console.log(`[updateUser] id=${user.id}, role=${role}, maxConversations=${user.maxConversations}, maxAiResponses=${user.maxAiResponses}, req.body.maxConversations=${maxConversations}`);
-
     res.status(200).json({
       success: true,
       message: resetQuota ? "Data user dan Kuota Pemakaian berhasil di-reset!" : "Data user berhasil diperbarui.",

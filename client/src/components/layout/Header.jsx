@@ -1,50 +1,17 @@
 import { FaBars, FaSun, FaMoon, FaCoins, FaSpinner } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { useState, useEffect } from "react";
 import { setTheme } from "../../features/theme/themeSlice";
-import axiosInstance from "../../api/axiosInstance";
 import Breadcrumbs from "../Breadcrumbs";
 import UserDropdown from "../UserDropdown";
 
-const Header = ({ toggleSidebar, onLogout }) => {
+const defaultUsage = { conversations: 0, aiResponses: 0, maxConversations: 1000, maxAiResponses: 1000, isLoading: true };
+
+const Header = ({ toggleSidebar, onLogout, usage = defaultUsage }) => {
   const { user } = useSelector((state) => state.auth);
   const themeMode = useSelector((state) => state.theme?.mode ?? "light");
   const dispatch = useDispatch();
   const isDark = themeMode === "dark";
 
-  const [usage, setUsage] = useState({
-    conversations: 0,
-    aiResponses: 0,
-    maxConversations: 1000,
-    maxAiResponses: 1000,
-    isLoading: false,
-  });
-
-  useEffect(() => {
-    const fetchUsage = async () => {
-      // Only fetch if it's a customer
-      if (user && user.role === "customer") {
-        setUsage((prev) => ({ ...prev, isLoading: true }));
-        try {
-          const res = await axiosInstance.get("/analytics/usage");
-          if (res.data?.success) {
-            setUsage({
-              conversations: res.data.data.usedConversations || 0,
-              aiResponses: res.data.data.usedAiResponses || 0,
-              maxConversations: res.data.data.maxConversations || 1000,
-              maxAiResponses: res.data.data.maxAiResponses || 1000,
-              isLoading: false,
-            });
-          }
-        } catch (error) {
-          console.error("Failed to fetch usage:", error);
-          setUsage((prev) => ({ ...prev, isLoading: false }));
-        }
-      }
-    };
-
-    fetchUsage();
-  }, [user]);
 
   return (
     <header className="sticky top-0 z-[60] bg-[var(--color-surface)]/95 backdrop-blur-sm border-b border-[var(--color-border)] h-14 sm:h-16 px-3 sm:px-6 flex items-center justify-between shadow-sm transition-all">
