@@ -263,6 +263,63 @@ export const getDashboardStats = async (req, res, next) => {
   }
 };
 
+// @desc    Get Usage Stats (Current Month)
+// @route   GET /api/analytics/usage
+export const getUsageStats = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    // 1. Get all agent IDs for this user
+    const userAgents = await Agent.findAll({
+      where: { userId },
+      attributes: ["id"],
+    });
+    const agentIds = userAgents.map((agent) => agent.id);
+
+    // 2. Calculate date range for current month
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // 3. Count total conversations (any log counts as 1 conversation)
+    const usedConversations = await ConversationLog.count({
+      where: {
+        agentId: { [Op.in]: agentIds },
+        mode: "production",
+        createdAt: {
+          [Op.gte]: firstDayOfMonth,
+        },
+      },
+    });
+
+    // 4. Count AI Responses (only where aiResponse is not null and not empty)
+    const usedAiResponses = await ConversationLog.count({
+      where: {
+        agentId: { [Op.in]: agentIds },
+        mode: "production",
+        aiResponse: {
+          [Op.and]: [
+            { [Op.not]: null },
+            { [Op.ne]: "" }
+          ]
+        },
+        createdAt: {
+          [Op.gte]: firstDayOfMonth,
+        },
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        usedConversations,
+        usedAiResponses,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Get Admin Dashboard Stats
 // @route   GET /api/analytics/admin-dashboard
 export const getAdminDashboardStats = async (req, res, next) => {
