@@ -96,9 +96,9 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-[var(--color-bg)] rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-[fadeIn_0.3s_ease-out] border border-[var(--color-border)]">
-        <div className="bg-[var(--color-primary)] px-6 py-4 flex justify-between items-center text-white">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <div className="bg-[var(--color-bg)] rounded-2xl shadow-2xl w-full max-w-lg max-h-[95vh] flex flex-col overflow-hidden animate-[fadeIn_0.3s_ease-out] border border-[var(--color-border)]">
+        <div className="bg-[var(--color-primary)] px-6 py-4 flex justify-between items-center text-white shrink-0">
           <h3 className="font-bold text-lg">
             {initialData ? "Edit User" : "Tambah Customer Baru"}
           </h3>
@@ -112,301 +112,303 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <fieldset disabled={isLoading} className="space-y-4">
-            {/* Nama */}
-            <div className="form-control">
-              <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                Nama Lengkap
-              </label>
-              <div className="relative">
-                <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                  <FaUser />
-                </div>
-                <input
-                  type="text"
-                  className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
-                  placeholder="Contoh: Budi Santoso"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Email */}
-            <div className="form-control">
-              <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                  <FaEnvelope />
-                </div>
-                <input
-                  type="email"
-                  className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
-                  placeholder="email@company.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  disabled={!!initialData}
-                  required
-                />
-              </div>
-              {!initialData && (
-                <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
-                  *Password sementara akan dikirim ke email ini.
-                </span>
-              )}
-            </div>
-
-            {/* Role & Status */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="form-control">
-                <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">Role</label>
-                <div className="relative">
-                  <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                    <FaUserTag />
-                  </div>
-                  <select
-                    className="select select-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
-                    value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  >
-                    <option value="customer">Customer</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-              </div>
-
-              {initialData && (
-                <div className="form-control">
-                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                    Status Akun
-                  </label>
-                  <select
-                    className={`select select-bordered w-full rounded-xl font-bold bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] ${formData.isActive ? "text-green-600" : "text-red-500"
-                      }`}
-                    value={formData.isActive}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        isActive: e.target.value === "true",
-                      })
-                    }
-                  >
-                    <option value="true">Active</option>
-                    <option value="false">Inactive / Suspend</option>
-                  </select>
-                </div>
-              )}
-            </div>
-
-            {/* Subscription Validity - Only for Customer */}
-            {formData.role === "customer" && (
+        <div className="overflow-y-auto p-6 flex-1 custom-scrollbar">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <fieldset disabled={isLoading} className="space-y-4">
+              {/* Nama */}
               <div className="form-control">
                 <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                  Berlaku Sampai Tanggal
+                  Nama Lengkap
                 </label>
                 <div className="relative">
                   <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                    <FaCalendarAlt />
+                    <FaUser />
                   </div>
                   <input
-                    type="date"
-                    className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
-                    value={formData.subscriptionExpiry}
-                    onChange={(e) =>
-                      setFormData({ ...formData, subscriptionExpiry: e.target.value })
-                    }
-                    required={formData.role === "customer"}
+                    type="text"
+                    className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
+                    placeholder="Contoh: Budi Santoso"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
                   />
                 </div>
-                <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
-                  *Tentukan tanggal batas akhir langganan (Otomatis ditutup pada 23:59)
-                </span>
               </div>
-            )}
 
-            {/* Conversation Limits */}
-            {formData.role === "customer" && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="form-control">
-                    <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                      Batas Maksimal Conversation
-                    </label>
-                    <div className="relative">
-                      <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                        <span className="font-bold">#</span>
-                      </div>
-                      <input
-                        type="number"
-                        min="1"
-                        className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
-                        value={formData.maxConversations}
-                        onChange={(e) =>
-                          setFormData({ ...formData, maxConversations: parseInt(e.target.value) || 1 })
-                        }
-                      />
-                    </div>
+              {/* Email */}
+              <div className="form-control">
+                <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                    <FaEnvelope />
                   </div>
+                  <input
+                    type="email"
+                    className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
+                    placeholder="email@company.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    disabled={!!initialData}
+                    required
+                  />
+                </div>
+                {!initialData && (
+                  <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
+                    *Password sementara akan dikirim ke email ini.
+                  </span>
+                )}
+              </div>
 
-                  <div className="form-control">
-                    <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                      Batas Maksimal AI Responses
-                    </label>
-                    <div className="relative">
-                      <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                        <span className="font-bold">#</span>
-                      </div>
-                      <input
-                        type="number"
-                        min="1"
-                        className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
-                        value={formData.maxAiResponses}
-                        onChange={(e) =>
-                          setFormData({ ...formData, maxAiResponses: parseInt(e.target.value) || 1 })
-                        }
-                      />
+              {/* Role & Status */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="form-control">
+                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">Role</label>
+                  <div className="relative">
+                    <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                      <FaUserTag />
                     </div>
+                    <select
+                      className="select select-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
+                      value={formData.role}
+                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    >
+                      <option value="customer">Customer</option>
+                      <option value="admin">Admin</option>
+                    </select>
                   </div>
                 </div>
 
-                {/* Tombol Reset Kuota (Hanya muncul jika mode Edit) */}
                 {initialData && (
-                  <div className="flex justify-end pt-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (window.confirm("Yakin ingin mereset kuota limit bulan ini menjadi 0 secara permanen?")) {
-                          const updatedData = { ...formData, resetQuota: true };
-                          setFormData(updatedData);
-                          onSubmit(updatedData);
-                        }
-                      }}
-                      className="btn btn-sm bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-800/50 text-red-600 dark:text-red-400 border-none font-bold rounded-lg shadow-sm w-full sm:w-auto"
+                  <div className="form-control">
+                    <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                      Status Akun
+                    </label>
+                    <select
+                      className={`select select-bordered w-full rounded-xl font-bold bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] ${formData.isActive ? "text-green-600" : "text-red-500"
+                        }`}
+                      value={formData.isActive}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          isActive: e.target.value === "true",
+                        })
+                      }
                     >
-                      <FaRedo className="mr-2" /> Reset Kuota Bulan Ini
-                    </button>
+                      <option value="true">Active</option>
+                      <option value="false">Inactive / Suspend</option>
+                    </select>
                   </div>
                 )}
               </div>
-            )}
 
-            {/* Max Platforms Limit - Only for Customer */}
-            {formData.role === "customer" && (
-              <div className="form-control">
-                <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                  Batas Maksimal Sesi WhatsApp
-                </label>
-                <div className="relative">
-                  <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                    <span className="font-bold">#</span>
+              {/* Subscription Validity - Only for Customer */}
+              {formData.role === "customer" && (
+                <div className="form-control">
+                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                    Berlaku Sampai Tanggal
+                  </label>
+                  <div className="relative">
+                    <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                      <FaCalendarAlt />
+                    </div>
+                    <input
+                      type="date"
+                      className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
+                      value={formData.subscriptionExpiry}
+                      onChange={(e) =>
+                        setFormData({ ...formData, subscriptionExpiry: e.target.value })
+                      }
+                      required={formData.role === "customer"}
+                    />
                   </div>
-                  <input
-                    type="number"
-                    min="1"
-                    className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
-                    value={formData.maxPlatforms}
-                    onChange={(e) =>
-                      setFormData({ ...formData, maxPlatforms: parseInt(e.target.value) || 1 })
-                    }
-                    require={formData.role === "customer"}
-                  />
-                </div>
-                <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
-                  *Berapa banyak nomor WA yang boleh dihubungkan oleh pengguna ini? (Default: 1)
-                </span>
-              </div>
-            )}
-
-            {/* n8n Webhook URL - Only for Customer */}
-            {formData.role === "customer" && (
-              <div className="form-control">
-                <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                  URL Webhook n8n <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                    <FaLink />
-                  </div>
-                  <input
-                    type="url"
-                    className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
-                    placeholder="https://n8n.example.com/webhook/..."
-                    value={formData.n8nWebhookUrl}
-                    onChange={(e) => setFormData({ ...formData, n8nWebhookUrl: e.target.value })}
-                    required={!initialData && formData.role === "customer"}
-                    pattern="https?://.+"
-                    title="Masukkan URL yang valid (contoh: https://n8n.example.com/webhook/...)"
-                  />
-                </div>
-                <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
-                  *Wajib diisi. Harus berupa link URL (http atau https) untuk webhook n8n.
-                </span>
-              </div>
-            )}
-
-            {/* n8n Simulator Webhook URL - Only for Customer */}
-            {formData.role === "customer" && (
-              <div className="form-control">
-                <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                  URL Webhook Simulator n8n <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
-                    <FaLink />
-                  </div>
-                  <input
-                    type="url"
-                    className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
-                    placeholder="https://n8n.example.com/webhook-test/simulator-chat"
-                    value={formData.n8nSimulatorWebhookUrl}
-                    onChange={(e) => setFormData({ ...formData, n8nSimulatorWebhookUrl: e.target.value })}
-                    required={!initialData && formData.role === "customer"}
-                    pattern="https?://.+"
-                    title="Masukkan URL yang valid (contoh: https://n8n.example.com/webhook-test/...)"
-                  />
-                </div>
-                <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
-                  *Wajib diisi. Khusus untuk testing di AI Simulator Dashboard Vlow.
-                </span>
-              </div>
-            )}
-          </fieldset>
-
-          {/* Actions */}
-          <div className="flex gap-3 pt-4 mt-2 border-t border-[var(--color-border)]">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isLoading}
-              className="btn flex-1 bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-border)] normal-case disabled:opacity-50"
-            >
-              Batal
-            </button>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="btn flex-1 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white border-none normal-case disabled:opacity-80"
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="loading loading-spinner loading-sm"></span>
-                  <span className="text-sm font-semibold">
-                    {initialData ? "Menyimpan..." : "Memproses..."}
+                  <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
+                    *Tentukan tanggal batas akhir langganan (Otomatis ditutup pada 23:59)
                   </span>
-                </span>
-              ) : initialData ? (
-                "Simpan Perubahan"
-              ) : (
-                "Tambah User"
+                </div>
               )}
-            </button>
-          </div>
-        </form>
+
+              {/* Conversation Limits */}
+              {formData.role === "customer" && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="form-control">
+                      <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                        Batas Maksimal Conversation
+                      </label>
+                      <div className="relative">
+                        <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                          <span className="font-bold">#</span>
+                        </div>
+                        <input
+                          type="number"
+                          min="1"
+                          className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
+                          value={formData.maxConversations}
+                          onChange={(e) =>
+                            setFormData({ ...formData, maxConversations: parseInt(e.target.value) || 1 })
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-control">
+                      <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                        Batas Maksimal AI Responses
+                      </label>
+                      <div className="relative">
+                        <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                          <span className="font-bold">#</span>
+                        </div>
+                        <input
+                          type="number"
+                          min="1"
+                          className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
+                          value={formData.maxAiResponses}
+                          onChange={(e) =>
+                            setFormData({ ...formData, maxAiResponses: parseInt(e.target.value) || 1 })
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tombol Reset Kuota (Hanya muncul jika mode Edit) */}
+                  {initialData && (
+                    <div className="flex justify-end pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm("Yakin ingin mereset kuota limit bulan ini menjadi 0 secara permanen?")) {
+                            const updatedData = { ...formData, resetQuota: true };
+                            setFormData(updatedData);
+                            onSubmit(updatedData);
+                          }
+                        }}
+                        className="btn btn-sm bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-800/50 text-red-600 dark:text-red-400 border-none font-bold rounded-lg shadow-sm w-full sm:w-auto"
+                      >
+                        <FaRedo className="mr-2" /> Reset Kuota Bulan Ini
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Max Platforms Limit - Only for Customer */}
+              {formData.role === "customer" && (
+                <div className="form-control">
+                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                    Batas Maksimal Sesi WhatsApp
+                  </label>
+                  <div className="relative">
+                    <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                      <span className="font-bold">#</span>
+                    </div>
+                    <input
+                      type="number"
+                      min="1"
+                      className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)]"
+                      value={formData.maxPlatforms}
+                      onChange={(e) =>
+                        setFormData({ ...formData, maxPlatforms: parseInt(e.target.value) || 1 })
+                      }
+                      require={formData.role === "customer"}
+                    />
+                  </div>
+                  <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
+                    *Berapa banyak nomor WA yang boleh dihubungkan oleh pengguna ini? (Default: 1)
+                  </span>
+                </div>
+              )}
+
+              {/* n8n Webhook URL - Only for Customer */}
+              {formData.role === "customer" && (
+                <div className="form-control">
+                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                    URL Webhook n8n <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                      <FaLink />
+                    </div>
+                    <input
+                      type="url"
+                      className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
+                      placeholder="https://n8n.example.com/webhook/..."
+                      value={formData.n8nWebhookUrl}
+                      onChange={(e) => setFormData({ ...formData, n8nWebhookUrl: e.target.value })}
+                      required={!initialData && formData.role === "customer"}
+                      pattern="https?://.+"
+                      title="Masukkan URL yang valid (contoh: https://n8n.example.com/webhook/...)"
+                    />
+                  </div>
+                  <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
+                    *Wajib diisi. Harus berupa link URL (http atau https) untuk webhook n8n.
+                  </span>
+                </div>
+              )}
+
+              {/* n8n Simulator Webhook URL - Only for Customer */}
+              {formData.role === "customer" && (
+                <div className="form-control">
+                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                    URL Webhook Simulator n8n <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                      <FaLink />
+                    </div>
+                    <input
+                      type="url"
+                      className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
+                      placeholder="https://n8n.example.com/webhook-test/simulator-chat"
+                      value={formData.n8nSimulatorWebhookUrl}
+                      onChange={(e) => setFormData({ ...formData, n8nSimulatorWebhookUrl: e.target.value })}
+                      required={!initialData && formData.role === "customer"}
+                      pattern="https?://.+"
+                      title="Masukkan URL yang valid (contoh: https://n8n.example.com/webhook-test/...)"
+                    />
+                  </div>
+                  <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
+                    *Wajib diisi. Khusus untuk testing di AI Simulator Dashboard Vlow.
+                  </span>
+                </div>
+              )}
+            </fieldset>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4 mt-2 border-t border-[var(--color-border)]">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isLoading}
+                className="btn flex-1 bg-[var(--color-surface)] border-[var(--color-border)] text-[var(--color-text)] hover:bg-[var(--color-border)] normal-case disabled:opacity-50"
+              >
+                Batal
+              </button>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="btn flex-1 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white border-none normal-case disabled:opacity-80"
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="loading loading-spinner loading-sm"></span>
+                    <span className="text-sm font-semibold">
+                      {initialData ? "Menyimpan..." : "Memproses..."}
+                    </span>
+                  </span>
+                ) : initialData ? (
+                  "Simpan Perubahan"
+                ) : (
+                  "Tambah User"
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

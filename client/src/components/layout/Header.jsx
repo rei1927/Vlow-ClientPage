@@ -15,6 +15,8 @@ const Header = ({ toggleSidebar, onLogout }) => {
   const [usage, setUsage] = useState({
     conversations: 0,
     aiResponses: 0,
+    maxConversations: 1000,
+    maxAiResponses: 1000,
     isLoading: false,
   });
 
@@ -29,6 +31,8 @@ const Header = ({ toggleSidebar, onLogout }) => {
             setUsage({
               conversations: res.data.data.usedConversations || 0,
               aiResponses: res.data.data.usedAiResponses || 0,
+              maxConversations: res.data.data.maxConversations || 1000,
+              maxAiResponses: res.data.data.maxAiResponses || 1000,
               isLoading: false,
             });
           }
@@ -130,7 +134,7 @@ const Header = ({ toggleSidebar, onLogout }) => {
                         usage.conversations
                       )}
                       <span className="text-gray-400 dark:text-gray-500 font-normal">/</span>
-                      {user?.maxConversations || "1000"}
+                      {usage.maxConversations}
                     </span>
                   </div>
 
@@ -145,7 +149,7 @@ const Header = ({ toggleSidebar, onLogout }) => {
                         usage.aiResponses
                       )}
                       <span className="text-gray-400 dark:text-gray-500 font-normal">/</span>
-                      {user?.maxAiResponses || "1000"}
+                      {usage.maxAiResponses}
                     </span>
                   </div>
                 </div>
