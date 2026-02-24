@@ -313,11 +313,16 @@ export const getUsageStats = async (req, res, next) => {
     const usedConversations = Math.ceil(totalUserChars / 4);
     const usedAiResponses = Math.ceil(totalAiChars / 4);
 
+    // DEBUG LOG: trace actual DB values
+    console.log(`[getUsageStats] userId=${userId}, userObj.maxConversations=${userObj?.maxConversations}, userObj.maxAiResponses=${userObj?.maxAiResponses}`);
+
     res.status(200).json({
       success: true,
       data: {
         usedConversations,
         usedAiResponses,
+        maxConversations: userObj ? userObj.maxConversations : 1000,
+        maxAiResponses: userObj ? userObj.maxAiResponses : 1000,
       },
     });
   } catch (error) {
