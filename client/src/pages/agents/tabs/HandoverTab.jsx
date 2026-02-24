@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaToggleOff, FaLightbulb, FaTimes, FaPlus, FaBrain } from "react-icons/fa";
+import { FaToggleOff, FaTimes, FaPlus, FaBrain } from "react-icons/fa";
 import { FiShield, FiClock, FiTag, FiMessageSquare, FiAlertTriangle } from "react-icons/fi";
 
 const HandoverTab = ({ config, setConfig }) => {
@@ -41,7 +41,7 @@ const HandoverTab = ({ config, setConfig }) => {
                     <div>
                         <h3 className="font-bold text-[var(--color-text)] text-lg">Human Handover</h3>
                         <p className="text-sm text-[var(--color-text-muted)]">
-                            Otomatis alihkan percakapan ke manusia berdasarkan kata kunci tertentu.
+                            Otomatis alihkan percakapan ke manusia berdasarkan kata kunci atau deteksi AI.
                         </p>
                     </div>
                 </div>
@@ -63,16 +63,16 @@ const HandoverTab = ({ config, setConfig }) => {
 
             {/* --- CONFIGURATION PANEL (Only if Active) --- */}
             {config.enabled ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up">
-                    {/* LEFT: KEYWORDS */}
-                    <div className="space-y-6">
-                        {/* Keyword Input */}
+                <div className="space-y-6 animate-slide-up">
+                    {/* ROW 1: Keywords + Response Message */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* LEFT: Keyword Input */}
                         <div className="bg-[var(--color-surface)] p-6 rounded-2xl shadow-sm border border-[var(--color-border)]">
-                            <h4 className="font-bold text-[var(--color-text)] mb-4 flex items-center gap-2">
+                            <h4 className="font-bold text-[var(--color-text)] mb-3 flex items-center gap-2">
                                 <FiTag className="text-blue-500" /> Kata Kunci Trigger
                             </h4>
-                            <p className="text-xs text-[var(--color-text-muted)] mb-4">
-                                Jika customer mengirim pesan yang mengandung salah satu kata kunci ini, AI akan berhenti dan chat dialihkan ke manusia.
+                            <p className="text-xs text-[var(--color-text-muted)] mb-3">
+                                Jika customer mengirim pesan yang mengandung salah satu kata kunci ini, chat dialihkan ke manusia.
                             </p>
 
                             <div className="join w-full mb-3">
@@ -93,11 +93,10 @@ const HandoverTab = ({ config, setConfig }) => {
                                 </button>
                             </div>
 
-                            {/* Keywords Tags */}
-                            <div className="flex flex-wrap gap-2 min-h-10">
+                            <div className="flex flex-wrap gap-2 min-h-8">
                                 {(config.keywords || []).length === 0 ? (
                                     <span className="text-xs text-[var(--color-text-muted)] italic">
-                                        Belum ada kata kunci. Tambahkan di atas.
+                                        Belum ada kata kunci.
                                     </span>
                                 ) : (
                                     (config.keywords || []).map((kw, idx) => (
@@ -119,18 +118,57 @@ const HandoverTab = ({ config, setConfig }) => {
                             </div>
                         </div>
 
-                        {/* Auto-Release & Label Settings */}
+                        {/* RIGHT: Response Message */}
                         <div className="bg-[var(--color-surface)] p-6 rounded-2xl shadow-sm border border-[var(--color-border)]">
-                            <h4 className="font-bold text-[var(--color-text)] mb-4 flex items-center gap-2">
-                                <FiClock className="text-green-500" /> Auto-Release Timer
+                            <h4 className="font-bold text-[var(--color-text)] mb-3 flex items-center gap-2">
+                                <FiMessageSquare className="text-purple-500" /> Pesan Saat Handover
                             </h4>
-                            <p className="text-xs text-[var(--color-text-muted)] mb-4">
-                                AI akan otomatis aktif kembali jika admin tidak membalas dalam waktu tertentu.
+                            <p className="text-xs text-[var(--color-text-muted)] mb-3">
+                                Pesan otomatis ke customer saat percakapan dialihkan ke manusia.
                             </p>
 
+                            <textarea
+                                className="textarea textarea-bordered w-full h-28 bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] resize-none"
+                                placeholder="Contoh: Baik, saya akan menghubungkan Anda dengan tim kami. Mohon tunggu sebentar."
+                                value={config.responseMessage || ""}
+                                onChange={(e) => handleChange("responseMessage", e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    {/* ROW 2: Escalation AI Prompt (full width) */}
+                    <div className="bg-[var(--color-surface)] p-6 rounded-2xl shadow-sm border border-[var(--color-border)]">
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="font-bold text-[var(--color-text)] flex items-center gap-2">
+                                <FiAlertTriangle className="text-red-500" /> Instruksi Escalation AI
+                            </h4>
+                            <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-full border border-blue-200 dark:border-blue-800">
+                                <FaBrain className="text-blue-500" size={12} />
+                                <span className="text-xs text-blue-700 dark:text-blue-300 font-medium">Tanpa kata kunci — AI deteksi otomatis</span>
+                            </div>
+                        </div>
+                        <p className="text-xs text-[var(--color-text-muted)] mb-3">
+                            Tentukan kondisi di mana AI harus otomatis mengalihkan ke manusia berdasarkan analisis percakapan.
+                        </p>
+
+                        <textarea
+                            className="textarea textarea-bordered w-full h-28 bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] resize-none text-sm"
+                            placeholder={"Contoh:\n- Jika customer menunjukkan emosi marah atau frustasi berulang kali\n- Jika ada pertanyaan yang tidak bisa dijawab dari knowledge yang tersedia\n- Jika customer meminta berbicara dengan manusia\n- Jika situasi memerlukan keputusan manusia (refund, pembatalan, dll)"}
+                            value={config.escalationPrompt || ""}
+                            onChange={(e) => handleChange("escalationPrompt", e.target.value)}
+                        />
+                    </div>
+
+                    {/* ROW 3: Auto-Release + Labels (compact row) */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Auto-Release Timer */}
+                        <div className="bg-[var(--color-surface)] p-5 rounded-2xl shadow-sm border border-[var(--color-border)]">
+                            <h4 className="font-bold text-[var(--color-text)] mb-3 flex items-center gap-2 text-sm">
+                                <FiClock className="text-green-500" /> Auto-Release Timer
+                            </h4>
                             <div className="form-control w-full">
-                                <label className="label">
-                                    <span className="label-text font-medium text-[var(--color-text-muted)]">
+                                <label className="label py-1">
+                                    <span className="label-text text-xs font-medium text-[var(--color-text-muted)]">
                                         Durasi (menit)
                                     </span>
                                 </label>
@@ -138,126 +176,42 @@ const HandoverTab = ({ config, setConfig }) => {
                                     type="number"
                                     min="5"
                                     max="1440"
-                                    className="input input-bordered w-full bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
+                                    className="input input-bordered input-sm w-full bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
                                     value={config.autoReleaseMinutes || 30}
                                     onChange={(e) => handleChange("autoReleaseMinutes", parseInt(e.target.value) || 30)}
                                 />
-                                <label className="label">
-                                    <span className="text-xs text-[var(--color-text-muted)] italic">
-                                        *) Minimum 5 menit, maksimum 1440 menit (24 jam).
-                                    </span>
-                                </label>
-                            </div>
-
-                            {/* WA Label IDs */}
-                            <div className="divider text-xs text-[var(--color-text-muted)]">Label WhatsApp</div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="form-control">
-                                    <label className="label">
-                                        <span className="label-text text-xs font-medium text-[var(--color-text-muted)]">
-                                            🤖 Label AI
-                                        </span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="input input-bordered input-sm bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
-                                        placeholder="Label ID"
-                                        value={config.aiLabelId || ""}
-                                        onChange={(e) => handleChange("aiLabelId", e.target.value || null)}
-                                    />
-                                </div>
-                                <div className="form-control">
-                                    <label className="label">
-                                        <span className="label-text text-xs font-medium text-[var(--color-text-muted)]">
-                                            👤 Label Human
-                                        </span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="input input-bordered input-sm bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
-                                        placeholder="Label ID"
-                                        value={config.handoverLabelId || ""}
-                                        onChange={(e) => handleChange("handoverLabelId", e.target.value || null)}
-                                    />
-                                </div>
-                            </div>
-                            <p className="text-xs text-[var(--color-text-muted)] mt-2">
-                                Masukkan ID label dari WhatsApp Business. Bisa dilihat di menu Chat → Label.
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* RIGHT: RESPONSE MESSAGE */}
-                    <div className="space-y-6">
-                        <div className="bg-[var(--color-surface)] p-6 rounded-2xl shadow-sm border border-[var(--color-border)] h-full flex flex-col">
-                            <h4 className="font-bold text-[var(--color-text)] mb-2 flex items-center gap-2">
-                                <FiMessageSquare className="text-purple-500" /> Pesan Saat Handover
-                            </h4>
-                            <p className="text-xs text-[var(--color-text-muted)] mb-4">
-                                Pesan ini akan dikirim secara otomatis ke customer saat percakapan dialihkan ke manusia.
-                            </p>
-
-                            <textarea
-                                className="textarea textarea-bordered w-full h-32 bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] resize-none"
-                                placeholder="Contoh: Baik, saya akan menghubungkan Anda dengan tim kami. Mohon tunggu sebentar."
-                                value={config.responseMessage || ""}
-                                onChange={(e) => handleChange("responseMessage", e.target.value)}
-                            />
-
-                            <div className="mt-6 bg-[var(--color-surface)] p-4 rounded-xl border border-[var(--color-border)] text-sm text-[var(--color-text)]">
-                                <div className="flex items-start gap-2">
-                                    <FaLightbulb className="mt-1 text-[var(--color-primary)] shrink-0" />
-                                    <div>
-                                        <p className="font-semibold mb-1">Cara Kerja Human Handover:</p>
-                                        <ol className="list-decimal list-inside space-y-1 text-xs text-[var(--color-text-muted)]">
-                                            <li>Customer kirim pesan yang mengandung kata kunci</li>
-                                            <li>AI otomatis berhenti dan mengirim pesan handover</li>
-                                            <li>Label WhatsApp berubah ke mode <strong>Human</strong></li>
-                                            <li>Admin bisa balas dari WhatsApp atau Dashboard</li>
-                                            <li>Admin tekan "Release to AI" atau auto-release setelah timer habis</li>
-                                        </ol>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="mt-4 bg-orange-50 dark:bg-orange-900/20 p-4 rounded-xl border border-orange-200 dark:border-orange-800 text-sm">
-                                <div className="flex items-start gap-2">
-                                    <FiShield className="mt-0.5 text-orange-500 shrink-0" />
-                                    <div>
-                                        <p className="font-semibold text-orange-700 dark:text-orange-300 mb-1">Trigger Manual</p>
-                                        <p className="text-xs text-orange-600 dark:text-orange-400">
-                                            Selain kata kunci, Anda juga bisa menekan tombol <strong>"Take Over"</strong> di Chat Dashboard untuk mengambil alih percakapan secara manual.
-                                        </p>
-                                    </div>
-                                </div>
+                                <span className="text-[10px] text-[var(--color-text-muted)] mt-1">Min 5, Max 1440 (24 jam)</span>
                             </div>
                         </div>
 
-                        {/* AI ESCALATION PROMPT */}
-                        <div className="bg-[var(--color-surface)] p-6 rounded-2xl shadow-sm border border-[var(--color-border)]">
-                            <h4 className="font-bold text-[var(--color-text)] mb-2 flex items-center gap-2">
-                                <FiAlertTriangle className="text-red-500" /> Instruksi Escalation AI
+                        {/* Label AI */}
+                        <div className="bg-[var(--color-surface)] p-5 rounded-2xl shadow-sm border border-[var(--color-border)]">
+                            <h4 className="font-bold text-[var(--color-text)] mb-3 flex items-center gap-2 text-sm">
+                                🤖 Label AI
                             </h4>
-                            <p className="text-xs text-[var(--color-text-muted)] mb-4">
-                                Tentukan kondisi di mana AI harus otomatis mengalihkan ke manusia. Instruksi ini akan ditambahkan ke system prompt AI.
-                            </p>
-
-                            <textarea
-                                className="textarea textarea-bordered w-full h-40 bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] resize-none text-sm"
-                                placeholder={"Contoh:\n- Jika customer menunjukkan emosi marah atau frustasi berulang kali\n- Jika ada pertanyaan yang tidak bisa dijawab dari knowledge yang tersedia\n- Jika customer meminta berbicara dengan manusia\n- Jika situasi memerlukan keputusan manusia (refund, pembatalan, dll)"}
-                                value={config.escalationPrompt || ""}
-                                onChange={(e) => handleChange("escalationPrompt", e.target.value)}
+                            <input
+                                type="text"
+                                className="input input-bordered input-sm w-full bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
+                                placeholder="Label ID"
+                                value={config.aiLabelId || ""}
+                                onChange={(e) => handleChange("aiLabelId", e.target.value || null)}
                             />
+                            <span className="text-[10px] text-[var(--color-text-muted)] mt-1 block">ID label dari WA Business</span>
+                        </div>
 
-                            <div className="mt-3 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-xl border border-blue-200 dark:border-blue-800">
-                                <div className="flex items-start gap-2">
-                                    <FaBrain className="mt-0.5 text-blue-500 shrink-0" size={14} />
-                                    <p className="text-xs text-blue-700 dark:text-blue-300">
-                                        AI akan menganalisis setiap pesan dan jika memenuhi kondisi di atas, otomatis mengalihkan ke manusia <strong>tanpa perlu kata kunci spesifik</strong>.
-                                    </p>
-                                </div>
-                            </div>
+                        {/* Label Human */}
+                        <div className="bg-[var(--color-surface)] p-5 rounded-2xl shadow-sm border border-[var(--color-border)]">
+                            <h4 className="font-bold text-[var(--color-text)] mb-3 flex items-center gap-2 text-sm">
+                                👤 Label Human
+                            </h4>
+                            <input
+                                type="text"
+                                className="input input-bordered input-sm w-full bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
+                                placeholder="Label ID"
+                                value={config.handoverLabelId || ""}
+                                onChange={(e) => handleChange("handoverLabelId", e.target.value || null)}
+                            />
+                            <span className="text-[10px] text-[var(--color-text-muted)] mt-1 block">ID label dari WA Business</span>
                         </div>
                     </div>
                 </div>
@@ -269,7 +223,7 @@ const HandoverTab = ({ config, setConfig }) => {
                     </div>
                     <h3 className="font-bold text-[var(--color-text-muted)] text-lg">Fitur Non-aktif</h3>
                     <p className="text-[var(--color-text-muted)] max-w-md mx-auto mt-2">
-                        Aktifkan toggle di atas untuk mengatur Human Handover — alihkan chat ke manusia berdasarkan kata kunci tertentu.
+                        Aktifkan toggle di atas untuk mengatur Human Handover.
                     </p>
                 </div>
             )}
