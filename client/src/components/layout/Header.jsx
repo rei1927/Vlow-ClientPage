@@ -43,7 +43,7 @@ const Header = ({ toggleSidebar, onLogout }) => {
   }, [user]);
 
   return (
-    <header className="sticky top-0 z-30 bg-[var(--color-surface)]/95 backdrop-blur-sm border-b border-[var(--color-border)] h-14 sm:h-16 px-3 sm:px-6 flex items-center justify-between shadow-sm transition-all">
+    <header className="sticky top-0 z-[60] bg-[var(--color-surface)]/95 backdrop-blur-sm border-b border-[var(--color-border)] h-14 sm:h-16 px-3 sm:px-6 flex items-center justify-between shadow-sm transition-all">
       <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
         <button
           onClick={toggleSidebar}
