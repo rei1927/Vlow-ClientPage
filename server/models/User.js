@@ -48,6 +48,18 @@ const User = sequelize.define(
       allowNull: true,
       comment: "Tanggal berakhirnya langganan (hanya untuk customer)",
     },
+    maxConversations: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1000,
+      comment: "Limit maksimal percakapan chat masuk/keluar untuk akun customer",
+    },
+    maxAiResponses: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1000,
+      comment: "Limit maksimal response AI yang digenerate untuk akun customer",
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,

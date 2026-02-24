@@ -1,4 +1,4 @@
-import { FaBars, FaSun, FaMoon } from "react-icons/fa";
+import { FaBars, FaSun, FaMoon, FaCoins } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { setTheme } from "../../features/theme/themeSlice";
 import Breadcrumbs from "../Breadcrumbs";
@@ -36,11 +36,10 @@ const Header = ({ toggleSidebar, onLogout }) => {
           <button
             type="button"
             onClick={() => dispatch(setTheme("light"))}
-            className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 ${
-              !isDark
-                ? "bg-[var(--color-primary)] text-white shadow-md"
-                : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
-            }`}
+            className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 ${!isDark
+              ? "bg-[var(--color-primary)] text-white shadow-md"
+              : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+              }`}
             aria-pressed={!isDark}
             aria-label="Mode terang"
             title="Mode terang"
@@ -50,11 +49,10 @@ const Header = ({ toggleSidebar, onLogout }) => {
           <button
             type="button"
             onClick={() => dispatch(setTheme("dark"))}
-            className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 ${
-              isDark
-                ? "bg-[var(--color-primary)] text-white shadow-md"
-                : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
-            }`}
+            className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 ${isDark
+              ? "bg-[var(--color-primary)] text-white shadow-md"
+              : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+              }`}
             aria-pressed={isDark}
             aria-label="Mode gelap"
             title="Mode gelap"
@@ -62,6 +60,51 @@ const Header = ({ toggleSidebar, onLogout }) => {
             <FaMoon size={16} className="sm:w-4 sm:h-4" />
           </button>
         </div>
+
+        {/* Package Details Coin (Visible for Customers) */}
+        {user?.role !== "admin" && (
+          <div className="relative group flex items-center h-full">
+            <button
+              type="button"
+              className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-500 hover:bg-yellow-200 dark:hover:bg-yellow-800/50 transition-colors"
+              aria-label="Package Details"
+            >
+              <FaCoins size={16} className="sm:w-4 sm:h-4" />
+            </button>
+
+            {/* Tooltip Hover Box */}
+            <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform origin-top-right scale-95 group-hover:scale-100">
+              <div className="p-4 space-y-3">
+                <h4 className="font-bold text-gray-800 dark:text-gray-100 text-sm border-b border-gray-100 dark:border-gray-700 pb-2">
+                  Package Details
+                </h4>
+
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 dark:text-gray-400 font-medium tracking-wide text-[11px] uppercase">Expires</span>
+                    <span className="font-semibold text-gray-800 dark:text-gray-200">
+                      {user?.subscriptionExpiry ? new Date(user.subscriptionExpiry).toLocaleDateString() : "Never"}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 dark:text-gray-400 font-medium tracking-wide text-[11px] uppercase">Conversation</span>
+                    <span className="font-semibold text-gray-800 dark:text-gray-200">
+                      0 <span className="text-gray-400 dark:text-gray-500 font-normal mx-1">/</span> {user?.maxConversations || "1000"}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-500 dark:text-gray-400 font-medium tracking-wide text-[11px] uppercase">Ai Responses</span>
+                    <span className="font-semibold text-gray-800 dark:text-gray-200">
+                      0 <span className="text-gray-400 dark:text-gray-500 font-normal mx-1">/</span> {user?.maxAiResponses || "1000"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="h-6 sm:h-8 w-px bg-[var(--color-border)] hidden sm:block" />
         <UserDropdown user={user} onLogout={onLogout} />

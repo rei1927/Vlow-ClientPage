@@ -35,8 +35,9 @@ export const sendTokenResponse = (user, statusCode, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
-        isFirstLogin: user.isFirstLogin,
         subscriptionExpiry: user.subscriptionExpiry,
+        maxConversations: user.maxConversations,
+        maxAiResponses: user.maxAiResponses,
         // Don't send n8nWebhookUrl to customer - security measure
         ...(user.role === "admin" ? { n8nWebhookUrl: user.n8nWebhookUrl } : {}),
       },
