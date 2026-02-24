@@ -5,8 +5,8 @@ const sendEmail = async (options) => {
   // 1. Buat Transporter (Konfigurasi SMTP)
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: false, // true untuk port 465, false untuk port lain
+    port: process.env.SMTP_PORT || 465,
+    secure: Number(process.env.SMTP_PORT || 465) === 465, // true untuk port 465, false untuk port lain
     auth: {
       user: process.env.SMTP_EMAIL,
       pass: process.env.SMTP_PASSWORD,
