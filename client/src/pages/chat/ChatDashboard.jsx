@@ -710,28 +710,51 @@ const ChatDashboard = () => {
                         </div>
 
                         {/* Chat Input */}
-                        <form onSubmit={handleSendMessage} className="p-3 bg-[var(--color-surface)] border-t border-[var(--color-border)] flex items-center gap-3 z-10">
-                            <button type="button" className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-2">
-                                <FaSmile className="text-xl" />
-                            </button>
-                            <div className="flex-1 bg-[var(--color-bg)] rounded-xl border border-[var(--color-border)] flex items-center px-4 py-2 focus-within:border-[var(--color-primary)]">
-                                <input
-                                    type="text"
-                                    value={inputText}
-                                    onChange={(e) => setInputText(e.target.value)}
-                                    placeholder="Ketik pesan..."
-                                    className="w-full bg-transparent border-none focus:outline-none text-sm text-[var(--color-text)]"
-                                    disabled={isSending || isFetchingMessages}
-                                />
+                        {handoverStatus === 'human' ? (
+                            <form onSubmit={handleSendMessage} className="p-3 bg-[var(--color-surface)] border-t border-[var(--color-border)] flex items-center gap-3 z-10">
+                                <button type="button" className="text-[var(--color-text-muted)] hover:text-[var(--color-text)] p-2">
+                                    <FaSmile className="text-xl" />
+                                </button>
+                                <div className="flex-1 bg-[var(--color-bg)] rounded-xl border border-[var(--color-border)] flex items-center px-4 py-2 focus-within:border-[var(--color-primary)]">
+                                    <input
+                                        type="text"
+                                        value={inputText}
+                                        onChange={(e) => setInputText(e.target.value)}
+                                        placeholder="Ketik pesan..."
+                                        className="w-full bg-transparent border-none focus:outline-none text-sm text-[var(--color-text)]"
+                                        disabled={isSending || isFetchingMessages}
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={!inputText.trim() || isSending}
+                                    className={`p-3 rounded-full transition-colors shadow-md ${!inputText.trim() ? 'bg-gray-300 dark:bg-gray-700 text-gray-500' : 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]'}`}
+                                >
+                                    {isSending ? <FaSync className="animate-spin" /> : <FaPaperPlane className="pl-1" />}
+                                </button>
+                            </form>
+                        ) : (
+                            <div className="p-4 bg-[var(--color-surface)] border-t border-[var(--color-border)] z-10">
+                                <div className="flex flex-col items-center gap-2">
+                                    <p className="text-xs text-[var(--color-text-muted)]">
+                                        🤖 Chat ini sedang ditangani oleh AI Agent
+                                    </p>
+                                    <button
+                                        onClick={() => handleHandover('activate')}
+                                        disabled={isHandoverLoading}
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors shadow-md disabled:opacity-50"
+                                    >
+                                        {isHandoverLoading ? (
+                                            <FaSync className="animate-spin" />
+                                        ) : (
+                                            <>
+                                                <FaHandPaper /> Beralih ke Human Agent
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
                             </div>
-                            <button
-                                type="submit"
-                                disabled={!inputText.trim() || isSending}
-                                className={`p-3 rounded-full transition-colors shadow-md ${!inputText.trim() ? 'bg-gray-300 dark:bg-gray-700 text-gray-500' : 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]'}`}
-                            >
-                                {isSending ? <FaSync className="animate-spin" /> : <FaPaperPlane className="pl-1" />}
-                            </button>
-                        </form>
+                        )}
                     </>
                 ) : (
                     /* Empty State */
