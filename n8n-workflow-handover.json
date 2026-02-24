@@ -42,7 +42,7 @@
         "operation": "Put Chat Labels",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.to }}",
-        "labels": "[\n  {\n    \"id\": \"1\" \n  }\n]",
+        "labels": "=[\n  {\n    \"id\": \"{{ $json.handoverConfig.handoverLabelId || \"1\" }}\"\n  }\n]",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
@@ -590,7 +590,7 @@
         "promptType": "define",
         "text": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').first().json.payload.body : '' }} | {{ $('Finalize Context').isExecuted ? $('Finalize Context').first().json.message : '' }}",
         "options": {
-          "systemMessage": "={{ $json.finalSystemPrompt }}\n\nCONTEXT:\n{{ $json.finalKnowledge }}\n\n{{ $('Finalize Context').item.json.agentConfig.systemInstruction }}"
+          "systemMessage": "={{ $('Finalize Context').item.json.finalSystemPrompt }}\n\nCONTEXT:\n{{ $('Finalize Context').item.json.finalKnowledge }}"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -776,7 +776,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n}\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
+        "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\n\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n    \n    // Parse handover_config (might be string from Postgres)\n    let hc = data.handover_config;\n    if (typeof hc === 'string') {\n        try { hc = JSON.parse(hc); } catch(e) { hc = null; }\n    }\n    \n    if (hc && hc.enabled) {\n        const rules = [];\n        rules.push(\"\\nPENTING - ATURAN ESCALATION:\");\n        rules.push(\"Kamu WAJIB menyertakan JSON {\\\"escalate\\\": true, \\\"reason\\\": \\\"<alasan>\\\"} di BARIS TERAKHIR response-mu jika salah satu kondisi berikut terpenuhi:\");\n\n        if (hc.escalationPrompt && hc.escalationPrompt.trim()) {\n            rules.push(\"\");\n            rules.push(\"KONDISI ESCALATION:\");\n            hc.escalationPrompt.trim().split('\\n').forEach(line => {\n                if (line.trim()) rules.push(\"• \" + line.trim());\n            });\n        }\n        \n        rules.push(\"\");\n        rules.push(\"FORMAT OUTPUT SAAT ESCALATION:\");\n        rules.push('Balas user dengan sopan, lalu DI BARIS TERAKHIR tulis: {\"escalate\": true, \"reason\": \"<alasan singkat>\"}');\n        rules.push(\"\");\n        rules.push(\"CONTOH OUTPUT ESCALATION:\");\n        rules.push('Mohon maaf, saya belum memiliki informasi mengenai hal tersebut. Saya akan menghubungkan Anda dengan tim kami.');\n        rules.push('{\"escalate\": true, \"reason\": \"Pertanyaan di luar knowledge base\"}');\n        rules.push(\"\");\n        rules.push(\"Jika TIDAK perlu escalation, JANGAN sertakan JSON escalate di response.\");\n        \n        finalPrompt += \"\\n\\n\" + rules.join(\"\\n\");\n    }\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n}\n\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1441,7 +1441,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT \n  a.\"id\" AS agent_id,\n  cp.\"id\" AS platform_id,\n  a.\"name\" AS agent_name,\n  a.\"systemInstruction\" AS system_prompt,\n  a.\"welcomeMessage\" AS greeting,\n  a.\"welcomeImageUrl\" AS welcome_image,\n  a.\"followupConfig\" AS followup_config,\n  COALESCE(a.\"knowledgeBase\", '') || '\\n\\n' || \n  COALESCE(\n    (\n      SELECT string_agg('=== ' || ks.title || ' ===\\n' || ks.description, '\\n\\n')\n      FROM \"KnowledgeSources\" ks\n      WHERE ks.\"agentId\" = a.id\n    ),\n    ''\n  ) AS knowledge\nFROM \"ConnectedPlatforms\" cp\nJOIN \"Agents\" a ON cp.\"agentId\" = a.id\nWHERE cp.\"sessionId\" = $1;\n",
+        "query": "SELECT \n  a.\"id\" AS agent_id,\n  cp.\"id\" AS platform_id,\n  a.\"name\" AS agent_name,\n  a.\"systemInstruction\" AS system_prompt,\n  a.\"welcomeMessage\" AS greeting,\n  a.\"welcomeImageUrl\" AS welcome_image,\n  a.\"followupConfig\" AS followup_config,\n  a.\"handoverConfig\" AS handover_config,\n  COALESCE(a.\"knowledgeBase\", '') || '\n\n' || \n  COALESCE(\n    (\n      SELECT string_agg('=== ' || ks.title || ' ===\n' || ks.description, '\n\n')\n      FROM \"KnowledgeSources\" ks\n      WHERE ks.\"agentId\" = a.id\n    ),\n    ''\n  ) AS knowledge\nFROM \"ConnectedPlatforms\" cp\nJOIN \"Agents\" a ON cp.\"agentId\" = a.id\nWHERE cp.\"sessionId\" = $1;",
         "options": {
           "queryReplacement": "=={{ $('WAHA Trigger').item.json.session }}"
         }
@@ -1633,6 +1633,53 @@
       "typeVersion": 1,
       "id": "hnd-sticky-001",
       "name": "Sticky Note Handover"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/handover/activate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chatId\": \"{{ $(\"WAHA Trigger\").item.json.payload.to || $(\"WAHA Trigger\").item.json.payload.chatId || $(\"WAHA Trigger\").item.json.payload.from }}\",\n  \"sessionId\": \"{{ $(\"WAHA Trigger\").item.json.session }}\",\n  \"triggeredBy\": \"manual_reply\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1472,
+        160
+      ],
+      "id": "hnd-auto-activate-manual",
+      "name": "Auto Label Human",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.vlow-ai.com/api/agents/integration/config",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('WAHA Trigger').item.json.session }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        42320,
+        7024
+      ],
+      "id": "fetch-handover-config-for-label",
+      "name": "Fetch Handover Config",
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
@@ -1699,7 +1746,7 @@
         [],
         [
           {
-            "node": "Get contact basic info1",
+            "node": "Auto Label Human",
             "type": "main",
             "index": 0
           }
@@ -1709,7 +1756,13 @@
     "CEK LABEL1": {
       "main": [
         [],
-        []
+        [
+          {
+            "node": "Fetch Handover Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "CEK API": {
@@ -2314,6 +2367,28 @@
         [
           {
             "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto Label Human": {
+      "main": [
+        [
+          {
+            "node": "Get contact basic info1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Handover Config": {
+      "main": [
+        [
+          {
+            "node": "Save labels for the chat",
             "type": "main",
             "index": 0
           }

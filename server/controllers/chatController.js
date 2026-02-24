@@ -121,6 +121,18 @@ export const sendMessage = async (req, res, next) => {
 
         const result = await wahaService.sendTextMessage(platform.sessionId, chatId, text);
 
+        // Auto-activate handover when admin sends a message from dashboard
+        try {
+            const { activateHandover } = await import("./handoverController.js");
+            await activateHandover(
+                { body: { chatId, sessionId: platform.sessionId, triggeredBy: "dashboard_reply" }, params: {} },
+                { json: () => { }, status: () => ({ json: () => { } }) },
+                () => { }
+            );
+        } catch (handoverErr) {
+            console.log("[Handover] Auto-activate on dashboard reply skipped:", handoverErr.message);
+        }
+
         res.status(200).json({
             success: true,
             message: "Pesan berhasil dikirim",
