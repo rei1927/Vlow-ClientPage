@@ -1,6 +1,25 @@
 import ConnectedPlatform from "../models/ConnectedPlatform.js";
+import Agent from "../models/Agent.js";
+import ChatHandover from "../models/ChatHandover.js";
 import AppError from "../utils/AppError.js";
 import * as wahaService from "../services/wahaService.js";
+
+// Helper: swap WA labels for dashboard reply
+const swapLabelsForDashboard = async (sessionId, chatId, handoverConfig) => {
+    try {
+        const humanLabelId = handoverConfig.handoverLabelId;
+        const aiLabelId = handoverConfig.aiLabelId;
+        if (!humanLabelId) return;
+        // Remove AI label if exists
+        if (aiLabelId) {
+            try { await wahaService.updateChatLabels(sessionId, chatId, aiLabelId, "remove"); } catch (e) { }
+        }
+        // Add Human label
+        await wahaService.updateChatLabels(sessionId, chatId, humanLabelId, "add");
+    } catch (e) {
+        console.log("[Handover] Label swap failed:", e.message);
+    }
+};
 
 // Helper: Cek Kepemilikan dan Status Platform
 const getValidPlatform = async (platformId, userId) => {
@@ -35,21 +54,15 @@ export const getChatMeta = async (req, res, next) => {
 
         let labels = [];
 
-        // Kita paksa ambil labels. Jika WAHA mengembalikan array atau object bersarang,
-        // itu berarti nomor ini mensupport / memiliki akses ke API labels (Business/Plus).
         const labelsData = await wahaService.getLabels(platform.sessionId);
-
         const actualLabels = Array.isArray(labelsData) ? labelsData : (labelsData && Array.isArray(labelsData.docs) ? labelsData.docs : null);
 
         if (actualLabels) {
             labels = actualLabels;
-            isBusiness = true; // Forcing it to true since labels API is working
+            isBusiness = true;
 
-            // Sync: WAHA doesn't put labels in chats nor chats in labels by default
-            // Fetch chats for each label and embed them as `items` so Frontend can map them
             await Promise.all(labels.map(async (lbl) => {
                 const chatAssociations = await wahaService.getChatsByLabel(platform.sessionId, lbl.id);
-                // Extract just the IDs or the whole objects. We'll put the whole object as returned
                 lbl.items = Array.isArray(chatAssociations) ? chatAssociations : [];
             }));
         }
@@ -91,9 +104,7 @@ export const getMessages = async (req, res, next) => {
         const { platformId, chatId } = req.params;
         const platform = await getValidPlatform(platformId, req.user.id);
 
-        // Limit pesannya agar frontend tidak berat
         const limit = Number(req.query.limit) || 50;
-
         const messages = await wahaService.getMessages(platform.sessionId, chatId, limit);
 
         res.status(200).json({
@@ -121,16 +132,43 @@ export const sendMessage = async (req, res, next) => {
 
         const result = await wahaService.sendTextMessage(platform.sessionId, chatId, text);
 
-        // Auto-activate handover when admin sends a message from dashboard
+        // Auto-activate handover + label when admin sends from dashboard
         try {
-            const { activateHandover } = await import("./handoverController.js");
-            await activateHandover(
-                { body: { chatId, sessionId: platform.sessionId, triggeredBy: "dashboard_reply" }, params: {} },
-                { json: () => { }, status: () => ({ json: () => { } }) },
-                () => { }
-            );
+            const agent = await Agent.findOne({ where: { id: platform.agentId } });
+            if (agent) {
+                const handoverConfig = agent.handoverConfig || {};
+                if (handoverConfig.enabled) {
+                    const autoReleaseMinutes = handoverConfig.autoReleaseMinutes || 30;
+
+                    const [handover, created] = await ChatHandover.findOrCreate({
+                        where: { chatId, sessionId: platform.sessionId },
+                        defaults: {
+                            platformId: platform.id,
+                            agentId: agent.id,
+                            status: "human",
+                            triggeredBy: "dashboard_reply",
+                            activatedAt: new Date(),
+                            autoReleaseAt: new Date(Date.now() + autoReleaseMinutes * 60 * 1000),
+                            releasedAt: null,
+                        },
+                    });
+
+                    if (!created) {
+                        handover.status = "human";
+                        handover.triggeredBy = "dashboard_reply";
+                        handover.activatedAt = new Date();
+                        handover.autoReleaseAt = new Date(Date.now() + autoReleaseMinutes * 60 * 1000);
+                        handover.releasedAt = null;
+                        await handover.save();
+                    }
+
+                    // Apply human label
+                    await swapLabelsForDashboard(platform.sessionId, chatId, handoverConfig);
+                    console.log("[Handover] Dashboard reply → handover activated for", chatId);
+                }
+            }
         } catch (handoverErr) {
-            console.log("[Handover] Auto-activate on dashboard reply skipped:", handoverErr.message);
+            console.log("[Handover] Dashboard auto-activate error:", handoverErr.message);
         }
 
         res.status(200).json({
