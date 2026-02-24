@@ -51,6 +51,16 @@ const buildHandoffSystemPrompt = (basePrompt, rawConfig) => {
   if (config.responseMessage) {
     rules.push(`- Pesan saat handoff: "${config.responseMessage}"`);
   }
+
+  // Add escalation prompt if configured
+  const escalationPrompt = typeof rawConfig === "object" ? rawConfig?.escalationPrompt : null;
+  if (escalationPrompt && escalationPrompt.trim()) {
+    rules.push("");
+    rules.push("AI ESCALATION RULES:");
+    rules.push("Kamu HARUS mendeteksi kondisi berikut dari percakapan dan jika terpenuhi, sertakan {\"escalate\": true} di response JSON:");
+    rules.push(escalationPrompt.trim());
+  }
+
   rules.push(
     '- Jika handoff diperlukan, balas user dengan pesan yang sopan, lalu tambahkan JSON di baris terakhir: {"escalate": true, "reason": "<alasan singkat>"}',
   );

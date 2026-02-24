@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { FaToggleOff, FaLightbulb, FaTimes, FaPlus } from "react-icons/fa";
-import { FiShield, FiClock, FiTag, FiMessageSquare } from "react-icons/fi";
+import { FaToggleOff, FaLightbulb, FaTimes, FaPlus, FaBrain } from "react-icons/fa";
+import { FiShield, FiClock, FiTag, FiMessageSquare, FiAlertTriangle } from "react-icons/fi";
 
 const HandoverTab = ({ config, setConfig }) => {
     const [keywordInput, setKeywordInput] = useState("");
@@ -230,6 +230,32 @@ const HandoverTab = ({ config, setConfig }) => {
                                             Selain kata kunci, Anda juga bisa menekan tombol <strong>"Take Over"</strong> di Chat Dashboard untuk mengambil alih percakapan secara manual.
                                         </p>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* AI ESCALATION PROMPT */}
+                        <div className="bg-[var(--color-surface)] p-6 rounded-2xl shadow-sm border border-[var(--color-border)]">
+                            <h4 className="font-bold text-[var(--color-text)] mb-2 flex items-center gap-2">
+                                <FiAlertTriangle className="text-red-500" /> Instruksi Escalation AI
+                            </h4>
+                            <p className="text-xs text-[var(--color-text-muted)] mb-4">
+                                Tentukan kondisi di mana AI harus otomatis mengalihkan ke manusia. Instruksi ini akan ditambahkan ke system prompt AI.
+                            </p>
+
+                            <textarea
+                                className="textarea textarea-bordered w-full h-40 bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)] resize-none text-sm"
+                                placeholder={"Contoh:\n- Jika customer menunjukkan emosi marah atau frustasi berulang kali\n- Jika ada pertanyaan yang tidak bisa dijawab dari knowledge yang tersedia\n- Jika customer meminta berbicara dengan manusia\n- Jika situasi memerlukan keputusan manusia (refund, pembatalan, dll)"}
+                                value={config.escalationPrompt || ""}
+                                onChange={(e) => handleChange("escalationPrompt", e.target.value)}
+                            />
+
+                            <div className="mt-3 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-xl border border-blue-200 dark:border-blue-800">
+                                <div className="flex items-start gap-2">
+                                    <FaBrain className="mt-0.5 text-blue-500 shrink-0" size={14} />
+                                    <p className="text-xs text-blue-700 dark:text-blue-300">
+                                        AI akan menganalisis setiap pesan dan jika memenuhi kondisi di atas, otomatis mengalihkan ke manusia <strong>tanpa perlu kata kunci spesifik</strong>.
+                                    </p>
                                 </div>
                             </div>
                         </div>

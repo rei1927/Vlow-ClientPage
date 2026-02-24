@@ -51,6 +51,7 @@ const Agent = sequelize.define("Agent", {
       autoReleaseMinutes: 30,
       handoverLabelId: null,
       aiLabelId: null,
+      escalationPrompt: "",
     },
   },
   followupConfig: {
