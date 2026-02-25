@@ -74,6 +74,13 @@ const MainLayout = () => {
         onLogoutClick={() => setIsLogoutModalOpen(true)}
       />
 
+      {/* Header: full width, always from left edge */}
+      <Header
+        toggleSidebar={toggleSidebar}
+        onLogout={() => setIsLogoutModalOpen(true)}
+        usage={usage}
+      />
+
       {/* Main Content */}
       <div
         className="
@@ -82,13 +89,6 @@ const MainLayout = () => {
           transition-all duration-300 ease-in-out
         "
       >
-        {/* Header: pass usage data for coin tooltip */}
-        <Header
-          toggleSidebar={toggleSidebar}
-          onLogout={() => setIsLogoutModalOpen(true)}
-          usage={usage}
-        />
-
         {/* Page Content */}
         <main className="flex-1 px-4 pt-6 pb-21 sm:px-6 lg:px-8 overflow-y-auto bg-[var(--color-bg)]">
           {/* CONTAINER */}
