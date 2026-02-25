@@ -648,26 +648,42 @@ export const testChatAgent = async (req, res, next) => {
     const response = await axios.post(N8N_SIMULATOR_URL, payload);
     const responseData = response.data;
 
-    // --- LOGIC BARU: MENERIMA 'output' ---
+    // --- LOGIC: MENERIMA 'output' + 'welcome_image_url' ---
     let aiResponse = "";
+    let imageUrl = null;
 
-    // Cek apakah response berupa Array (Format [ { output: "..." } ])
-    if (Array.isArray(responseData)) {
-      aiResponse = responseData[0]?.output || responseData[0]?.reply || responseData[0]?.text;
-    } else {
-      // Cek apakah response berupa Object (Format { output: "..." })
-      aiResponse = responseData?.output || responseData?.reply || responseData?.text;
+    const firstItem = Array.isArray(responseData) ? responseData[0] : responseData;
+
+    aiResponse = firstItem?.output || firstItem?.reply || firstItem?.text || "";
+    imageUrl = firstItem?.welcome_image_url || firstItem?.image_url || null;
+
+    // Fallback: jika n8n tidak memisahkan image, coba extract dari teks AI
+    if (!imageUrl && aiResponse) {
+      const mdRegex = /\[([^\]]*)\]\((https?:\/\/[^\s)]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s)]*)?)\)/i;
+      const rawRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?)/i;
+      const mdMatch = aiResponse.match(mdRegex);
+      if (mdMatch) {
+        imageUrl = mdMatch[2];
+        aiResponse = aiResponse.replace(mdMatch[0], "").trim();
+      } else {
+        const rawMatch = aiResponse.match(rawRegex);
+        if (rawMatch) {
+          imageUrl = rawMatch[1];
+          aiResponse = aiResponse.replace(rawMatch[0], "").trim();
+        }
+      }
     }
 
-    if (!aiResponse) {
+    if (!aiResponse && !imageUrl) {
       console.warn("n8n Empty Response:", responseData);
       aiResponse = "Maaf, AI tidak merespon (Empty Output).";
     }
 
-    // Kirim ke Frontend dengan key 'output' (SESUAI REQUEST ANDA)
+    // Kirim ke Frontend dengan key 'output' + 'image_url'
     res.status(200).json({
       success: true,
-      output: aiResponse, // <--- Kita kirim sebagai 'output'
+      output: aiResponse,
+      image_url: imageUrl, // <--- URL gambar dari knowledge resource
     });
   } catch (error) {
     console.error("Simulator Error:", error.message);

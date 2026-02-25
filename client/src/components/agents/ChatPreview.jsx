@@ -92,23 +92,23 @@ const ChatPreview = ({
 
       // 3. Receive answer
       let cleanedText = response.output || "";
-      let resolvedImageUrl = null;
+      let resolvedImageUrl = response.image_url || null; // Backend already extracted the image URL
 
-      // Extract markdown image link [text](url.jpg) or plain url.jpg
-      const mdRegex = /\[([^\]]*)\]\((https?:\/\/[^\s)]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s)]*)?)\)/i;
-      const rawRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?)/i;
+      // Fallback: jika backend belum extract, coba di frontend
+      if (!resolvedImageUrl) {
+        const mdRegex = /\[([^\]]*)\]\((https?:\/\/[^\s)]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s)]*)?)\)/i;
+        const rawRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?)/i;
 
-      // First try to match markdown links
-      const mdMatch = cleanedText.match(mdRegex);
-      if (mdMatch) {
-        resolvedImageUrl = mdMatch[2]; // Group 2 is the URL
-        cleanedText = cleanedText.replace(mdMatch[0], "").trim();
-      } else {
-        // Fallback to raw URLs
-        const rawMatch = cleanedText.match(rawRegex);
-        if (rawMatch) {
-          resolvedImageUrl = rawMatch[1];
-          cleanedText = cleanedText.replace(rawMatch[0], "").trim();
+        const mdMatch = cleanedText.match(mdRegex);
+        if (mdMatch) {
+          resolvedImageUrl = mdMatch[2];
+          cleanedText = cleanedText.replace(mdMatch[0], "").trim();
+        } else {
+          const rawMatch = cleanedText.match(rawRegex);
+          if (rawMatch) {
+            resolvedImageUrl = rawMatch[1];
+            cleanedText = cleanedText.replace(rawMatch[0], "").trim();
+          }
         }
       }
 
