@@ -29,13 +29,13 @@ services:
       - DB_PASS=${DB_PASS}
       - DB_NAME=${DB_NAME}
       - DB_SSL=true
-      # MinIO (Internal Network)
-      - MINIO_ENDPOINT=minio
-      - MINIO_PORT=9000
-      - MINIO_USE_SSL=false
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-minioadmin}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
-      - MINIO_BUCKET=${MINIO_BUCKET:-vlow-agents}
+      # MinIO (External Network)
+      - MINIO_ENDPOINT=minio-api.dayamedialangit.co.id
+      - MINIO_PORT=443
+      - MINIO_USE_SSL=true
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-admin}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-rahasia123}
+      - MINIO_BUCKET=${MINIO_BUCKET:-vlow-client}
       - MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL:-https://minio.dayamedialangit.co.id}
       # JWT
       - JWT_SECRET=${JWT_SECRET:-rahasia_aman}
