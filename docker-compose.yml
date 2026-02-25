@@ -36,6 +36,7 @@ services:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-minioadmin}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
       - MINIO_BUCKET=${MINIO_BUCKET:-vlow-agents}
+      - MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL:-https://minio.dayamedialangit.co.id}
       # JWT
       - JWT_SECRET=${JWT_SECRET:-rahasia_aman}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
