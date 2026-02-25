@@ -130,14 +130,10 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
           lg:translate-x-0
         `}
       >
-        {/* Logo */}
+        {/* Top spacer */}
         <div>
-          <div className="h-16 flex items-center gap-3 px-5 border-b border-white/10 bg-black/10 flex-shrink-0">
-            <img src="/vlow-icon.png" alt="Logo" className="h-8 w-8 flex-shrink-0" />
-            <span className="sidebar-label text-xl font-extrabold tracking-tight">
-              Vlow<span className="text-[var(--sidebar-accent)]">.ai</span>
-            </span>
-            <button onClick={toggleSidebar} className="lg:hidden ml-auto text-white/70 hover:text-white flex-shrink-0">
+          <div className="h-16 flex items-center justify-end px-4 border-b border-white/10 bg-black/10 flex-shrink-0">
+            <button onClick={toggleSidebar} className="lg:hidden text-white/70 hover:text-white flex-shrink-0">
               <FaTimes size={18} />
             </button>
           </div>

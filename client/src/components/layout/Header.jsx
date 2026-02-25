@@ -24,6 +24,16 @@ const Header = ({ toggleSidebar, onLogout, usage = defaultUsage }) => {
           <FaBars size={20} />
         </button>
 
+        {/* Logo - always visible */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <img src="/vlow-icon.png" alt="Vlow" className="h-7 w-7" />
+          <span className="text-lg font-extrabold tracking-tight text-[var(--color-text)] hidden sm:inline">
+            Vlow<span className="text-[var(--color-primary)]">.ai</span>
+          </span>
+        </div>
+
+        <div className="h-6 w-px bg-[var(--color-border)] flex-shrink-0" />
+
         <nav className="min-w-0 flex-1" aria-label="Breadcrumb">
           <Breadcrumbs />
         </nav>
