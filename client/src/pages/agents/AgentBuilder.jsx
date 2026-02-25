@@ -89,6 +89,8 @@ const AgentBuilder = () => {
         ...currentAgent.KnowledgeSources.map((k) => ({
           title: k.title || "Untitled",
           description: k.description || "",
+          fileUrl: k.fileUrl || "",
+          fileName: k.fileName || "",
         })),
       );
     }
@@ -97,12 +99,22 @@ const AgentBuilder = () => {
         ...pendingKnowledge.map((k) => ({
           title: k.title || "Untitled",
           description: k.description || "",
+          // Note for pending: file is a File object, so it doesn't have a public URL yet
+          // We can only pass the name if present, but usually we just wait till saved
+          fileUrl: "",
+          fileName: k.file?.name || "",
         })),
       );
     }
     return sources
       .filter((k) => k.description && k.description.trim().length > 0)
-      .map((k) => `[${k.title}]:\n${k.description}`)
+      .map((k) => {
+        let text = `[${k.title}]:\n${k.description}`;
+        if (k.fileUrl) {
+          text += `\nAttached File (${k.fileName || 'file'}): ${k.fileUrl}`;
+        }
+        return text;
+      })
       .join("\n\n---\n\n");
   }, [currentAgent, pendingKnowledge]);
 
@@ -354,8 +366,8 @@ const AgentBuilder = () => {
               onClick={handleSave}
               disabled={isSaving || isSubscriptionExpired}
               className={`btn btn-sm border-none rounded-lg shadow-md gap-1.5 px-3 sm:px-5 ${isSubscriptionExpired
-                  ? "bg-[var(--color-text-muted)] text-white cursor-not-allowed"
-                  : "bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white"
+                ? "bg-[var(--color-text-muted)] text-white cursor-not-allowed"
+                : "bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white"
                 }`}
             >
               {isSaving ? <FaSpinner className="animate-spin" /> : <FaSave />}

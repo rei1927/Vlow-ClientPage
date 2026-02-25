@@ -550,7 +550,13 @@ export const getIntegrationConfig = async (req, res, next) => {
 
     // 2. Format Knowledge Base jadi satu teks
     const knowledgeText = (agent.KnowledgeSources || [])
-      .map((k) => `[${k.title}]:\n${k.description}`)
+      .map((k) => {
+        let text = `[${k.title}]:\n${k.description}`;
+        if (k.fileUrl) {
+          text += `\nAttached File (${k.fileName || 'file'}): ${k.fileUrl}`;
+        }
+        return text;
+      })
       .join("\n\n---\n\n");
 
     // Use handoverConfig (new JSONB) or fall back to transferCondition (legacy TEXT)
