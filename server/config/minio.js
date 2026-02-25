@@ -32,22 +32,22 @@ export const initMinio = async () => {
     const exists = await minioClient.bucketExists(bucketName);
     if (!exists) {
       await minioClient.makeBucket(bucketName, "us-east-1");
-
-      // Set Policy Read-Only Public
-      const policy = {
-        Version: "2012-10-17",
-        Statement: [
-          {
-            Effect: "Allow",
-            Principal: { AWS: ["*"] },
-            Action: ["s3:GetObject"],
-            Resource: [`arn:aws:s3:::${bucketName}/*`],
-          },
-        ],
-      };
-      await minioClient.setBucketPolicy(bucketName, JSON.stringify(policy));
-      console.log(`✅ MinIO Bucket '${bucketName}' siap.`);
     }
+
+    // Selalu pastikan policy diset Read-Only Public, bahkan jika bucket sudah ada
+    const policy = {
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Effect: "Allow",
+          Principal: { AWS: ["*"] },
+          Action: ["s3:GetObject"],
+          Resource: [`arn:aws:s3:::${bucketName}/*`],
+        },
+      ],
+    };
+    await minioClient.setBucketPolicy(bucketName, JSON.stringify(policy));
+    console.log(`✅ MinIO Bucket '${bucketName}' terkonfigurasi dengan policy public.`);
   } catch (err) {
     console.error("❌ MinIO Connection Error:", err.message);
   }
