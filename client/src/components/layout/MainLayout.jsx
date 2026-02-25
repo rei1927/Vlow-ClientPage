@@ -78,7 +78,7 @@ const MainLayout = () => {
       <div
         className="
           flex flex-col min-h-screen
-          lg:pl-72
+          lg:pl-20
           transition-all duration-300 ease-in-out
         "
       >
