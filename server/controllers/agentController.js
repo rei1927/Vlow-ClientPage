@@ -564,8 +564,14 @@ export const getIntegrationConfig = async (req, res, next) => {
       ? agent.handoverConfig
       : agent.transferCondition;
 
+    // Inject knowledgeBase directly into system prompt so AI always sees it
+    let enrichedInstruction = agent.systemInstruction || "";
+    if (knowledgeText && knowledgeText.trim().length > 0) {
+      enrichedInstruction += `\n\n=== KNOWLEDGE BASE (gunakan informasi ini untuk menjawab pertanyaan user) ===\n${knowledgeText}\n=== AKHIR KNOWLEDGE BASE ===`;
+    }
+
     const finalSystemPrompt = buildAgentSystemPrompt(
-      agent.systemInstruction,
+      enrichedInstruction,
       handoffConfig,
       agent.welcomeMessage,
       agent.welcomeImageUrl,
@@ -613,8 +619,14 @@ export const testChatAgent = async (req, res, next) => {
 
     const uniqueSession = sessionId || `preview-${Date.now()}`;
 
+    // Inject knowledgeBase directly into system prompt so AI always sees it
+    let enrichedInstruction = systemInstruction || "";
+    if (knowledgeBase && knowledgeBase.trim().length > 0) {
+      enrichedInstruction += `\n\n=== KNOWLEDGE BASE (gunakan informasi ini untuk menjawab pertanyaan user) ===\n${knowledgeBase}\n=== AKHIR KNOWLEDGE BASE ===`;
+    }
+
     const finalSystemPrompt = buildAgentSystemPrompt(
-      systemInstruction,
+      enrichedInstruction,
       transferCondition,
       req.body.welcomeMessage,
       req.body.welcomeImageUrl,
