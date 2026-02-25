@@ -95,13 +95,13 @@ const ChatPreview = ({
       let resolvedImageUrl = null;
 
       // Extract markdown image link [text](url.jpg) or plain url.jpg
-      const mdRegex = /\[.*?\]\((https?:\/\/[^\s]+?\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s)]*)?)\)/i;
-      const rawRegex = /(https?:\/\/[^\s]+?\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?)/i;
+      const mdRegex = /\[([^\]]*)\]\((https?:\/\/[^\s)]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s)]*)?)\)/i;
+      const rawRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?)/i;
 
       // First try to match markdown links
       const mdMatch = cleanedText.match(mdRegex);
       if (mdMatch) {
-        resolvedImageUrl = mdMatch[1];
+        resolvedImageUrl = mdMatch[2]; // Group 2 is the URL
         cleanedText = cleanedText.replace(mdMatch[0], "").trim();
       } else {
         // Fallback to raw URLs
