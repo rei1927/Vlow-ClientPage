@@ -90,12 +90,32 @@ const ChatPreview = ({
 
       const response = await agentService.testChat(payload);
 
-      const rawOutput = response.output || "";
-      const imgMatch = rawOutput.match(/WELCOME_IMAGE_URL:\s*(\S+)/i);
-      const imageUrl = imgMatch?.[1]?.trim() || null;
-      const cleanedText = rawOutput.replace(/WELCOME_IMAGE_URL:\s*\S+/i, "").trim();
-      const resolvedImageUrl =
-        imageUrl || (!hasWelcomed && welcomeImageUrl ? welcomeImageUrl : null);
+      // 3. Receive answer
+      let cleanedText = response.output || "";
+      let resolvedImageUrl = null;
+
+      // Extract markdown image link [text](url.jpg) or plain url.jpg
+      const mdRegex = /\[.*?\]\((https?:\/\/[^\s]+?\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s)]*)?)\)/i;
+      const rawRegex = /(https?:\/\/[^\s]+?\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?)/i;
+
+      // First try to match markdown links
+      const mdMatch = cleanedText.match(mdRegex);
+      if (mdMatch) {
+        resolvedImageUrl = mdMatch[1];
+        cleanedText = cleanedText.replace(mdMatch[0], "").trim();
+      } else {
+        // Fallback to raw URLs
+        const rawMatch = cleanedText.match(rawRegex);
+        if (rawMatch) {
+          resolvedImageUrl = rawMatch[1];
+          cleanedText = cleanedText.replace(rawMatch[0], "").trim();
+        }
+      }
+
+      // If no image was extracted from the response, but it's the first message and welcomeImageUrl exists
+      if (!resolvedImageUrl && !hasWelcomed && welcomeImageUrl) {
+        resolvedImageUrl = welcomeImageUrl;
+      }
 
       setMessages((prev) => [
         ...prev,
@@ -179,13 +199,12 @@ const ChatPreview = ({
           <div key={msg.id} className={`chat ${msg.sender === "user" ? "chat-end" : "chat-start"}`}>
             <div
               className={`chat-bubble text-sm shadow-sm leading-relaxed max-w-[85%]
-                    ${
-                      msg.sender === "user"
-                        ? "bg-[#E7FFDB] text-gray-800 rounded-tr-none" // Style WA Sender
-                        : msg.sender === "system"
-                          ? "bg-green-100 text-gray-800 rounded-tl-none"
-                          : " bg-red-100 text-red-600" // Style WA Receiver
-                    }`}
+                    ${msg.sender === "user"
+                  ? "bg-[#E7FFDB] text-gray-800 rounded-tr-none" // Style WA Sender
+                  : msg.sender === "system"
+                    ? "bg-green-100 text-gray-800 rounded-tl-none"
+                    : " bg-red-100 text-red-600" // Style WA Receiver
+                }`}
             >
               {/* Render Image for Welcome Msg */}
               {msg.image && (

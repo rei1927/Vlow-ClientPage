@@ -182,17 +182,37 @@ const KnowledgeTab = ({
   // Render file preview thumbnail
   const renderFilePreview = (fileUrl, fileName, fileType, isSmall = false) => {
     if (!fileUrl) return null;
-    const isImage = fileType?.startsWith("image/");
-    const isPdf = fileType === "application/pdf";
+
+    // Determine type safely
+    let isImage = false;
+    let isPdf = false;
+
+    if (fileType) {
+      isImage = fileType.startsWith("image/");
+      isPdf = fileType === "application/pdf";
+    } else if (fileName) {
+      // Fallback to extension check if fileType is somehow missing
+      const ext = fileName.split('.').pop()?.toLowerCase();
+      isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(ext);
+      isPdf = ext === "pdf";
+    } else if (fileUrl) {
+      // Last resort fallback using URL extension
+      const ext = fileUrl.split('?')[0].split('.').pop()?.toLowerCase();
+      isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(ext);
+      isPdf = ext === "pdf";
+    }
+
     const size = isSmall ? "w-12 h-12" : "w-20 h-20";
 
     return (
       <div className={`${size} rounded-lg overflow-hidden border border-[var(--color-border)] bg-[var(--color-bg)] flex items-center justify-center flex-shrink-0`}>
         {isImage ? (
-          <img src={fileUrl} alt={fileName} className="w-full h-full object-cover" />
+          <img src={fileUrl} alt={fileName || "Knowledge Image"} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/150?text=Image+Error'; }} />
         ) : isPdf ? (
           <FaFilePdf className="text-red-500" size={isSmall ? 20 : 28} />
-        ) : null}
+        ) : (
+          <span className="text-xs text-gray-400">File</span>
+        )}
       </div>
     );
   };
