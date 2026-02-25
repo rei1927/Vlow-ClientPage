@@ -20,6 +20,19 @@ const KnowledgeSource = sequelize.define("KnowledgeSource", {
     type: DataTypes.UUID,
     allowNull: false,
   },
+  // --- File attachment fields ---
+  fileUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  fileName: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  fileType: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 export default KnowledgeSource;

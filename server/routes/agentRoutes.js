@@ -27,10 +27,9 @@ import {
 } from "../validators/agentValidator.js";
 
 // --- SETUP MULTER (Security & Config) ---
-const storage = multer.memoryStorage(); // Simpan di RAM agar cepat diproses ke MinIO
+const storage = multer.memoryStorage();
 
-const fileFilter = (req, file, cb) => {
-  // Hanya izinkan file gambar
+const imageFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
@@ -38,10 +37,25 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+// For knowledge: accept images + PDFs
+const knowledgeFileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/") || file.mimetype === "application/pdf") {
+    cb(null, true);
+  } else {
+    cb(new AppError("Format tidak didukung! Upload gambar atau PDF saja (maks 5MB).", 400), false);
+  }
+};
+
 const upload = multer({
   storage,
-  fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit 5MB per file
+  fileFilter: imageFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+const knowledgeUpload = multer({
+  storage,
+  fileFilter: knowledgeFileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
 });
 
 const router = express.Router();
@@ -94,11 +108,11 @@ router
 router.post("/test-chat", testChatAgent);
 
 // --- KNOWLEDGE BASE ROUTES ---
-// Add Knowledge (Wajib ada Image)
-router.post("/:id/knowledge", validateAgentId, runValidation, addKnowledge);
+// Add Knowledge (optional file: image or PDF)
+router.post("/:id/knowledge", validateAgentId, runValidation, knowledgeUpload.single("file"), addKnowledge);
 
-// Update Knowledge
-router.put("/knowledge/:knowledgeId", updateKnowledge);
+// Update Knowledge (optional file replacement)
+router.put("/knowledge/:knowledgeId", knowledgeUpload.single("file"), updateKnowledge);
 
 // Delete Knowledge
 // (Kita asumsikan ID knowledge juga UUID, bisa pakai validateAgentId kalau regex-nya sama,

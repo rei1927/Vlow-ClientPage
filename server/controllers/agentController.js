@@ -3,7 +3,7 @@ import KnowledgeSource from "../models/KnowledgeSource.js";
 import ConnectedPlatform from "../models/ConnectedPlatform.js";
 import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
-import minioClient, { bucketName } from "../config/minio.js";
+import minioClient, { bucketName, getPublicFileUrl } from "../config/minio.js";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { buildAgentSystemPrompt } from "../utils/handoff.js";
@@ -329,7 +329,7 @@ export const updateAgent = async (req, res, next) => {
   }
 };
 
-// @desc    Add Knowledge Source (Image + Desc)
+// @desc    Add Knowledge Source (with optional file: image/PDF)
 // @route   POST /api/agents/:id/knowledge
 export const addKnowledge = async (req, res, next) => {
   try {
@@ -340,10 +340,29 @@ export const addKnowledge = async (req, res, next) => {
       return next(new AppError("Deskripsi konten wajib diisi.", 400));
     }
 
+    let fileUrl = null;
+    let fileName = null;
+    let fileType = null;
+
+    // Upload file to MinIO if present
+    if (req.file) {
+      const ext = req.file.originalname.split(".").pop();
+      const objectName = `knowledge/${id}/${uuidv4()}.${ext}`;
+      await minioClient.putObject(bucketName, objectName, req.file.buffer, req.file.size, {
+        "Content-Type": req.file.mimetype,
+      });
+      fileUrl = getPublicFileUrl(objectName);
+      fileName = req.file.originalname;
+      fileType = req.file.mimetype;
+    }
+
     const knowledge = await KnowledgeSource.create({
-      agentId: id, // Gunakan 'id' yang dari params tadi
+      agentId: id,
       title: title || "Untitled Resource",
       description: description,
+      fileUrl,
+      fileName,
+      fileType,
     });
 
     res.status(201).json({ success: true, data: knowledge });
@@ -365,7 +384,29 @@ export const updateKnowledge = async (req, res, next) => {
       return next(new AppError("Knowledge source tidak ditemukan.", 404));
     }
 
-    // Update fields
+    // Handle file replacement
+    if (req.file) {
+      // Delete old file from MinIO if exists
+      if (knowledge.fileUrl) {
+        try {
+          const oldPath = knowledge.fileUrl.split(`${bucketName}/`)[1];
+          if (oldPath) await minioClient.removeObject(bucketName, oldPath);
+        } catch (e) {
+          console.warn("Warning: could not delete old MinIO file:", e.message);
+        }
+      }
+      // Upload new file
+      const ext = req.file.originalname.split(".").pop();
+      const objectName = `knowledge/${knowledge.agentId}/${uuidv4()}.${ext}`;
+      await minioClient.putObject(bucketName, objectName, req.file.buffer, req.file.size, {
+        "Content-Type": req.file.mimetype,
+      });
+      knowledge.fileUrl = getPublicFileUrl(objectName);
+      knowledge.fileName = req.file.originalname;
+      knowledge.fileType = req.file.mimetype;
+    }
+
+    // Update text fields
     knowledge.title = title || knowledge.title;
     knowledge.description = description || knowledge.description;
 
@@ -390,6 +431,16 @@ export const deleteKnowledge = async (req, res, next) => {
     });
 
     if (!knowledge) return next(new AppError("Data knowledge tidak ditemukan.", 404));
+
+    // Delete file from MinIO if exists
+    if (knowledge.fileUrl) {
+      try {
+        const filePath = knowledge.fileUrl.split(`${bucketName}/`)[1];
+        if (filePath) await minioClient.removeObject(bucketName, filePath);
+      } catch (e) {
+        console.warn("Warning: could not delete MinIO file:", e.message);
+      }
+    }
 
     await knowledge.destroy();
     res.status(200).json({ success: true, message: "Knowledge deleted." });

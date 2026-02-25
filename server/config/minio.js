@@ -13,6 +13,20 @@ const minioClient = new Client({
 
 export const bucketName = process.env.MINIO_BUCKET || "vlow-agents";
 
+// Public URL for constructing file download links
+// e.g. https://minio.dayamedialangit.co.id
+export const minioPublicUrl =
+  process.env.MINIO_PUBLIC_URL || `http://${process.env.MINIO_ENDPOINT || "localhost"}:${process.env.MINIO_PORT || 9000}`;
+
+/**
+ * Build a public URL for a file in MinIO
+ * @param {string} objectName - path within bucket, e.g. "knowledge/abc123/file.pdf"
+ * @returns {string} public URL
+ */
+export const getPublicFileUrl = (objectName) => {
+  return `${minioPublicUrl}/${bucketName}/${objectName}`;
+};
+
 export const initMinio = async () => {
   try {
     const exists = await minioClient.bucketExists(bucketName);

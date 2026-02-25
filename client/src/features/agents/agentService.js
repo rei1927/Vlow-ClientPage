@@ -11,17 +11,17 @@ const createAgent = async (agentData) => {
 // Get All (with Pagination, Search, Filter, Sort)
 const getAgents = async (params = {}) => {
   const queryParams = new URLSearchParams();
-  
+
   if (params.page) queryParams.append("page", params.page);
   if (params.limit) queryParams.append("limit", params.limit);
   if (params.search) queryParams.append("search", params.search);
   if (params.status && params.status !== "all") queryParams.append("status", params.status);
   if (params.sortBy) queryParams.append("sortBy", params.sortBy);
   if (params.sortOrder) queryParams.append("sortOrder", params.sortOrder);
-  
+
   const queryString = queryParams.toString();
   const url = queryString ? `${API_URL}?${queryString}` : API_URL;
-  
+
   const response = await axiosInstance.get(url);
   return response.data;
 };
@@ -50,12 +50,16 @@ const deleteAgent = async (id) => {
 // --- KNOWLEDGE BASE ---
 
 const addKnowledge = async ({ agentId, knowledgeData }) => {
-  const response = await axiosInstance.post(`/agents/${agentId}/knowledge`, knowledgeData);
+  const response = await axiosInstance.post(`/agents/${agentId}/knowledge`, knowledgeData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return response.data;
 };
 
 const updateKnowledge = async ({ knowledgeId, knowledgeData }) => {
-  const response = await axiosInstance.put(`/agents/knowledge/${knowledgeId}`, knowledgeData);
+  const response = await axiosInstance.put(`/agents/knowledge/${knowledgeId}`, knowledgeData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return response.data;
 };
 
