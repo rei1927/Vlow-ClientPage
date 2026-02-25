@@ -116,7 +116,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
 
       {/* Mobile Overlay */}
       <div
-        className={`fixed inset-0 z-20 bg-black/50 transition-opacity lg:hidden ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 z-[45] bg-black/50 transition-opacity lg:hidden ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         onClick={toggleSidebar}
       />
 
@@ -124,16 +124,17 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
       <aside
         className={`
           sidebar-desktop
-          fixed top-0 left-0 z-40 h-screen bg-[var(--sidebar-bg)] text-white
+          fixed top-14 sm:top-16 left-0 z-[50] bg-[var(--sidebar-bg)] text-white
           flex flex-col justify-between overflow-hidden
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
         `}
+        style={{ height: 'calc(100vh - 3.5rem)' }}
       >
-        {/* Top spacer */}
         <div>
-          <div className="h-16 flex items-center justify-end px-4 border-b border-white/10 bg-black/10 flex-shrink-0">
-            <button onClick={toggleSidebar} className="lg:hidden text-white/70 hover:text-white flex-shrink-0">
+          {/* Mobile: close button */}
+          <div className="lg:hidden flex items-center justify-end px-4 py-2 border-b border-white/10">
+            <button onClick={toggleSidebar} className="text-white/70 hover:text-white">
               <FaTimes size={18} />
             </button>
           </div>
