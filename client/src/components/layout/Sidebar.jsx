@@ -1,26 +1,97 @@
-import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FaHome, FaUsers, FaRobot, FaNetworkWired, FaTimes, FaSignOutAlt, FaComments } from "react-icons/fa";
 
-const COLLAPSED_W = 72;
-const EXPANDED_W = 260;
-
-const useIsDesktop = () => {
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
-  useEffect(() => {
-    const handler = () => setIsDesktop(window.innerWidth >= 1024);
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
-  return isDesktop;
-};
+// CSS-only sidebar hover styles injected as a style tag
+const sidebarStyles = `
+  .sidebar-desktop {
+    width: 72px;
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sidebar-desktop:hover {
+    width: 260px;
+  }
+  .sidebar-label {
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+  }
+  .sidebar-desktop:hover .sidebar-label {
+    max-width: 180px;
+    opacity: 1;
+  }
+  .sidebar-section-title {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease, height 0.2s ease;
+  }
+  .sidebar-desktop:hover .sidebar-section-title {
+    opacity: 1;
+    height: auto;
+  }
+  .sidebar-menu-link {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+    transition: all 0.15s ease;
+  }
+  .sidebar-desktop:hover .sidebar-menu-link {
+    justify-content: flex-start;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  .sidebar-footer-info {
+    justify-content: center;
+  }
+  .sidebar-desktop:hover .sidebar-footer-info {
+    justify-content: flex-start;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .sidebar-btn {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .sidebar-desktop:hover .sidebar-btn {
+    justify-content: flex-start;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  @media (max-width: 1023px) {
+    .sidebar-desktop {
+      width: 260px !important;
+    }
+    .sidebar-label {
+      max-width: 180px !important;
+      opacity: 1 !important;
+    }
+    .sidebar-section-title {
+      opacity: 1 !important;
+      height: auto !important;
+    }
+    .sidebar-menu-link {
+      justify-content: flex-start !important;
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
+    .sidebar-footer-info {
+      justify-content: flex-start !important;
+      padding-left: 0.5rem !important;
+    }
+    .sidebar-btn {
+      justify-content: flex-start !important;
+      padding-left: 0.75rem !important;
+    }
+  }
+`;
 
 const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
-  const [isHovered, setIsHovered] = useState(false);
-  const isDesktop = useIsDesktop();
 
   const isActive = (path) =>
     location.pathname === path
@@ -30,8 +101,6 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
   const handleMenuClick = () => {
     if (isOpen) toggleSidebar();
   };
-
-  const expanded = isDesktop ? isHovered : true;
 
   const menuItems = [
     { to: "/dashboard", icon: FaHome, label: "Dashboard", show: true },
@@ -43,6 +112,8 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
 
   return (
     <>
+      <style>{sidebarStyles}</style>
+
       {/* Mobile Overlay */}
       <div
         className={`fixed inset-0 z-20 bg-black/50 transition-opacity lg:hidden ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
@@ -51,42 +122,28 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
 
       {/* Sidebar */}
       <aside
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        style={{
-          width: isDesktop ? (expanded ? EXPANDED_W : COLLAPSED_W) : EXPANDED_W,
-        }}
         className={`
+          sidebar-desktop
           fixed top-0 left-0 z-40 h-screen bg-[var(--sidebar-bg)] text-white
           flex flex-col justify-between overflow-hidden
-          transition-[width] duration-200 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
         `}
       >
-        {/* Logo - Always visible in header */}
+        {/* Logo */}
         <div>
           <div className="h-16 flex items-center gap-3 px-5 border-b border-white/10 bg-black/10 flex-shrink-0">
             <img src="/vlow-icon.png" alt="Logo" className="h-8 w-8 flex-shrink-0" />
-            <span
-              className="text-xl font-extrabold tracking-tight whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-200"
-              style={{
-                maxWidth: expanded ? 160 : 0,
-                opacity: expanded ? 1 : 0,
-              }}
-            >
+            <span className="sidebar-label text-xl font-extrabold tracking-tight">
               Vlow<span className="text-[var(--sidebar-accent)]">.ai</span>
             </span>
-            <button onClick={toggleSidebar} className="lg:hidden ml-auto text-white/70 hover:text-white">
+            <button onClick={toggleSidebar} className="lg:hidden ml-auto text-white/70 hover:text-white flex-shrink-0">
               <FaTimes size={18} />
             </button>
           </div>
 
           {/* Section Title */}
-          <div
-            className="px-5 pt-4 pb-1 text-[10px] font-bold text-white/30 uppercase tracking-widest whitespace-nowrap overflow-hidden transition-[opacity] duration-200"
-            style={{ opacity: expanded ? 1 : 0, height: expanded ? "auto" : 0 }}
-          >
+          <div className="sidebar-section-title px-5 pt-4 pb-1 text-[10px] font-bold text-white/30 uppercase tracking-widest whitespace-nowrap">
             Main Menu
           </div>
 
@@ -100,22 +157,10 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
                   to={item.to}
                   onClick={handleMenuClick}
                   title={item.label}
-                  className={`
-                    flex items-center h-11 rounded-xl transition-all duration-150 font-medium
-                    ${expanded ? "px-3 gap-3" : "justify-center px-0"}
-                    ${isActive(item.to)}
-                  `}
+                  className={`sidebar-menu-link flex items-center gap-3 h-11 rounded-xl font-medium ${isActive(item.to)}`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span
-                    className="whitespace-nowrap overflow-hidden transition-[opacity,max-width] duration-200"
-                    style={{
-                      maxWidth: expanded ? 180 : 0,
-                      opacity: expanded ? 1 : 0,
-                    }}
-                  >
-                    {item.label}
-                  </span>
+                  <span className="sidebar-label">{item.label}</span>
                 </Link>
               );
             })}
@@ -124,43 +169,23 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
 
         {/* Footer */}
         <div className="p-3 bg-black/10 border-t border-white/10">
-          {/* User Info */}
-          <div className={`flex items-center gap-3 mb-3 ${expanded ? "px-2" : "justify-center"}`}>
+          <div className="sidebar-footer-info flex items-center gap-3 mb-3">
             <div className="bg-[var(--sidebar-accent)] text-[var(--sidebar-bg)] rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0 border-2 border-white/20">
               <span className="text-lg font-bold">{user?.name?.charAt(0).toUpperCase()}</span>
             </div>
-            <div
-              className="flex flex-col overflow-hidden whitespace-nowrap transition-[opacity,max-width] duration-200"
-              style={{
-                maxWidth: expanded ? 160 : 0,
-                opacity: expanded ? 1 : 0,
-              }}
-            >
+            <div className="sidebar-label flex flex-col">
               <span className="font-bold text-sm truncate">{user?.name}</span>
               <span className="text-[10px] text-white/50 uppercase tracking-wider">{user?.role}</span>
             </div>
           </div>
 
-          {/* Logout Button */}
           <button
             onClick={onLogoutClick}
             title="Keluar Aplikasi"
-            className={`
-              flex items-center h-10 w-full rounded-xl border border-white/20 text-white/80
-              hover:bg-white hover:text-[var(--sidebar-bg)] hover:border-white transition-all duration-150
-              ${expanded ? "px-3 gap-3 justify-start" : "justify-center px-0"}
-            `}
+            className="sidebar-btn flex items-center gap-3 h-10 w-full rounded-xl border border-white/20 text-white/80 hover:bg-white hover:text-[var(--sidebar-bg)] hover:border-white transition-colors"
           >
             <FaSignOutAlt className="w-4 h-4 flex-shrink-0" />
-            <span
-              className="whitespace-nowrap overflow-hidden text-sm font-medium transition-[opacity,max-width] duration-200"
-              style={{
-                maxWidth: expanded ? 160 : 0,
-                opacity: expanded ? 1 : 0,
-              }}
-            >
-              Keluar Aplikasi
-            </span>
+            <span className="sidebar-label text-sm font-medium">Keluar Aplikasi</span>
           </button>
         </div>
       </aside>
