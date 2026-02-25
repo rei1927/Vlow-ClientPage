@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { FaPaperPlane, FaRobot, FaEraser } from "react-icons/fa";
+import { FaPaperPlane, FaRobot, FaEraser, FaFilePdf } from "react-icons/fa";
 import { toast } from "react-hot-toast";
 import agentService from "../../features/agents/agentService";
 
@@ -206,10 +206,22 @@ const ChatPreview = ({
                     : " bg-red-100 text-red-600" // Style WA Receiver
                 }`}
             >
-              {/* Render Image for Welcome Msg */}
+              {/* Render Image or PDF for Knowledge Resource */}
               {msg.image && (
                 <div className="mb-2 -mx-2 -mt-2">
-                  <img src={msg.image} alt="Welcome" className="w-full h-auto rounded-t-lg" />
+                  {msg.image.toLowerCase().includes('.pdf') ? (
+                    <a
+                      href={msg.image}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 p-3 bg-red-50 hover:bg-red-100 transition-colors rounded-t-lg"
+                    >
+                      <FaFilePdf className="text-red-500 flex-shrink-0" size={20} />
+                      <span className="text-sm font-medium text-red-700">Buka PDF</span>
+                    </a>
+                  ) : (
+                    <img src={msg.image} alt="Knowledge Resource" className="w-full h-auto rounded-t-lg" />
+                  )}
                 </div>
               )}
 

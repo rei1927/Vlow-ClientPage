@@ -7,10 +7,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        2272,
-        816
+        52720,
+        10352
       ],
-      "id": "39e8fe82-788c-4968-8c80-60f9fda46175",
+      "id": "6aef7e3b-42c1-46b3-bfa4-adcb848bf8df",
       "name": "Wait",
       "webhookId": "8f8cfbb8-3482-44a5-bd25-54086424ae9f"
     },
@@ -24,10 +24,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        1168,
-        480
+        51376,
+        10096
       ],
-      "id": "6e852230-8f46-41ec-98b8-1598fb159597",
+      "id": "c94bc33e-1c1c-43f1-ac3b-00f6f3ab2935",
       "name": "Get contact basic info",
       "credentials": {
         "wahaApi": {
@@ -48,10 +48,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        2000,
-        160
+        52496,
+        9904
       ],
-      "id": "7c5411e4-b884-454d-a9fa-d5d03db03a5c",
+      "id": "134a44f7-e07f-4acb-9940-af1c5f29ccae",
       "name": "Save labels for the chat",
       "credentials": {
         "wahaApi": {
@@ -89,10 +89,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1392,
-        480
+        51600,
+        10096
       ],
-      "id": "3e68cd7c-3486-460d-933b-0489e43f213b",
+      "id": "69077909-c6dc-4fb6-84b5-69330d883763",
       "name": "CEK GRUP ATAU BUKAN"
     },
     {
@@ -133,10 +133,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1024,
-        160
+        51152,
+        9904
       ],
-      "id": "955c6a51-665e-4056-8a43-627cef0e3895",
+      "id": "1419abb6-1fda-4d39-962e-43a9d3d35061",
       "name": "CEK DARI IKLAN"
     },
     {
@@ -166,10 +166,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1248,
-        160
+        51376,
+        9904
       ],
-      "id": "2f7b25a0-21e0-469f-baaf-50e0f0dbfb19",
+      "id": "edd81184-b5e8-477b-881c-237cc26a477f",
       "name": "CEK BOT"
     },
     {
@@ -200,10 +200,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1696,
-        160
+        52048,
+        9904
       ],
-      "id": "ce0ba6ec-794d-423c-832e-c58ca09d0b6f",
+      "id": "c7486bb3-e3f1-4d76-9ca4-86a11b9f3b76",
       "name": "CEK LABEL1"
     },
     {
@@ -233,10 +233,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        944,
-        480
+        51152,
+        10096
       ],
-      "id": "8a293767-a31e-4797-9cb8-ac6c2c27a053",
+      "id": "e757210a-945f-4530-8e89-4ea8aa3499a8",
       "name": "CEK API"
     },
     {
@@ -267,10 +267,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        720,
-        384
+        50928,
+        10000
       ],
-      "id": "dde2ac24-86af-419b-a09b-914933715a99",
+      "id": "93c29802-9015-4dd6-b1e7-e83e262352d1",
       "name": "ME or NOT"
     },
     {
@@ -301,10 +301,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        2064,
-        480
+        52496,
+        10096
       ],
-      "id": "ff44f316-f6b9-4215-b56c-c4b0c01d3cf3",
+      "id": "7c07b92e-72f4-4eb1-ad2b-e20257b56034",
       "name": "If"
     },
     {
@@ -324,10 +324,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        2288,
-        336
+        54512,
+        10032
       ],
-      "id": "47ced55c-c5dd-41a8-a7be-e341704af177",
+      "id": "39d63e51-8de2-4f38-8163-cff64637b525",
       "name": "HTTP Request"
     },
     {
@@ -347,10 +347,10 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.1,
       "position": [
-        2848,
-        352
+        54960,
+        9936
       ],
-      "id": "d45f7f67-1d4b-451c-97f9-0e63f4cf07b7",
+      "id": "7c3803d5-ce84-4734-a323-84f63ac17fc8",
       "name": "Analyze an image",
       "credentials": {
         "googlePalmApi": {
@@ -371,10 +371,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        3392,
-        352
+        55760,
+        9936
       ],
-      "id": "f3ca80d5-f9e5-433f-933f-2077d6373380",
+      "id": "e7117547-c9f6-49d9-ba2d-7c38049f219d",
       "name": "Send a text message1",
       "credentials": {
         "wahaApi": {
@@ -391,11 +391,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2816,
-        304
+        55008,
+        9856
       ],
       "typeVersion": 1,
-      "id": "901132a1-8d28-4a58-b5ce-88bc88446e8a",
+      "id": "ecd7d868-5afd-4844-a8e4-cba40cee6d54",
       "name": "Sticky Note"
     },
     {
@@ -407,11 +407,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1248,
-        640
+        52544,
+        9920
       ],
       "typeVersion": 1,
-      "id": "f5f7b232-c21a-4dd6-996f-08bda306db54",
+      "id": "1b724ec7-5dc6-475d-948d-0eef77d7a8d5",
       "name": "Sticky Note1"
     },
     {
@@ -423,11 +423,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        976,
-        96
+        51216,
+        9824
       ],
       "typeVersion": 1,
-      "id": "0ec0e5e5-871a-4b52-83d7-d44d3526c6c1",
+      "id": "f7544cc6-6472-45ab-ba5f-1aeddb7b91d1",
       "name": "Sticky Note2"
     },
     {
@@ -457,10 +457,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        2512,
-        336
+        54736,
+        10032
       ],
-      "id": "353cd94a-baaa-490a-96e5-7704eb347d21",
+      "id": "d0bb71c2-f513-447e-a0f6-82642b7638b3",
       "name": "If1"
     },
     {
@@ -480,10 +480,10 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.1,
       "position": [
-        2512,
-        544
+        54960,
+        10176
       ],
-      "id": "979765e5-f86b-4462-a1a0-06efbb92f9da",
+      "id": "43b20360-cad4-44a6-891a-b43956a29eb7",
       "name": "Analyze audio",
       "credentials": {
         "googlePalmApi": {
@@ -503,10 +503,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        3040,
-        352
+        55248,
+        9936
       ],
-      "id": "688d6f84-fef3-4bb3-8927-aa6ecbab48e5",
+      "id": "51fdd31a-542d-48c0-9473-366e3d124193",
       "name": "Start Typing2",
       "credentials": {
         "wahaApi": {
@@ -526,10 +526,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        3216,
-        352
+        55536,
+        9936
       ],
-      "id": "f7063f6c-d08d-4f84-b345-68787ab58afd",
+      "id": "7314255c-e3c2-4125-aee9-39b0702ab93c",
       "name": "Stop Typing2",
       "credentials": {
         "wahaApi": {
@@ -540,15 +540,15 @@
     },
     {
       "parameters": {
-        "jsCode": "const aiOutput = items[0].json.output;\nconst agentData = $('AI Agent2').item.json;\nlet finalMessageForUser = aiOutput;\nlet welcomeImageUrl = null;\nlet bookingData = { booking: false, escalate: false };\nlet promptTokens = agentData?.response_metadata?.tokenUsage?.promptTokens || agentData?.usage_metadata?.prompt_token_count || 0;\nlet completionTokens = agentData?.response_metadata?.tokenUsage?.completionTokens || agentData?.usage_metadata?.candidates_token_count || 0;\nif (promptTokens === 0 || completionTokens === 0) {\n    const ctx = $('Finalize Context').first().json;\n    const userMessage = $('Set Prod Mode').first().json.message || \"\";\n    const fullInputText = (ctx.finalSystemPrompt || \"\") + (ctx.finalKnowledge || \"\") + userMessage;\n    promptTokens = Math.ceil(fullInputText.length / 4);\n    completionTokens = Math.ceil((aiOutput || \"\").length / 4);\n}\nlet totalTokens = promptTokens + completionTokens;\ntry {\n    if (!aiOutput) throw new Error(\"Output kosong\");\n    const jsonMatch = aiOutput.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n        let jsonString = jsonMatch[0];\n        jsonString = jsonString.replace(/^json\\s*/i, \"\").replace(/$/i, \"\");\n        jsonString = jsonString.replace(/\\\\(?![\"\\\\bfnrtu])/g, \"\\\\\\\\\");\n        const parsed = JSON.parse(jsonString);\n        if (parsed.booking && String(parsed.booking).toLowerCase() === 'true') {\n            bookingData.booking = true;\n            bookingData.topic = parsed.topic;\n            bookingData.clientEmail = parsed.clientEmail;\n            let time = parsed.startTime ? parsed.startTime.replace(' ', 'T') : '';\n            if (time && time.split(':').length === 2) { time = time.includes('+') ? time.split('+')[0] + ':00+' + time.split('+')[1] : time + ':00'; }\n            if (time && !time.includes('+') && !time.endsWith('Z')) time += '+07:00';\n            bookingData.startTime = time;\n        }\n        if (parsed.escalate && String(parsed.escalate).toLowerCase() === 'true') { bookingData.escalate = true; }\n        finalMessageForUser = aiOutput.replace(/json[\\s\\S]*/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/\\{[\\s\\S]*\\}/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/`/g, \"\").trim();\n    }\n    const imgMatch = finalMessageForUser.match(/WELCOME_IMAGE_URL:\\s*(\\S+)/i);\n    if (imgMatch && imgMatch[1]) {\n        welcomeImageUrl = imgMatch[1].trim();\n        finalMessageForUser = finalMessageForUser.replace(/WELCOME_IMAGE_URL:\\s*\\S+/i, \"\").trim();\n    }\n} catch (error) { bookingData.error = error.message; }\nreturn [{ json: { ...bookingData, welcome_image_url: welcomeImageUrl, text_for_wa: finalMessageForUser, output: finalMessageForUser, tokens: { prompt: promptTokens, completion: completionTokens, total: totalTokens } } }];"
+        "jsCode": "const aiOutput = items[0].json.output;\nconst agentData = $('AI Agent2').item.json;\nlet finalMessageForUser = aiOutput;\nlet welcomeImageUrl = null;\nlet bookingData = { booking: false, escalate: false };\nlet promptTokens = agentData?.response_metadata?.tokenUsage?.promptTokens || agentData?.usage_metadata?.prompt_token_count || 0;\nlet completionTokens = agentData?.response_metadata?.tokenUsage?.completionTokens || agentData?.usage_metadata?.candidates_token_count || 0;\n\nif (promptTokens === 0 || completionTokens === 0) {\n    const ctx = $('Finalize Context').first().json;\n    const userMessage = $('Set Prod Mode').first().json.message || \"\";\n    const fullInputText = (ctx.finalSystemPrompt || \"\") + (ctx.finalKnowledge || \"\") + userMessage;\n    promptTokens = Math.ceil(fullInputText.length / 4);\n    completionTokens = Math.ceil((aiOutput || \"\").length / 4);\n}\nlet totalTokens = promptTokens + completionTokens;\n\ntry {\n    if (!aiOutput) throw new Error(\"Output kosong\");\n\n    // 1. Tangkap output JSON Booking/Escalate jika ada\n    const jsonMatch = aiOutput.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n        let jsonString = jsonMatch[0];\n        jsonString = jsonString.replace(/^json\\s*/i, \"\").replace(/$/i, \"\");\n        jsonString = jsonString.replace(/\\\\(?![\"\\\\bfnrtu])/g, \"\\\\\\\\\");\n        const parsed = JSON.parse(jsonString);\n        if (parsed.booking && String(parsed.booking).toLowerCase() === 'true') {\n            bookingData.booking = true;\n            bookingData.topic = parsed.topic;\n            bookingData.clientEmail = parsed.clientEmail;\n            let time = parsed.startTime ? parsed.startTime.replace(' ', 'T') : '';\n            if (time && time.split(':').length === 2) { time = time.includes('+') ? time.split('+')[0] + ':00+' + time.split('+')[1] : time + ':00'; }\n            if (time && !time.includes('+') && !time.endsWith('Z')) time += '+07:00';\n            bookingData.startTime = time;\n        }\n        if (parsed.escalate && String(parsed.escalate).toLowerCase() === 'true') { bookingData.escalate = true; }\n        \n        finalMessageForUser = aiOutput.replace(/json[\\s\\S]*/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/\\{[\\s\\S]*\\}/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/`/g, \"\").trim();\n    }\n\n    // 2. TANGKAP SEMUA LINK GAMBAR (REGEX BARU)\n    // Cek format markdown [nama](https://...jpg)\n    const mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i;\n    // Cek format link biasa https://...jpg\n    const rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i;\n\n    const mdMatch = finalMessageForUser.match(mdRegex);\n    if (mdMatch) {\n        welcomeImageUrl = mdMatch[2]; // Ambil URL-nya\n        finalMessageForUser = finalMessageForUser.replace(mdMatch[0], \"\").trim(); // Hapus dari teks balik ke user\n    } else {\n        const rawMatch = finalMessageForUser.match(rawRegex);\n        if (rawMatch) {\n            welcomeImageUrl = rawMatch[1];\n            finalMessageForUser = finalMessageForUser.replace(rawMatch[0], \"\").trim();\n        }\n    }\n\n    // 3. Fallback jika format lama (WELCOME_IMAGE_URL:) masih dipakai\n    const imgMatch = finalMessageForUser.match(/WELCOME_IMAGE_URL:\\s*(\\S+)/i);\n    if (imgMatch && imgMatch[1]) {\n        welcomeImageUrl = imgMatch[1].trim();\n        finalMessageForUser = finalMessageForUser.replace(/WELCOME_IMAGE_URL:\\s*\\S+/i, \"\").trim();\n    }\n\n} catch (error) { \n    bookingData.error = error.message; \n}\n\nreturn [{ \n    json: { \n        ...bookingData, \n        welcome_image_url: welcomeImageUrl, // N8N WAHA akan otomatis ngirim ini sebagai gambar!\n        text_for_wa: finalMessageForUser, \n        output: finalMessageForUser, \n        tokens: { prompt: promptTokens, completion: completionTokens, total: totalTokens } \n    } \n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4448,
-        848
+        55760,
+        10256
       ],
-      "id": "ce14d670-fd8d-4aba-9227-7b3722af2233",
+      "id": "f61c8a95-ed6f-42b2-9125-1e72ecc2c925",
       "name": "Code in JavaScript"
     },
     {
@@ -562,10 +562,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        4648,
-        920
+        55184,
+        10352
       ],
-      "id": "3181f2dc-252c-432c-916a-1e951e2e5caf",
+      "id": "977121a2-9f87-4af0-9618-070f258f1562",
       "name": "AI Agent2"
     },
     {
@@ -575,10 +575,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        3872,
-        1024
+        55200,
+        10576
       ],
-      "id": "014cad89-820c-402f-a2a1-d1023edd4a08",
+      "id": "f70d052b-7077-43cb-a73e-7f82a7e68924",
       "name": "Google Gemini Chat Model3",
       "credentials": {
         "googlePalmApi": {
@@ -595,10 +595,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        3984,
-        1072
+        55328,
+        10576
       ],
-      "id": "00d4c326-a5cb-4235-970a-dd775bd0a00f",
+      "id": "ead1eec4-7032-4f71-b3b1-8512b30dd304",
       "name": "Simple Memory1"
     },
     {
@@ -611,10 +611,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        2272,
-        1056
+        52720,
+        10544
       ],
-      "id": "5afcc98c-e7e5-4129-bc39-cb8cf6cf018d",
+      "id": "2af733a1-8636-4ba2-95d1-56377b6e84c5",
       "name": "Webhook (Simulator Mode)",
       "webhookId": "3bcbcc00-e3c0-462d-81de-66c395f40d8a"
     },
@@ -625,10 +625,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2432,
-        1056
+        52944,
+        10544
       ],
-      "id": "2bcf2a08-742b-4ff5-bc85-d55d618c4f4d",
+      "id": "62b3383b-43ec-4e16-ae67-a464264a3345",
       "name": "Set Sim Mode"
     },
     {
@@ -638,10 +638,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2640,
-        816
+        52944,
+        10352
       ],
-      "id": "59f47672-9556-44f0-8b46-424bbea5476f",
+      "id": "265e1c68-a5ec-4805-b9b9-0e4979fed16d",
       "name": "Set Prod Mode"
     },
     {
@@ -649,10 +649,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        2832,
-        1040
+        53168,
+        10448
       ],
-      "id": "5bce87ea-6716-4eba-a4db-b8cc315e7967",
+      "id": "43ad1b8c-2866-4c3d-bcf9-8b6ab6676ab0",
       "name": "Merge Inputs"
     },
     {
@@ -711,10 +711,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        3024,
-        1040
+        53392,
+        10448
       ],
-      "id": "448b0fa7-63c1-4dc1-b6c3-55559be6165f",
+      "id": "41d288c6-0973-4abc-8876-bac53b6e2167",
       "name": "Is Production?"
     },
     {
@@ -734,23 +734,23 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        4080,
-        464
+        50480,
+        10768
       ],
-      "id": "654c5dcf-3c97-4c6d-9c02-4953151f1e1f",
+      "id": "add86981-fafa-42e5-89bf-b44bf1218de1",
       "name": "Fetch Config DB"
     },
     {
       "parameters": {
-        "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\n\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n    \n    // Parse handover_config (might be string from Postgres)\n    let hc = data.handover_config;\n    if (typeof hc === 'string') {\n        try { hc = JSON.parse(hc); } catch(e) { hc = null; }\n    }\n    \n    if (hc && hc.enabled) {\n        const rules = [];\n        rules.push(\"\\nPENTING - ATURAN ESCALATION:\");\n        rules.push(\"Kamu WAJIB menyertakan JSON {\\\"escalate\\\": true, \\\"reason\\\": \\\"<alasan>\\\"} di BARIS TERAKHIR response-mu jika salah satu kondisi berikut terpenuhi:\");\n\n        if (hc.escalationPrompt && hc.escalationPrompt.trim()) {\n            rules.push(\"\");\n            rules.push(\"KONDISI ESCALATION:\");\n            hc.escalationPrompt.trim().split('\\n').forEach(line => {\n                if (line.trim()) rules.push(\"• \" + line.trim());\n            });\n        }\n        \n        rules.push(\"\");\n        rules.push(\"FORMAT OUTPUT SAAT ESCALATION:\");\n        rules.push('Balas user dengan sopan, lalu DI BARIS TERAKHIR tulis: {\"escalate\": true, \"reason\": \"<alasan singkat>\"}');\n        rules.push(\"\");\n        rules.push(\"CONTOH OUTPUT ESCALATION:\");\n        rules.push('Mohon maaf, saya belum memiliki informasi mengenai hal tersebut. Saya akan menghubungkan Anda dengan tim kami.');\n        rules.push('{\"escalate\": true, \"reason\": \"Pertanyaan di luar knowledge base\"}');\n        rules.push(\"\");\n        rules.push(\"Jika TIDAK perlu escalation, JANGAN sertakan JSON escalate di response.\");\n        \n        finalPrompt += \"\\n\\n\" + rules.join(\"\\n\");\n    }\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n}\n\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
+        "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\n\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n    \n    // Tambahkan instruksi GAMBAR otomatis jika knowledge mengandung 'Attached File'\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', kamu WAJIB menyertakan URL gambar tersebut di dalam response-mu.\\n\";\n        finalPrompt += \"Format: tulis URL gambar langsung di response, contoh: https://minio.example.com/gambar.jpg\\n\";\n        finalPrompt += \"Jangan sembunyikan URL gambar. Jika user bertanya tentang topik yang memiliki Attached File, SELALU sertakan URL file tersebut di response.\\n\";\n        finalPrompt += \"JANGAN escalate jika informasi (termasuk gambar) sudah tersedia di CONTEXT.\";\n    }\n    \n    // Parse handover_config (might be string from Postgres)\n    let hc = data.handover_config;\n    if (typeof hc === 'string') {\n        try { hc = JSON.parse(hc); } catch(e) { hc = null; }\n    }\n    \n    if (hc && hc.enabled) {\n        const rules = [];\n        rules.push(\"\\nPENTING - ATURAN ESCALATION:\");\n        rules.push(\"Kamu WAJIB menyertakan JSON {\\\"escalate\\\": true, \\\"reason\\\": \\\"<alasan>\\\"} di BARIS TERAKHIR response-mu jika salah satu kondisi berikut terpenuhi:\");\n\n        if (hc.escalationPrompt && hc.escalationPrompt.trim()) {\n            rules.push(\"\");\n            rules.push(\"KONDISI ESCALATION:\");\n            hc.escalationPrompt.trim().split('\\n').forEach(line => {\n                if (line.trim()) rules.push(\"• \" + line.trim());\n            });\n        }\n        \n        rules.push(\"\");\n        rules.push(\"PENTING: JANGAN escalate jika pertanyaan user BISA dijawab dari CONTEXT yang tersedia (termasuk gambar/file yang terlampir).\");\n        rules.push(\"\");\n        rules.push(\"FORMAT OUTPUT SAAT ESCALATION:\");\n        rules.push('Balas user dengan sopan, lalu DI BARIS TERAKHIR tulis: {\"escalate\": true, \"reason\": \"<alasan singkat>\"}');\n        rules.push(\"\");\n        rules.push(\"CONTOH OUTPUT ESCALATION:\");\n        rules.push('Mohon maaf, saya belum memiliki informasi mengenai hal tersebut. Saya akan menghubungkan Anda dengan tim kami.');\n        rules.push('{\"escalate\": true, \"reason\": \"Pertanyaan di luar knowledge base\"}');\n        rules.push(\"\");\n        rules.push(\"Jika TIDAK perlu escalation, JANGAN sertakan JSON escalate di response.\");\n        \n        finalPrompt += \"\\n\\n\" + rules.join(\"\\n\");\n    }\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n    \n    // Add file instruction for simulator mode (mirrors production path)\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', kamu WAJIB menyertakan URL tersebut di dalam response-mu.\\n\";\n        finalPrompt += \"Format: tulis URL file langsung di response, contoh: https://minio.example.com/gambar.jpg\\n\";\n        finalPrompt += \"Jika user bertanya tentang topik yang memiliki Attached File, SELALU sertakan URL file tersebut di response.\";\n    }\n}\n\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3472,
-        1056
+        53840,
+        10448
       ],
-      "id": "050db979-9abe-414f-afa3-81b1891a146b",
+      "id": "3c8cad38-0c3c-4112-9ea0-3b803a235382",
       "name": "Finalize Context"
     },
     {
@@ -809,10 +809,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        4224,
-        1008
+        55536,
+        10352
       ],
-      "id": "b82cbb9c-1370-4749-8466-fd5e5b361c71",
+      "id": "dc7ee983-0e77-40e3-b037-cabdaf80d8cc",
       "name": "Is Simulator?"
     },
     {
@@ -823,10 +823,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        4448,
-        1104
+        55968,
+        10448
       ],
-      "id": "ed16d201-684a-46f5-8da7-a2e19b5c20c8",
+      "id": "9b4a2415-07e2-4ef3-9a58-d0586474aa04",
       "name": "Respond to Webhook"
     },
     {
@@ -841,10 +841,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        5120,
-        832
+        56432,
+        10160
       ],
-      "id": "e62e8b12-065a-4216-805f-e090badbcde6",
+      "id": "5f821a38-b9bf-47bb-a410-9dea7c251004",
       "name": "Save labels for the chat2",
       "credentials": {
         "wahaApi": {
@@ -864,10 +864,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        4912,
-        832
+        56208,
+        10160
       ],
-      "id": "de0e56ea-61a2-4d1e-b601-7d46c75c23cc",
+      "id": "7fcfcfd8-39c3-472c-b2bf-4d260c561a85",
       "name": "Get contact basic info3",
       "credentials": {
         "wahaApi": {
@@ -887,10 +887,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        4912,
-        1056
+        56208,
+        10352
       ],
-      "id": "6ec43564-1dac-4d10-9867-194340a11f70",
+      "id": "2450f3d2-fdbf-4ce6-8162-86ca6c492433",
       "name": "Start Typing",
       "credentials": {
         "wahaApi": {
@@ -910,10 +910,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        5488,
-        1200
+        56880,
+        10496
       ],
-      "id": "10227fee-6430-4972-b726-bd4967df307d",
+      "id": "5c4e44fb-22a8-413f-b97b-3cedd646ca91",
       "name": "Stop Typing",
       "credentials": {
         "wahaApi": {
@@ -950,10 +950,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        5296,
-        1056
+        56656,
+        10352
       ],
-      "id": "62d51cc1-0708-4dfc-b61a-7f58b24e7938",
+      "id": "daf80040-5f1b-4f0f-8986-7e40ec5f8aa1",
       "name": "SCHEDULE"
     },
     {
@@ -963,10 +963,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        5120,
-        1056
+        56432,
+        10352
       ],
-      "id": "d9e0eff4-2b94-4648-8b80-da0cc647f7ef",
+      "id": "b4470719-9f94-414f-b2c4-679633e23cef",
       "name": "Wait4",
       "webhookId": "3c8d1cb9-9c7f-4d0e-b199-3c159ec30a3c"
     },
@@ -983,10 +983,10 @@
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
       "position": [
-        5504,
-        880
+        56880,
+        10208
       ],
-      "id": "36508a64-ce12-4760-9e1d-802cf0601fa6",
+      "id": "98731d70-dd15-44de-9f7c-89da32b2d914",
       "name": "Create an event",
       "disabled": true
     },
@@ -1002,10 +1002,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        6224,
-        896
+        57552,
+        10208
       ],
-      "id": "8ec7faf9-d752-4dc0-8785-9a78b81d38d4",
+      "id": "0e3657ad-b5db-42d2-b625-1b1280c30334",
       "name": "Send a text message8",
       "credentials": {
         "wahaApi": {
@@ -1026,7 +1026,7 @@
           "conditions": [
             {
               "id": "09e1f07e-3b98-4f2e-8a47-7d1b66b1f6a1",
-              "leftValue": "={{ $json.welcome_image_url }}",
+              "leftValue": "={{ $('Code in JavaScript').item.json.welcome_image_url }}",
               "rightValue": "",
               "operator": {
                 "type": "string",
@@ -1042,10 +1042,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        5696,
-        1200
+        57104,
+        10496
       ],
-      "id": "293c19bb-4069-40e9-b59c-d50c630fb5ec",
+      "id": "6e6ec787-ea04-4bdd-b8a2-e6944bd78c27",
       "name": "HAS WELCOME IMAGE"
     },
     {
@@ -1054,16 +1054,16 @@
         "operation": "Send Image",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"filename.jpg\",\n  \"url\": \"{{$json.welcome_image_url}}\"\n}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"filename.jpg\",\n  \"url\": \"{{$('Code in JavaScript').item.json.welcome_image_url}}\"\n}",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        5936,
-        1056
+        57328,
+        10416
       ],
-      "id": "c715b0d2-7df9-4e0d-816b-a5d6371d8454",
+      "id": "6e353c31-9b79-450f-8129-3786b06f3de6",
       "name": "Send welcome image1",
       "credentials": {
         "wahaApi": {
@@ -1078,16 +1078,16 @@
         "operation": "Send Text",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "text": "={{ $('AI Agent2').item.json.output }}",
+        "text": "={{ $('Code in JavaScript').item.json.text_for_wa }}",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        6224,
-        1216
+        57552,
+        10496
       ],
-      "id": "cd15ff19-546c-4abf-b62c-253e2dc9a1a7",
+      "id": "e76756dd-adfc-4684-917e-d025627d921e",
       "name": "Send a text message4",
       "credentials": {
         "wahaApi": {
@@ -1104,10 +1104,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        544,
-        384
+        50704,
+        10000
       ],
-      "id": "091d97e7-656d-4fca-a54a-7c388b1eb84b",
+      "id": "805fbf39-6127-40e2-ab38-ea34c5608f85",
       "name": "Edit Fields"
     },
     {
@@ -1138,10 +1138,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        3648,
-        1056
+        54064,
+        10448
       ],
-      "id": "df4cac01-692b-42ac-be0c-b9bb6dd3bdc5",
+      "id": "a7f03faa-7730-4a83-a7b9-4eee61f19e8f",
       "name": "IS ACTIVE?"
     },
     {
@@ -1156,7 +1156,7 @@
           "conditions": [
             {
               "id": "22a5b3c1-6d9c-4b6b-9f6c-2df96c4f7a12",
-              "leftValue": "={{ $json.welcome_image_url }}",
+              "leftValue": "={{ $('Code in JavaScript').item.json.welcome_image_url }}",
               "rightValue": "",
               "operator": {
                 "type": "string",
@@ -1172,10 +1172,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        5696,
-        880
+        57104,
+        10208
       ],
-      "id": "c46c62da-da02-48ec-bb8f-41408ef29770",
+      "id": "5c828f15-2f8e-4caf-b719-ed0fc428923f",
       "name": "HAS WELCOME IMAGE (BOOKING)"
     },
     {
@@ -1184,16 +1184,16 @@
         "operation": "Send Image",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"filename.jpg\",\n  \"url\": \"{{$json.welcome_image_url}}\"\n}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"filename.jpg\",\n  \"url\": \"{{$('Code in JavaScript').item.json.welcome_image_url}}\"\n}",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        5936,
-        768
+        57328,
+        10128
       ],
-      "id": "51187413-9244-4968-981a-fbaddc9e3a2e",
+      "id": "201134cf-02d3-48dc-b9e9-5ada355ea10f",
       "name": "Send welcome image (booking)",
       "credentials": {
         "wahaApi": {
@@ -1230,10 +1230,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        6688,
-        1040
+        58000,
+        10352
       ],
-      "id": "884d1827-3f5d-4ca3-bfea-1cc38642b8c2",
+      "id": "ac7c4fb6-229d-4bae-a4a2-4504058c85ba",
       "name": "FOLLOWUP ENABLED?"
     },
     {
@@ -1244,10 +1244,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        7088,
-        1040
+        58448,
+        10352
       ],
-      "id": "e22e73e5-6eb6-482e-835f-c6eff66a38fc",
+      "id": "5b391fdf-c694-48af-855c-59f049747e8f",
       "name": "Followup Wait",
       "webhookId": "fb0c5c98-9c47-4829-a6b5-f9137efc6b9e"
     },
@@ -1279,10 +1279,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        7264,
-        1040
+        58672,
+        10352
       ],
-      "id": "d2ccf17d-fbf8-4ca9-a931-ea3640df95df",
+      "id": "5d9927aa-b38f-4224-bf43-eeebb31745ee",
       "name": "FOLLOWUP HAS TEXT?"
     },
     {
@@ -1293,10 +1293,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6912,
-        1040
+        58224,
+        10352
       ],
-      "id": "818f5341-44ef-4885-9ce3-f41d5b1d64ca",
+      "id": "bcb2a579-5281-4d98-bbd6-7d60eb95ddb6",
       "name": "Prepare Followup"
     },
     {
@@ -1311,10 +1311,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        7488,
-        1024
+        58896,
+        10352
       ],
-      "id": "67f0a67e-312d-4cb5-afb9-0a3c1336bb83",
+      "id": "ffc18e8a-d955-4612-8209-d43a4ca9b841",
       "name": "Send Followup",
       "credentials": {
         "wahaApi": {
@@ -1351,10 +1351,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        4672,
-        848
+        55984,
+        10256
       ],
-      "id": "ee6109f7-5603-4c34-8324-ffd906e3d54b",
+      "id": "08fcaa0f-b423-4aa2-aecf-87d74f3de989",
       "name": "IF ESCALATE"
     },
     {
@@ -1368,10 +1368,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        6448,
-        896
+        57776,
+        10208
       ],
-      "id": "4d94ed24-35f4-42ef-9a29-468f1b3b78ec",
+      "id": "09a2559c-b4fc-477a-8c30-37f463ea299e",
       "name": "Log Conversation"
     },
     {
@@ -1386,10 +1386,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        6448,
-        1216
+        57776,
+        10496
       ],
-      "id": "347c2ac8-ffd2-449f-91ef-369386088b67",
+      "id": "80effd8c-6bdb-444b-b9a3-5accb8733997",
       "name": "Log Conversation (Alt)"
     },
     {
@@ -1397,17 +1397,17 @@
       "type": "@devlikeapro/n8n-nodes-waha.wahaTrigger",
       "typeVersion": 202502,
       "position": [
-        256,
-        -32
+        50480,
+        9616
       ],
-      "id": "b5afdfb4-b4e7-4b9e-8eea-b09a6488c632",
+      "id": "d496867a-310c-4c32-a826-0daa68885f3b",
       "name": "WAHA Trigger",
       "webhookId": "20d16051-147e-4463-a36c-d98a15cf35ff"
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "SELECT \n  a.\"id\" AS agent_id,\n  cp.\"id\" AS platform_id,\n  a.\"name\" AS agent_name,\n  a.\"systemInstruction\" AS system_prompt,\n  a.\"welcomeMessage\" AS greeting,\n  a.\"welcomeImageUrl\" AS welcome_image,\n  a.\"followupConfig\" AS followup_config,\n  a.\"handoverConfig\" AS handover_config,\n  COALESCE(a.\"knowledgeBase\", '') || '\n\n' || \n  COALESCE(\n    (\n      SELECT string_agg('=== ' || ks.title || ' ===\n' || ks.description, '\n\n')\n      FROM \"KnowledgeSources\" ks\n      WHERE ks.\"agentId\" = a.id\n    ),\n    ''\n  ) AS knowledge\nFROM \"ConnectedPlatforms\" cp\nJOIN \"Agents\" a ON cp.\"agentId\" = a.id\nWHERE cp.\"sessionId\" = $1;",
+        "query": "SELECT \n  a.\"id\" AS agent_id,\n  cp.\"id\" AS platform_id,\n  a.\"name\" AS agent_name,\n  a.\"systemInstruction\" AS system_prompt,\n  a.\"welcomeMessage\" AS greeting,\n  a.\"welcomeImageUrl\" AS welcome_image,\n  a.\"followupConfig\" AS followup_config,\n  a.\"handoverConfig\" AS handover_config,\n  COALESCE(a.\"knowledgeBase\", '') || E'\\n\\n' || \n  COALESCE(\n    (\n      SELECT string_agg(\n        '=== ' || ks.title || ' ===' || E'\\n' || ks.description || \n        CASE WHEN ks.\"fileUrl\" IS NOT NULL \n          THEN E'\\nAttached File (' || COALESCE(ks.\"fileName\", 'file') || '): ' || ks.\"fileUrl\"\n          ELSE '' \n        END,\n        E'\\n\\n'\n      )\n      FROM \"KnowledgeSources\" ks\n      WHERE ks.\"agentId\" = a.id\n    ),\n    ''\n  ) AS knowledge\nFROM \"ConnectedPlatforms\" cp\nJOIN \"Agents\" a ON cp.\"agentId\" = a.id\nWHERE cp.\"sessionId\" = $1;\n",
         "options": {
           "queryReplacement": "=={{ $('WAHA Trigger').item.json.session }}"
         }
@@ -1415,10 +1415,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        3232,
-        944
+        53616,
+        10352
       ],
-      "id": "c0a23e80-f50d-438a-ab5c-f3b71294d5f0",
+      "id": "f772d2d9-cff8-46c1-b1a2-17e078875387",
       "name": "Execute a SQL query",
       "credentials": {
         "postgres": {
@@ -1431,16 +1431,17 @@
       "parameters": {
         "resource": "Contacts",
         "operation": "Get",
-        "contactId": "={{ $json.payload.from }}",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "contactId": "={{ $('WAHA Trigger').item.json.payload.from }}",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        1488,
-        160
+        51824,
+        9904
       ],
-      "id": "af3f60ce-ac50-40d0-9785-e494f007944f",
+      "id": "07657631-ebf4-4f39-8b01-6056245cd590",
       "name": "Get contact basic info1",
       "credentials": {
         "wahaApi": {
@@ -1463,10 +1464,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        5340,
-        832
+        56656,
+        10160
       ],
-      "id": "hnd-activate-escalate-001",
+      "id": "58d997b7-7da1-4772-a7f1-eea880d4b12a",
       "name": "Activate Handover",
       "onError": "continueRegularOutput"
     },
@@ -1484,10 +1485,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        3848,
-        848
+        54288,
+        10448
       ],
-      "id": "hnd-check-keyword-001",
+      "id": "d7a90971-0b1c-41a5-a5fa-4b0d2622d946",
       "name": "Check Keyword",
       "onError": "continueRegularOutput"
     },
@@ -1519,10 +1520,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        4048,
-        848
+        54512,
+        10448
       ],
-      "id": "hnd-if-keyword-001",
+      "id": "26a5aeb8-b38b-4e10-a42e-88a2ac8b1710",
       "name": "IF Keyword Match"
     },
     {
@@ -1544,10 +1545,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        4248,
-        920
+        54736,
+        10448
       ],
-      "id": "hnd-check-status-001",
+      "id": "d8676db1-463d-4ccb-aa82-813a33f5db7e",
       "name": "Check Handover Status",
       "onError": "continueRegularOutput"
     },
@@ -1578,10 +1579,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        4448,
-        920
+        54960,
+        10448
       ],
-      "id": "hnd-if-human-001",
+      "id": "0519588a-abb9-4727-aa1b-38f62f2a3934",
       "name": "IF Human Mode"
     },
     {
@@ -1593,11 +1594,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        3800,
-        780
+        54640,
+        10336
       ],
       "typeVersion": 1,
-      "id": "hnd-sticky-001",
+      "id": "6d422ba1-dee7-48e9-a2a8-ea4d513c3936",
       "name": "Sticky Note Handover"
     },
     {
@@ -1614,10 +1615,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1472,
-        160
+        51600,
+        9904
       ],
-      "id": "hnd-auto-activate-manual",
+      "id": "71e28ca2-a939-45d8-8214-e720b6c15a40",
       "name": "Auto Label Human",
       "onError": "continueRegularOutput"
     },
@@ -1640,10 +1641,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        42320,
-        7024
+        52272,
+        9904
       ],
-      "id": "fetch-handover-config-for-label",
+      "id": "7b1c9e38-0c7a-43ab-8a91-79c4c7585d82",
       "name": "Fetch Handover Config",
       "onError": "continueRegularOutput"
     },
@@ -1666,10 +1667,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1616,
-        480
+        51824,
+        10096
       ],
-      "id": "fetch-label-cfg-001",
+      "id": "dff77114-f43f-45e6-8344-e20ab1fa1246",
       "name": "Fetch Label Config",
       "onError": "continueRegularOutput"
     },
@@ -1680,10 +1681,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1840,
-        480
+        52048,
+        10096
       ],
-      "id": "cek-label-code-001",
+      "id": "2849f60b-5fc4-41e8-a2f7-f8af4ddfb013",
       "name": "CEK LABEL Logic"
     },
     {
@@ -1714,11 +1715,163 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        2064,
-        480
+        52272,
+        10096
       ],
-      "id": "cek-label-if-001",
+      "id": "7b0b2481-f5b6-439e-8fb5-3552ab69c468",
       "name": "CEK LABEL"
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiOutput = items[0].json.output || \"\";\nlet text = aiOutput;\nlet imageUrl = null;\n\n// Cek format markdown [nama](url.jpg)\nconst mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i;\nconst rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i;\n\nconst mdMatch = text.match(mdRegex);\nif (mdMatch) {\n    imageUrl = mdMatch[2];\n    text = text.replace(mdMatch[0], \"\").trim();\n} else {\n    const rawMatch = text.match(rawRegex);\n    if (rawMatch) {\n        imageUrl = rawMatch[1];\n        text = text.replace(rawMatch[0], \"\").trim();\n    }\n}\n\nreturn [{ json: { output: text, welcome_image_url: imageUrl } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        55728,
+        10448
+      ],
+      "id": "5ccdb578-1471-427e-8d05-5da11f9073ae",
+      "name": "Process Sim Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e7c2e9b0-4f51-4f1b-85d8-c89b7888b64e",
+              "leftValue": "={{ $json.welcome_image_url }}",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        55960,
+        10256
+      ],
+      "id": "if-has-image-1772015892310",
+      "name": "Check If Image Exists"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e7c2e9b0-4f51-4f1b-85d8-c89b7888b64e",
+              "leftValue": "={{ $json.welcome_image_url }}",
+              "rightValue": ".pdf",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        56100,
+        10256
+      ],
+      "id": "if-is-pdf-1772015892310",
+      "name": "Check If is PDF"
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Image",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "file": {
+          "mimetype": "image/jpeg",
+          "url": "={{ $json.welcome_image_url }}"
+        },
+        "caption": "",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        56160,
+        10156
+      ],
+      "id": "waha-send-image-1772015892310",
+      "name": "WAHA Send Image",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send File",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "file": {
+          "mimetype": "application/pdf",
+          "filename": "KnowledgeResource.pdf",
+          "url": "={{ $json.welcome_image_url }}"
+        },
+        "caption": "",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        56160,
+        10356
+      ],
+      "id": "waha-send-file-1772015892310",
+      "name": "WAHA Send File",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n\"output\": \"{{ $json.output }}\",\n\"welcome_image_url\": \"{{ $json.welcome_image_url }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        56000,
+        10500
+      ],
+      "id": "sim-respond-to-webhook",
+      "name": "Respond Webhook Simulator"
     }
   ],
   "connections": {
@@ -1917,7 +2070,7 @@
       "main": [
         [
           {
-            "node": "IF ESCALATE",
+            "node": "Check If Image Exists",
             "type": "main",
             "index": 0
           }
@@ -2041,7 +2194,18 @@
         ],
         [
           {
-            "node": "Respond to Webhook",
+            "node": "Process Sim Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save labels for the chat2": {
+      "main": [
+        [
+          {
+            "node": "Activate Handover",
             "type": "main",
             "index": 0
           }
@@ -2343,17 +2507,6 @@
         ]
       ]
     },
-    "Save labels for the chat2": {
-      "main": [
-        [
-          {
-            "node": "Activate Handover",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Check Keyword": {
       "main": [
         [
@@ -2450,6 +2603,75 @@
         [
           {
             "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Sim Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Webhook Simulator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Image Exists": {
+      "main": [
+        [
+          {
+            "node": "Check If is PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If is PDF": {
+      "main": [
+        [
+          {
+            "node": "WAHA Send File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "WAHA Send Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAHA Send Image": {
+      "main": [
+        [
+          {
+            "node": "IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAHA Send File": {
+      "main": [
+        [
+          {
+            "node": "IF ESCALATE",
             "type": "main",
             "index": 0
           }

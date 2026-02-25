@@ -16,9 +16,8 @@ const uploadToMinio = async (file) => {
 
   // Return Public URL (Sesuaikan dengan ENV Anda)
   // Contoh: http://localhost:9000/vlow-agents/gambar.jpg
-  const minioUrl =
-    process.env.MINIO_PUBLIC_URL || `http://localhost:${process.env.MINIO_PORT || 9000}`;
-  return `${minioUrl}/${bucketName}/${fileName}`;
+  // Update: use the centralized getPublicFileUrl method to avoid localhost fallback issues
+  return getPublicFileUrl(fileName);
 };
 
 const deleteFromMinio = async (imageUrl) => {
@@ -647,6 +646,7 @@ export const testChatAgent = async (req, res, next) => {
     // Kirim ke n8n
     const response = await axios.post(N8N_SIMULATOR_URL, payload);
     const responseData = response.data;
+    console.log("=== N8N SIMULATOR REPLY ===", JSON.stringify(responseData, null, 2));
 
     // --- LOGIC: MENERIMA 'output' + 'welcome_image_url' ---
     let aiResponse = "";
@@ -654,13 +654,16 @@ export const testChatAgent = async (req, res, next) => {
 
     const firstItem = Array.isArray(responseData) ? responseData[0] : responseData;
 
-    aiResponse = firstItem?.output || firstItem?.reply || firstItem?.text || "";
-    imageUrl = firstItem?.welcome_image_url || firstItem?.image_url || null;
+    // Kadang N8N membungkus dalam { json: { ... } } jika tidak ada explicit Respond to Webhook
+    const n8nData = firstItem?.json ? firstItem.json : firstItem;
+
+    aiResponse = n8nData?.output || n8nData?.reply || n8nData?.text || "";
+    imageUrl = n8nData?.welcome_image_url || n8nData?.image_url || null;
 
     // Fallback: jika n8n tidak memisahkan image, coba extract dari teks AI
     if (!imageUrl && aiResponse) {
-      const mdRegex = /\[([^\]]*)\]\((https?:\/\/[^\s)]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s)]*)?)\)/i;
-      const rawRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp)(?:\?[^\s]*)?)/i;
+      const mdRegex = /\[([^\]]*)\]\((https?:\/\/[^\s)]+\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\?[^\s)]*)?)\)/i;
+      const rawRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\?[^\s]*)?)/i;
       const mdMatch = aiResponse.match(mdRegex);
       if (mdMatch) {
         imageUrl = mdMatch[2];
