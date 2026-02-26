@@ -2349,7 +2349,7 @@
       "main": [
         [
           {
-            "node": "Download Image 1",
+            "node": "Fetch & Encode Image",
             "type": "main",
             "index": 0
           }
@@ -2411,7 +2411,7 @@
       "main": [
         [
           {
-            "node": "Download Image Booking",
+            "node": "Fetch & Encode Booking",
             "type": "main",
             "index": 0
           }
@@ -2691,14 +2691,14 @@
       "main": [
         [
           {
-            "node": "Download File Escalate",
+            "node": "Fetch & Encode Escalate PDF",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Download Image Escalate",
+            "node": "Fetch & Encode Escalate Img",
             "type": "main",
             "index": 0
           }
@@ -2721,39 +2721,6 @@
         [
           {
             "node": "IF ESCALATE",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Download Welcome Image": {
-      "main": [
-        [
-          {
-            "node": "Download Image 1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Download Escalate Image": {
-      "main": [
-        [
-          {
-            "node": "Download Image Escalate",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Download Escalate File": {
-      "main": [
-        [
-          {
-            "node": "Download File Escalate",
             "type": "main",
             "index": 0
           }
