@@ -1054,10 +1054,7 @@
         "operation": "Send Image",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": {
-          "mimetype": "image/jpeg",
-          "url": "={{ $json.waha_image_url }}"
-        },
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"filename.jpg\",\n  \"url\": \"{{$('Code in JavaScript').item.json.waha_image_url}}\"\n}",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
@@ -1810,10 +1807,7 @@
         "operation": "Send Image",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": {
-          "mimetype": "image/jpeg",
-          "url": "={{ $json.waha_image_url }}"
-        },
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"filename.jpg\",\n  \"url\": \"{{$json.waha_image_url}}\"\n}",
         "caption": "",
         "requestOptions": {}
       },
@@ -1838,11 +1832,7 @@
         "operation": "Send File",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": {
-          "mimetype": "application/pdf",
-          "filename": "KnowledgeResource.pdf",
-          "url": "={{ $json.waha_image_url }}"
-        },
+        "file": "={\n  \"mimetype\": \"application/pdf\",\n  \"filename\": \"KnowledgeResource.pdf\",\n  \"url\": \"{{$json.waha_image_url}}\"\n}",
         "caption": "",
         "requestOptions": {}
       },
