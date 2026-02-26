@@ -57,7 +57,7 @@ const ConnectedPlatforms = () => {
     if (!window.FB) {
       window.fbAsyncInit = function () {
         window.FB.init({
-          appId: "1191217912806430", // Facebook App ID
+          appId: "4503298316613982", // Facebook App ID
           cookie: true,
           xfbml: true,
           version: "v22.0",
