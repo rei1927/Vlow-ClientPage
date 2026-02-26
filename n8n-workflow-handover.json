@@ -1868,7 +1868,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Fetch image from MinIO and convert to base64\nconst imageUrl = items[0].json.waha_image_url;\nif (!imageUrl) return items;\n\nconst resp = await fetch(imageUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    ...items[0].json,\n    base64Data: base64\n  }\n}];",
+        "jsCode": "// Fetch image from MinIO and convert to base64\n// Reference the original Code in JavaScript node since IF nodes don't pass through data\nconst imageUrl = $('Code in JavaScript').item.json.waha_image_url;\nif (!imageUrl) {\n  return [{ json: { error: 'No image URL found' } }];\n}\n\nconst resp = await fetch(imageUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status + ' for URL: ' + imageUrl);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    base64Data: base64\n  }\n}];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
@@ -1882,7 +1882,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Fetch image from MinIO and convert to base64\nconst imageUrl = items[0].json.waha_image_url;\nif (!imageUrl) return items;\n\nconst resp = await fetch(imageUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    ...items[0].json,\n    base64Data: base64\n  }\n}];",
+        "jsCode": "// Fetch image from MinIO and convert to base64\n// Reference the original Code in JavaScript node since IF nodes don't pass through data\nconst imageUrl = $('Code in JavaScript').item.json.waha_image_url;\nif (!imageUrl) {\n  return [{ json: { error: 'No image URL found' } }];\n}\n\nconst resp = await fetch(imageUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status + ' for URL: ' + imageUrl);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    base64Data: base64\n  }\n}];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
@@ -1896,7 +1896,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Fetch image from MinIO and convert to base64\nconst imageUrl = items[0].json.waha_image_url;\nif (!imageUrl) return items;\n\nconst resp = await fetch(imageUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    ...items[0].json,\n    base64Data: base64\n  }\n}];",
+        "jsCode": "// Fetch image from MinIO and convert to base64\n// Reference the Code in JavaScript node for the escalate/simulator path\nconst codeNode = $('Code in JavaScript');\nconst simNode = $('Process Sim Response');\nlet imageUrl;\ntry { imageUrl = codeNode.item.json.waha_image_url; } catch(e) {}\nif (!imageUrl) {\n  try { imageUrl = simNode.item.json.waha_image_url; } catch(e) {}\n}\nif (!imageUrl) {\n  return [{ json: { error: 'No image URL found' } }];\n}\n\nconst resp = await fetch(imageUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status + ' for URL: ' + imageUrl);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    base64Data: base64\n  }\n}];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
@@ -1910,7 +1910,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Fetch PDF from MinIO and convert to base64\nconst fileUrl = items[0].json.waha_image_url;\nif (!fileUrl) return items;\n\nconst resp = await fetch(fileUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    ...items[0].json,\n    base64Data: base64\n  }\n}];",
+        "jsCode": "// Fetch PDF from MinIO and convert to base64\nconst codeNode = $('Code in JavaScript');\nconst simNode = $('Process Sim Response');\nlet fileUrl;\ntry { fileUrl = codeNode.item.json.waha_image_url; } catch(e) {}\nif (!fileUrl) {\n  try { fileUrl = simNode.item.json.waha_image_url; } catch(e) {}\n}\nif (!fileUrl) {\n  return [{ json: { error: 'No file URL found' } }];\n}\n\nconst resp = await fetch(fileUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status + ' for URL: ' + fileUrl);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    base64Data: base64\n  }\n}];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
