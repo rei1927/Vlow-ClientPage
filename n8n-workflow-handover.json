@@ -1054,7 +1054,7 @@
         "operation": "Send Image",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$binary.data.data}}\"\n}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
@@ -1184,7 +1184,7 @@
         "operation": "Send Image",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$binary.data.data}}\"\n}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
@@ -1807,7 +1807,7 @@
         "operation": "Send Image",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$binary.data.data}}\"\n}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
         "caption": "",
         "requestOptions": {}
       },
@@ -1832,7 +1832,7 @@
         "operation": "Send File",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": "={\n  \"mimetype\": \"application/pdf\",\n  \"filename\": \"document.pdf\",\n  \"data\": \"{{$binary.data.data}}\"\n}",
+        "file": "={\n  \"mimetype\": \"application/pdf\",\n  \"filename\": \"document.pdf\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
         "caption": "",
         "requestOptions": {}
       },
@@ -1945,6 +1945,62 @@
       ],
       "id": "http-dl-1772087535092-3",
       "name": "Download File Escalate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = items[0];\nconst base64 = item.binary.data.data;\nreturn [{\n  json: {\n    ...item.json,\n    base64Data: base64,\n    mimeType: item.binary?.data?.mimeType || 'image/jpeg'\n  }\n}];",
+        "mode": "runOnceForAllItems"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        57203,
+        10416
+      ],
+      "id": "extract-b64-1772089925720-0",
+      "name": "Extract Base64 1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = items[0];\nconst base64 = item.binary.data.data;\nreturn [{\n  json: {\n    ...item.json,\n    base64Data: base64,\n    mimeType: item.binary?.data?.mimeType || 'image/jpeg'\n  }\n}];",
+        "mode": "runOnceForAllItems"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        57203,
+        10128
+      ],
+      "id": "extract-b64-1772089925722-1",
+      "name": "Extract Base64 Booking"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = items[0];\nconst base64 = item.binary.data.data;\nreturn [{\n  json: {\n    ...item.json,\n    base64Data: base64,\n    mimeType: item.binary?.data?.mimeType || 'image/jpeg'\n  }\n}];",
+        "mode": "runOnceForAllItems"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56035,
+        10156
+      ],
+      "id": "extract-b64-1772089925722-2",
+      "name": "Extract Base64 Escalate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = items[0];\nconst base64 = item.binary.data.data;\nreturn [{\n  json: {\n    ...item.json,\n    base64Data: base64,\n    mimeType: item.binary?.data?.mimeType || 'image/jpeg'\n  }\n}];",
+        "mode": "runOnceForAllItems"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56035,
+        10356
+      ],
+      "id": "extract-b64-1772089925722-3",
+      "name": "Extract Base64 File"
     }
   ],
   "connections": {
@@ -2788,7 +2844,7 @@
       "main": [
         [
           {
-            "node": "Send welcome image1",
+            "node": "Extract Base64 1",
             "type": "main",
             "index": 0
           }
@@ -2799,7 +2855,7 @@
       "main": [
         [
           {
-            "node": "Send welcome image (booking)",
+            "node": "Extract Base64 Booking",
             "type": "main",
             "index": 0
           }
@@ -2810,7 +2866,7 @@
       "main": [
         [
           {
-            "node": "WAHA Send Image",
+            "node": "Extract Base64 Escalate",
             "type": "main",
             "index": 0
           }
@@ -2818,6 +2874,50 @@
       ]
     },
     "Download File Escalate": {
+      "main": [
+        [
+          {
+            "node": "Extract Base64 File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Base64 1": {
+      "main": [
+        [
+          {
+            "node": "Send welcome image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Base64 Booking": {
+      "main": [
+        [
+          {
+            "node": "Send welcome image (booking)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Base64 Escalate": {
+      "main": [
+        [
+          {
+            "node": "WAHA Send Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Base64 File": {
       "main": [
         [
           {
