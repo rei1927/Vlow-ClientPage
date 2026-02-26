@@ -13,18 +13,29 @@ export const exchangeAuthCode = async (code) => {
             throw new AppError("META_APP_ID atau META_APP_SECRET belum dikonfigurasi di setup server (.env).", 500);
         }
 
+        console.log("Exchanging Meta code for token. App ID:", appId, "Code length:", code?.length);
+
+        // Step 1: Exchange code for short-lived access token
         const response = await axios.get(`${META_API_URL}/oauth/access_token`, {
             params: {
                 client_id: appId,
                 client_secret: appSecret,
                 code: code,
+                redirect_uri: `https://login.vlow-ai.com/platforms`,
             },
         });
+
+        console.log("Meta token exchange SUCCESS. Token type:", response.data.token_type);
 
         // response.data berisi: { access_token, token_type, expires_in }
         return response.data;
     } catch (error) {
-        console.error("Meta Token Exchange Error FULL:", JSON.stringify(error?.response?.data || error.message, null, 2));
+        const fbError = error?.response?.data?.error;
+        console.error("Meta Token Exchange Error:", JSON.stringify(fbError || error?.response?.data || error.message, null, 2));
+
+        if (fbError?.message) {
+            throw new AppError(`Meta API Error: ${fbError.message}`, 400);
+        }
         throw new AppError("Gagal menukar Meta Auth Code dengan Access Token. Silakan coba lagi.", 400);
     }
 };
