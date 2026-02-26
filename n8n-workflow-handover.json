@@ -1868,59 +1868,139 @@
     },
     {
       "parameters": {
-        "jsCode": "\nfunction downloadUrl(url) {\n  return new Promise((resolve, reject) => {\n    const mod = url.startsWith('https') ? require('https') : require('http');\n    mod.get(url, (res) => {\n      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {\n        return downloadUrl(res.headers.location).then(resolve).catch(reject);\n      }\n      if (res.statusCode !== 200) {\n        return reject(new Error('HTTP ' + res.statusCode));\n      }\n      const chunks = [];\n      res.on('data', c => chunks.push(c));\n      res.on('end', () => resolve(Buffer.concat(chunks)));\n      res.on('error', reject);\n    }).on('error', reject);\n  });\n}\n\nconst imageUrl = $('Code in JavaScript').item.json.waha_image_url;\nif (!imageUrl) return [{ json: { error: 'No image URL' } }];\n\nconst buf = await downloadUrl(imageUrl);\nconst base64 = buf.toString('base64');\n\nreturn [{ json: { base64Data: base64 } }];",
-        "mode": "runOnceForAllItems"
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
       },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         57128,
         10416
       ],
-      "id": "fetch-encode-1772090232712-0",
-      "name": "Fetch & Encode Image"
+      "id": "http-dl-1772094912991-0",
+      "name": "Download Image"
     },
     {
       "parameters": {
-        "jsCode": "\nfunction downloadUrl(url) {\n  return new Promise((resolve, reject) => {\n    const mod = url.startsWith('https') ? require('https') : require('http');\n    mod.get(url, (res) => {\n      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {\n        return downloadUrl(res.headers.location).then(resolve).catch(reject);\n      }\n      if (res.statusCode !== 200) {\n        return reject(new Error('HTTP ' + res.statusCode));\n      }\n      const chunks = [];\n      res.on('data', c => chunks.push(c));\n      res.on('end', () => resolve(Buffer.concat(chunks)));\n      res.on('error', reject);\n    }).on('error', reject);\n  });\n}\n\nconst imageUrl = $('Code in JavaScript').item.json.waha_image_url;\nif (!imageUrl) return [{ json: { error: 'No image URL' } }];\n\nconst buf = await downloadUrl(imageUrl);\nconst base64 = buf.toString('base64');\n\nreturn [{ json: { base64Data: base64 } }];",
+        "jsCode": "// Extract base64 from binary data (N8N built-ins only)\nconst binary = $input.first().binary;\nif (binary && binary.data) {\n  return [{ json: { base64Data: binary.data.data } }];\n}\nreturn [{ json: { error: 'No binary data received' } }];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
+      "position": [
+        57328,
+        10416
+      ],
+      "id": "extract-b64-1772094912992-1",
+      "name": "To Base64"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         57128,
         10128
       ],
-      "id": "fetch-encode-1772090232715-1",
-      "name": "Fetch & Encode Booking"
+      "id": "http-dl-1772094912995-2",
+      "name": "Download Image (Booking)"
     },
     {
       "parameters": {
-        "jsCode": "\nfunction downloadUrl(url) {\n  return new Promise((resolve, reject) => {\n    const mod = url.startsWith('https') ? require('https') : require('http');\n    mod.get(url, (res) => {\n      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {\n        return downloadUrl(res.headers.location).then(resolve).catch(reject);\n      }\n      if (res.statusCode !== 200) {\n        return reject(new Error('HTTP ' + res.statusCode));\n      }\n      const chunks = [];\n      res.on('data', c => chunks.push(c));\n      res.on('end', () => resolve(Buffer.concat(chunks)));\n      res.on('error', reject);\n    }).on('error', reject);\n  });\n}\n\nlet imageUrl;\ntry { imageUrl = $('Code in JavaScript').item.json.waha_image_url; } catch(e) {}\nif (!imageUrl) {\n  try { imageUrl = $('Process Sim Response').item.json.waha_image_url; } catch(e) {}\n}\nif (!imageUrl) return [{ json: { error: 'No image URL' } }];\n\nconst buf = await downloadUrl(imageUrl);\nconst base64 = buf.toString('base64');\n\nreturn [{ json: { base64Data: base64 } }];",
+        "jsCode": "// Extract base64 from binary data (N8N built-ins only)\nconst binary = $input.first().binary;\nif (binary && binary.data) {\n  return [{ json: { base64Data: binary.data.data } }];\n}\nreturn [{ json: { error: 'No binary data received' } }];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
+      "position": [
+        57328,
+        10128
+      ],
+      "id": "extract-b64-1772094912995-3",
+      "name": "To Base64 (Booking)"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         55960,
         10156
       ],
-      "id": "fetch-encode-1772090232715-2",
-      "name": "Fetch & Encode Escalate Img"
+      "id": "http-dl-1772094912995-4",
+      "name": "Download Image (Escalate)"
     },
     {
       "parameters": {
-        "jsCode": "\nfunction downloadUrl(url) {\n  return new Promise((resolve, reject) => {\n    const mod = url.startsWith('https') ? require('https') : require('http');\n    mod.get(url, (res) => {\n      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {\n        return downloadUrl(res.headers.location).then(resolve).catch(reject);\n      }\n      if (res.statusCode !== 200) {\n        return reject(new Error('HTTP ' + res.statusCode));\n      }\n      const chunks = [];\n      res.on('data', c => chunks.push(c));\n      res.on('end', () => resolve(Buffer.concat(chunks)));\n      res.on('error', reject);\n    }).on('error', reject);\n  });\n}\n\nlet imageUrl;\ntry { imageUrl = $('Code in JavaScript').item.json.waha_image_url; } catch(e) {}\nif (!imageUrl) {\n  try { imageUrl = $('Process Sim Response').item.json.waha_image_url; } catch(e) {}\n}\nif (!imageUrl) return [{ json: { error: 'No image URL' } }];\n\nconst buf = await downloadUrl(imageUrl);\nconst base64 = buf.toString('base64');\n\nreturn [{ json: { base64Data: base64 } }];",
+        "jsCode": "// Extract base64 from binary data (N8N built-ins only)\nconst binary = $input.first().binary;\nif (binary && binary.data) {\n  return [{ json: { base64Data: binary.data.data } }];\n}\nreturn [{ json: { error: 'No binary data received' } }];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
+        56160,
+        10156
+      ],
+      "id": "extract-b64-1772094912995-5",
+      "name": "To Base64 (Escalate)"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
         55960,
         10356
       ],
-      "id": "fetch-encode-1772090232715-3",
-      "name": "Fetch & Encode Escalate PDF"
+      "id": "http-dl-1772094912995-6",
+      "name": "Download File (Escalate)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract base64 from binary data (N8N built-ins only)\nconst binary = $input.first().binary;\nif (binary && binary.data) {\n  return [{ json: { base64Data: binary.data.data } }];\n}\nreturn [{ json: { error: 'No binary data received' } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56160,
+        10356
+      ],
+      "id": "extract-b64-1772094912995-7",
+      "name": "To Base64 (File)"
     }
   ],
   "connections": {
@@ -2349,7 +2429,7 @@
       "main": [
         [
           {
-            "node": "Fetch & Encode Image",
+            "node": "Download Image",
             "type": "main",
             "index": 0
           }
@@ -2411,7 +2491,7 @@
       "main": [
         [
           {
-            "node": "Fetch & Encode Booking",
+            "node": "Download Image (Booking)",
             "type": "main",
             "index": 0
           }
@@ -2691,14 +2771,14 @@
       "main": [
         [
           {
-            "node": "Fetch & Encode Escalate PDF",
+            "node": "Download File (Escalate)",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Fetch & Encode Escalate Img",
+            "node": "Download Image (Escalate)",
             "type": "main",
             "index": 0
           }
@@ -2727,7 +2807,18 @@
         ]
       ]
     },
-    "Fetch & Encode Image": {
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "To Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64": {
       "main": [
         [
           {
@@ -2738,7 +2829,18 @@
         ]
       ]
     },
-    "Fetch & Encode Booking": {
+    "Download Image (Booking)": {
+      "main": [
+        [
+          {
+            "node": "To Base64 (Booking)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64 (Booking)": {
       "main": [
         [
           {
@@ -2749,7 +2851,18 @@
         ]
       ]
     },
-    "Fetch & Encode Escalate Img": {
+    "Download Image (Escalate)": {
+      "main": [
+        [
+          {
+            "node": "To Base64 (Escalate)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64 (Escalate)": {
       "main": [
         [
           {
@@ -2760,7 +2873,18 @@
         ]
       ]
     },
-    "Fetch & Encode Escalate PDF": {
+    "Download File (Escalate)": {
+      "main": [
+        [
+          {
+            "node": "To Base64 (File)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64 (File)": {
       "main": [
         [
           {
