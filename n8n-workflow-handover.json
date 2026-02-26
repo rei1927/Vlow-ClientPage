@@ -1868,139 +1868,59 @@
     },
     {
       "parameters": {
-        "url": "={{$('Code in JavaScript').item.json.waha_image_url}}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
-        }
+        "jsCode": "// Fetch image from MinIO and convert to base64\nconst imageUrl = items[0].json.waha_image_url;\nif (!imageUrl) return items;\n\nconst resp = await fetch(imageUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    ...items[0].json,\n    base64Data: base64\n  }\n}];",
+        "mode": "runOnceForAllItems"
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        57078,
+        57128,
         10416
       ],
-      "id": "http-dl-1772087535088-0",
-      "name": "Download Image 1"
+      "id": "fetch-encode-1772090232712-0",
+      "name": "Fetch & Encode Image"
     },
     {
       "parameters": {
-        "url": "={{$('Code in JavaScript').item.json.waha_image_url}}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
-        }
+        "jsCode": "// Fetch image from MinIO and convert to base64\nconst imageUrl = items[0].json.waha_image_url;\nif (!imageUrl) return items;\n\nconst resp = await fetch(imageUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    ...items[0].json,\n    base64Data: base64\n  }\n}];",
+        "mode": "runOnceForAllItems"
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        57078,
+        57128,
         10128
       ],
-      "id": "http-dl-1772087535092-1",
-      "name": "Download Image Booking"
+      "id": "fetch-encode-1772090232715-1",
+      "name": "Fetch & Encode Booking"
     },
     {
       "parameters": {
-        "url": "={{$json.waha_image_url}}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
-        }
+        "jsCode": "// Fetch image from MinIO and convert to base64\nconst imageUrl = items[0].json.waha_image_url;\nif (!imageUrl) return items;\n\nconst resp = await fetch(imageUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    ...items[0].json,\n    base64Data: base64\n  }\n}];",
+        "mode": "runOnceForAllItems"
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        55910,
+        55960,
         10156
       ],
-      "id": "http-dl-1772087535092-2",
-      "name": "Download Image Escalate"
+      "id": "fetch-encode-1772090232715-2",
+      "name": "Fetch & Encode Escalate Img"
     },
     {
       "parameters": {
-        "url": "={{$json.waha_image_url}}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
-        }
+        "jsCode": "// Fetch PDF from MinIO and convert to base64\nconst fileUrl = items[0].json.waha_image_url;\nif (!fileUrl) return items;\n\nconst resp = await fetch(fileUrl, { redirect: 'follow' });\nif (!resp.ok) throw new Error('Download failed: ' + resp.status);\n\nconst buf = Buffer.from(await resp.arrayBuffer());\nconst base64 = buf.toString('base64');\n\nreturn [{\n  json: {\n    ...items[0].json,\n    base64Data: base64\n  }\n}];",
+        "mode": "runOnceForAllItems"
       },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
-        55910,
+        55960,
         10356
       ],
-      "id": "http-dl-1772087535092-3",
-      "name": "Download File Escalate"
-    },
-    {
-      "parameters": {
-        "jsCode": "const item = items[0];\nconst base64 = item.binary.data.data;\nreturn [{\n  json: {\n    ...item.json,\n    base64Data: base64,\n    mimeType: item.binary?.data?.mimeType || 'image/jpeg'\n  }\n}];",
-        "mode": "runOnceForAllItems"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        57203,
-        10416
-      ],
-      "id": "extract-b64-1772089925720-0",
-      "name": "Extract Base64 1"
-    },
-    {
-      "parameters": {
-        "jsCode": "const item = items[0];\nconst base64 = item.binary.data.data;\nreturn [{\n  json: {\n    ...item.json,\n    base64Data: base64,\n    mimeType: item.binary?.data?.mimeType || 'image/jpeg'\n  }\n}];",
-        "mode": "runOnceForAllItems"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        57203,
-        10128
-      ],
-      "id": "extract-b64-1772089925722-1",
-      "name": "Extract Base64 Booking"
-    },
-    {
-      "parameters": {
-        "jsCode": "const item = items[0];\nconst base64 = item.binary.data.data;\nreturn [{\n  json: {\n    ...item.json,\n    base64Data: base64,\n    mimeType: item.binary?.data?.mimeType || 'image/jpeg'\n  }\n}];",
-        "mode": "runOnceForAllItems"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        56035,
-        10156
-      ],
-      "id": "extract-b64-1772089925722-2",
-      "name": "Extract Base64 Escalate"
-    },
-    {
-      "parameters": {
-        "jsCode": "const item = items[0];\nconst base64 = item.binary.data.data;\nreturn [{\n  json: {\n    ...item.json,\n    base64Data: base64,\n    mimeType: item.binary?.data?.mimeType || 'image/jpeg'\n  }\n}];",
-        "mode": "runOnceForAllItems"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        56035,
-        10356
-      ],
-      "id": "extract-b64-1772089925722-3",
-      "name": "Extract Base64 File"
+      "id": "fetch-encode-1772090232715-3",
+      "name": "Fetch & Encode Escalate PDF"
     }
   ],
   "connections": {
@@ -2840,51 +2760,7 @@
         ]
       ]
     },
-    "Download Image 1": {
-      "main": [
-        [
-          {
-            "node": "Extract Base64 1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Download Image Booking": {
-      "main": [
-        [
-          {
-            "node": "Extract Base64 Booking",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Download Image Escalate": {
-      "main": [
-        [
-          {
-            "node": "Extract Base64 Escalate",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Download File Escalate": {
-      "main": [
-        [
-          {
-            "node": "Extract Base64 File",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract Base64 1": {
+    "Fetch & Encode Image": {
       "main": [
         [
           {
@@ -2895,7 +2771,7 @@
         ]
       ]
     },
-    "Extract Base64 Booking": {
+    "Fetch & Encode Booking": {
       "main": [
         [
           {
@@ -2906,7 +2782,7 @@
         ]
       ]
     },
-    "Extract Base64 Escalate": {
+    "Fetch & Encode Escalate Img": {
       "main": [
         [
           {
@@ -2917,7 +2793,7 @@
         ]
       ]
     },
-    "Extract Base64 File": {
+    "Fetch & Encode Escalate PDF": {
       "main": [
         [
           {
