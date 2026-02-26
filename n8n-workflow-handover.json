@@ -1888,7 +1888,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Extract base64 from binary data (N8N built-ins only)\nconst binary = $input.first().binary;\nif (binary && binary.data) {\n  return [{ json: { base64Data: binary.data.data } }];\n}\nreturn [{ json: { error: 'No binary data received' } }];",
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
@@ -1922,7 +1922,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Extract base64 from binary data (N8N built-ins only)\nconst binary = $input.first().binary;\nif (binary && binary.data) {\n  return [{ json: { base64Data: binary.data.data } }];\n}\nreturn [{ json: { error: 'No binary data received' } }];",
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
@@ -1956,7 +1956,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Extract base64 from binary data (N8N built-ins only)\nconst binary = $input.first().binary;\nif (binary && binary.data) {\n  return [{ json: { base64Data: binary.data.data } }];\n}\nreturn [{ json: { error: 'No binary data received' } }];",
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
@@ -1990,7 +1990,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Extract base64 from binary data (N8N built-ins only)\nconst binary = $input.first().binary;\nif (binary && binary.data) {\n  return [{ json: { base64Data: binary.data.data } }];\n}\nreturn [{ json: { error: 'No binary data received' } }];",
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
         "mode": "runOnceForAllItems"
       },
       "type": "n8n-nodes-base.code",
