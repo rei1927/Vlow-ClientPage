@@ -1,0 +1,9 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no root@72.62.121.97
+expect "*?assword:*"
+send "RMRNqm7(axBlq#-dK0;s\r"
+expect "# "
+send "cd /var/lib/docker/volumes/portainer_data/_data/compose && ls -la\r"
+expect "# "
+send "exit\r"
