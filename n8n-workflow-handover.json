@@ -1054,7 +1054,7 @@
         "operation": "Send Image",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"filename.jpg\",\n  \"url\": \"{{$('Code in JavaScript').item.json.waha_image_url}}\"\n}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$binary.data.data}}\"\n}",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
@@ -1809,7 +1809,8 @@
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
         "file": {
           "mimetype": "image/jpeg",
-          "url": "={{ $json.waha_image_url }}"
+          "filename": "image.jpg",
+          "data": "={{ $binary.data.data }}"
         },
         "caption": "",
         "requestOptions": {}
@@ -1837,8 +1838,8 @@
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
         "file": {
           "mimetype": "application/pdf",
-          "filename": "KnowledgeResource.pdf",
-          "url": "={{ $json.waha_image_url }}"
+          "filename": "document.pdf",
+          "data": "={{ $binary.data.data }}"
         },
         "caption": "",
         "requestOptions": {}
@@ -1872,6 +1873,57 @@
       ],
       "id": "sim-respond-to-webhook",
       "name": "Respond Webhook Simulator"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "responseFormat": "file",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        57128,
+        10416
+      ],
+      "id": "http-download-welcome",
+      "name": "Download Welcome Image"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.waha_image_url }}",
+        "responseFormat": "file",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        55960,
+        10156
+      ],
+      "id": "http-download-escalate-image",
+      "name": "Download Escalate Image"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.waha_image_url }}",
+        "responseFormat": "file",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        55960,
+        10356
+      ],
+      "id": "http-download-escalate-file",
+      "name": "Download Escalate File"
     }
   ],
   "connections": {
@@ -2300,7 +2352,7 @@
       "main": [
         [
           {
-            "node": "Send welcome image1",
+            "node": "Download Welcome Image",
             "type": "main",
             "index": 0
           }
@@ -2642,14 +2694,14 @@
       "main": [
         [
           {
-            "node": "WAHA Send File",
+            "node": "Download Escalate File",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "WAHA Send Image",
+            "node": "Download Escalate Image",
             "type": "main",
             "index": 0
           }
@@ -2672,6 +2724,39 @@
         [
           {
             "node": "IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Welcome Image": {
+      "main": [
+        [
+          {
+            "node": "Send welcome image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Escalate Image": {
+      "main": [
+        [
+          {
+            "node": "WAHA Send Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Escalate File": {
+      "main": [
+        [
+          {
+            "node": "WAHA Send File",
             "type": "main",
             "index": 0
           }
