@@ -1,6 +1,12 @@
-import { FaExclamationTriangle } from "react-icons/fa";
+import { FaExclamationTriangle, FaSyncAlt, FaSignOutAlt, FaWhatsapp } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { logoutUser, reset } from "../../features/auth/authSlice";
 
 const QuotaOverlay = ({ user, usage }) => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     // Only apply to customers
     if (!user || user.role === "admin") return null;
 
@@ -72,6 +78,39 @@ const QuotaOverlay = ({ user, usage }) => {
                                 Silakan hubungi Admin untuk memperpanjang masa aktif atau
                                 menambah kuota Anda.
                             </p>
+
+                            {/* Actions */}
+                            <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium transition-colors"
+                                >
+                                    <FaSyncAlt />
+                                    <span>Retry</span>
+                                </button>
+
+                                <button
+                                    onClick={async () => {
+                                        await dispatch(logoutUser());
+                                        dispatch(reset());
+                                        navigate("/login");
+                                    }}
+                                    className="flex items-center justify-center gap-2 px-3 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-300 rounded-lg text-sm font-medium transition-colors"
+                                >
+                                    <FaSignOutAlt />
+                                    <span>Logout</span>
+                                </button>
+
+                                <a
+                                    href="https://wa.me/6287885487671"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center justify-center gap-2 px-3 py-2 bg-[#25D366] hover:bg-[#1ebd58] text-white rounded-lg text-sm font-medium transition-colors"
+                                >
+                                    <FaWhatsapp className="text-lg" />
+                                    <span>Hubungi Admin</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
