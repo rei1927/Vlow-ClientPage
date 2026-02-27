@@ -127,6 +127,13 @@ const startServer = async () => {
     await sequelize.sync({ alter: true });
     logger.info("Database Models Synced.");
 
+    // Fix: ensure agentId column is nullable for meta_cloud platforms
+    try {
+      await sequelize.query(`ALTER TABLE "ChatHandovers" ALTER COLUMN "agentId" DROP NOT NULL;`);
+    } catch (e) {
+      // Ignore if already nullable or table doesn't exist
+    }
+
     // Start handover auto-release scheduler
     startHandoverScheduler();
 
