@@ -64,7 +64,7 @@ export const activateHandover = async (req, res, next) => {
             where: { chatId, sessionId },
             defaults: {
                 platformId: platform.id,
-                agentId: agent.id,
+                agentId: agent?.id || null,
                 status: "human",
                 triggeredBy: triggeredBy || "manual",
                 triggerKeyword: triggerKeyword || null,
