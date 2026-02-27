@@ -23,7 +23,7 @@ const ChatHandover = sequelize.define("ChatHandover", {
     },
     agentId: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true,
     },
     status: {
         type: DataTypes.ENUM("ai", "human"),
