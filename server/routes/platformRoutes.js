@@ -9,6 +9,7 @@ import {
   updatePlatform,
   connectMetaWhatsApp,
   subscribeWebhook,
+  diagnoseWebhook,
 } from "../controllers/platformController.js";
 
 const router = express.Router();
@@ -27,6 +28,9 @@ router.get("/:id/status", getPlatformStatus);
 
 // Subscribe existing meta_cloud platform to webhook
 router.post("/:id/subscribe-webhook", subscribeWebhook);
+
+// Diagnose webhook issues for meta_cloud platform
+router.get("/:id/diagnose-webhook", diagnoseWebhook);
 
 export default router;
 

@@ -459,3 +459,84 @@ export const subscribeWebhook = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Diagnose webhook configuration for a meta_cloud platform
+// @route   GET /api/platforms/:id/diagnose-webhook
+// @access  Private
+export const diagnoseWebhook = async (req, res, next) => {
+  try {
+    const platform = await ConnectedPlatform.findOne({
+      where: { id: req.params.id, userId: req.user.id, provider: "meta_cloud" },
+    });
+
+    if (!platform) {
+      return next(new AppError("Platform Meta Cloud tidak ditemukan.", 404));
+    }
+
+    const token = platform.systemUserAccessToken;
+    const results = {};
+
+    // 1. Check platform DB info
+    results.platform = {
+      id: platform.id,
+      wabaId: platform.wabaId,
+      phoneNumberId: platform.phoneNumberId,
+      status: platform.status,
+      hasAccessToken: !!token,
+    };
+
+    // 2. Check WABA subscribed apps
+    try {
+      const axios = (await import("axios")).default;
+      const subRes = await axios.get(`https://graph.facebook.com/v22.0/${platform.wabaId}/subscribed_apps`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      results.wabaSubscription = subRes.data;
+    } catch (e) {
+      results.wabaSubscription = { error: e?.response?.data?.error?.message || e.message };
+    }
+
+    // 3. Check phone number details
+    try {
+      const axios = (await import("axios")).default;
+      const phoneRes = await axios.get(`https://graph.facebook.com/v22.0/${platform.phoneNumberId}`, {
+        params: { fields: "display_phone_number,verified_name,quality_rating,messaging_limit_tier,is_official_business_account,registered_whatsapp_business_api_hosting_type" },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      results.phoneNumber = phoneRes.data;
+    } catch (e) {
+      results.phoneNumber = { error: e?.response?.data?.error?.message || e.message };
+    }
+
+    // 4. Check WABA phone numbers
+    try {
+      const axios = (await import("axios")).default;
+      const phonesRes = await axios.get(`https://graph.facebook.com/v22.0/${platform.wabaId}/phone_numbers`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      results.wabaPhoneNumbers = phonesRes.data;
+    } catch (e) {
+      results.wabaPhoneNumbers = { error: e?.response?.data?.error?.message || e.message };
+    }
+
+    // 5. Debug token
+    try {
+      const axios = (await import("axios")).default;
+      const debugRes = await axios.get(`https://graph.facebook.com/v22.0/debug_token`, {
+        params: { input_token: token, access_token: token },
+      });
+      results.tokenInfo = {
+        scopes: debugRes.data?.data?.scopes,
+        app_id: debugRes.data?.data?.app_id,
+        is_valid: debugRes.data?.data?.is_valid,
+        expires_at: debugRes.data?.data?.expires_at,
+      };
+    } catch (e) {
+      results.tokenInfo = { error: e?.response?.data?.error?.message || e.message };
+    }
+
+    res.status(200).json({ success: true, data: results });
+  } catch (error) {
+    next(error);
+  }
+};
