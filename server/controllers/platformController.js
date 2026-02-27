@@ -402,7 +402,16 @@ export const connectMetaWhatsApp = async (req, res, next) => {
       phoneNumberDisplay = phoneNumbers[0].display_phone_number;
     }
 
-    // 3. CREATE PLATFORM
+    // 3. Subscribe our app to the WABA webhooks (CRITICAL - without this, no messages arrive!)
+    try {
+      const subResult = await metaService.subscribeAppToWABA(wabaId, accessToken);
+      console.log("[Meta] Webhook subscription result:", subResult);
+    } catch (subErr) {
+      console.error("[Meta] Webhook subscription failed:", subErr.message);
+      // Continue anyway — subscription can be retried later
+    }
+
+    // 4. CREATE PLATFORM
     const newPlatform = await ConnectedPlatform.create({
       userId: req.user.id,
       name: `Meta Inbox (${phoneNumberDisplay})`,
@@ -425,3 +434,28 @@ export const connectMetaWhatsApp = async (req, res, next) => {
   }
 };
 
+// @desc    Subscribe a meta_cloud platform to WABA webhooks
+// @route   POST /api/platforms/:id/subscribe-webhook
+// @access  Private
+export const subscribeWebhook = async (req, res, next) => {
+  try {
+    const platform = await ConnectedPlatform.findOne({
+      where: { id: req.params.id, userId: req.user.id, provider: "meta_cloud" },
+    });
+
+    if (!platform) {
+      return next(new AppError("Platform Meta Cloud tidak ditemukan.", 404));
+    }
+
+    const result = await metaService.subscribeAppToWABA(platform.wabaId, platform.systemUserAccessToken);
+    console.log("[Meta] Manual webhook subscription result:", result);
+
+    res.status(200).json({
+      success: true,
+      message: "Berhasil subscribe webhook WABA",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

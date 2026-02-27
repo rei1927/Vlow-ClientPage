@@ -8,6 +8,7 @@ import {
   deletePlatform,
   updatePlatform,
   connectMetaWhatsApp,
+  subscribeWebhook,
 } from "../controllers/platformController.js";
 
 const router = express.Router();
@@ -24,4 +25,8 @@ router.route("/:id").put(updatePlatform).delete(deletePlatform);
 router.get("/:id/qr", getPlatformQR);
 router.get("/:id/status", getPlatformStatus);
 
+// Subscribe existing meta_cloud platform to webhook
+router.post("/:id/subscribe-webhook", subscribeWebhook);
+
 export default router;
+

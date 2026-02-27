@@ -27,6 +27,7 @@ export const verifyMetaWebhook = (req, res) => {
 export const receiveMetaWebhook = async (req, res) => {
     try {
         const { object, entry } = req.body;
+        console.log("[Webhook] Received event:", object, "entries:", entry?.length, JSON.stringify(req.body).substring(0, 500));
 
         // Pastikan ini hook dari Whatsapp
         if (object !== "whatsapp_business_account") {
