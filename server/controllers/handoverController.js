@@ -3,6 +3,7 @@ import ConnectedPlatform from "../models/ConnectedPlatform.js";
 import Agent from "../models/Agent.js";
 import AppError from "../utils/AppError.js";
 import * as wahaService from "../services/wahaService.js";
+import * as metaService from "../services/metaService.js";
 import { Op } from "sequelize";
 
 // Helper: swap WA labels for handover
@@ -50,12 +51,12 @@ export const activateHandover = async (req, res, next) => {
             include: [{ model: Agent }],
         });
 
-        if (!platform || !platform.Agent) {
-            return next(new AppError("Platform or Agent not found for this session", 404));
+        if (!platform) {
+            return next(new AppError("Platform not found for this session", 404));
         }
 
         const agent = platform.Agent;
-        const handoverConfig = agent.handoverConfig || {};
+        const handoverConfig = agent?.handoverConfig || {};
         const autoReleaseMinutes = handoverConfig.autoReleaseMinutes || 30;
 
         // Upsert: find existing or create new
@@ -84,16 +85,27 @@ export const activateHandover = async (req, res, next) => {
             await handover.save();
         }
 
-        // Swap WA labels
-        await swapLabels(sessionId, chatId, handoverConfig, "human");
+        // Swap WA labels (WAHA only)
+        if (platform.provider !== "meta_cloud") {
+            await swapLabels(sessionId, chatId, handoverConfig, "human");
+        }
 
-        // If there's a response message and triggered by keyword/ai, send it via WAHA
+        // If there's a response message and triggered by keyword/ai, send it
         if (
             handoverConfig.responseMessage &&
             (triggeredBy === "auto_keyword" || triggeredBy === "ai_escalate")
         ) {
             try {
-                await wahaService.sendTextMessage(sessionId, chatId, handoverConfig.responseMessage);
+                if (platform.provider === "meta_cloud") {
+                    await metaService.sendCloudMessage(
+                        platform.phoneNumberId,
+                        platform.systemUserAccessToken,
+                        chatId,
+                        handoverConfig.responseMessage
+                    );
+                } else {
+                    await wahaService.sendTextMessage(sessionId, chatId, handoverConfig.responseMessage);
+                }
             } catch (e) {
                 console.error("[Handover] Failed to send response message:", e.message);
             }
@@ -139,8 +151,8 @@ export const releaseHandover = async (req, res, next) => {
         handover.autoReleaseAt = null;
         await handover.save();
 
-        // Swap labels back
-        if (platform?.Agent) {
+        // Swap labels back (WAHA only)
+        if (platform?.Agent && platform.provider !== "meta_cloud") {
             await swapLabels(sessionId, chatId, platform.Agent.handoverConfig, "ai");
         }
 
