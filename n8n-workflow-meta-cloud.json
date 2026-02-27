@@ -1,0 +1,1241 @@
+{
+    "name": "Vlow AI Agent - Meta Cloud API",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "/meta-webhook",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                340,
+                560
+            ],
+            "id": "meta-trigger-001",
+            "name": "Meta Cloud Webhook",
+            "webhookId": "meta-cloud-webhook-001"
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem",
+                "jsCode": "// Parse Meta Cloud API webhook payload\nconst body = $json.body || $json;\nconst entry = body.entry || [];\n\nif (!entry.length) return [{ json: { skip: true } }];\n\nconst changes = entry[0]?.changes || [];\nif (!changes.length) return [{ json: { skip: true } }];\n\nconst value = changes[0]?.value;\nif (!value || !value.messages || !value.messages.length) {\n  return [{ json: { skip: true } }];\n}\n\nconst msg = value.messages[0];\nconst contacts = value.contacts || [];\nconst contact = contacts.find(c => c.wa_id === msg.from) || {};\nconst metadata = value.metadata || {};\n\n// Extract message body based on type\nlet messageBody = '';\nlet hasMedia = false;\nlet mediaUrl = null;\nlet mediaMimetype = null;\n\nswitch (msg.type) {\n  case 'text':\n    messageBody = msg.text?.body || '';\n    break;\n  case 'image':\n    messageBody = msg.image?.caption || '';\n    hasMedia = true;\n    mediaMimetype = 'image/jpeg';\n    break;\n  case 'video':\n    messageBody = msg.video?.caption || '';\n    hasMedia = true;\n    mediaMimetype = 'video/mp4';\n    break;\n  case 'audio':\n    messageBody = '';\n    hasMedia = true;\n    mediaMimetype = 'audio/ogg';\n    break;\n  case 'document':\n    messageBody = msg.document?.caption || msg.document?.filename || '';\n    hasMedia = true;\n    mediaMimetype = msg.document?.mime_type || 'application/pdf';\n    break;\n  case 'sticker':\n    messageBody = '';\n    hasMedia = true;\n    mediaMimetype = 'image/webp';\n    break;\n  case 'location':\n    messageBody = `📍 Lokasi: ${msg.location?.latitude}, ${msg.location?.longitude}`;\n    break;\n  default:\n    messageBody = `(${msg.type})`;\n}\n\n// Get media ID for downloading\nconst mediaId = msg[msg.type]?.id || null;\n\nreturn [{\n  json: {\n    skip: false,\n    // Meta-specific fields\n    phoneNumberId: metadata.phone_number_id,\n    displayPhoneNumber: metadata.display_phone_number,\n    // Message data\n    from: msg.from,\n    messageId: msg.id,\n    timestamp: msg.timestamp,\n    type: msg.type,\n    body: messageBody,\n    // Contact\n    contactName: contact.profile?.name || msg.from,\n    // Media\n    hasMedia: hasMedia,\n    mediaId: mediaId,\n    mediaMimetype: mediaMimetype,\n    // Session identifier for DB lookups\n    sessionId: `meta_${metadata.phone_number_id}`\n  }\n}];"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                580,
+                560
+            ],
+            "id": "meta-parse-001",
+            "name": "Parse Meta Payload"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "id": "skip-check",
+                            "leftValue": "={{ $json.skip }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "boolean",
+                                "operation": "false",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [
+                820,
+                560
+            ],
+            "id": "meta-skip-check",
+            "name": "Has Message?"
+        },
+        {
+            "parameters": {
+                "jsCode": "const trigger = items[0].json;\nconst senderId = trigger.from || '';\nconst message = trigger.body || '';\n\nif (!senderId) { throw new Error('Sender ID tidak ditemukan dari Meta webhook'); }\n\nreturn {\n  json: {\n    mode: 'production',\n    message: message,\n    sessionId: senderId,\n    chatId: senderId,\n    agentConfig: null,\n    // Pass through Meta fields\n    phoneNumberId: trigger.phoneNumberId,\n    contactName: trigger.contactName,\n    messageType: trigger.type,\n    hasMedia: trigger.hasMedia,\n    mediaId: trigger.mediaId,\n    mediaMimetype: trigger.mediaMimetype,\n    metaSessionId: trigger.sessionId\n  }\n};"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1060,
+                460
+            ],
+            "id": "meta-set-prod",
+            "name": "Set Prod Mode"
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "/simulator-chat",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                820,
+                760
+            ],
+            "id": "sim-webhook",
+            "name": "Webhook (Simulator Mode)",
+            "webhookId": "sim-webhook-meta-001"
+        },
+        {
+            "parameters": {
+                "jsCode": "const input = $input.first().json.body;\nreturn {\n  json: {\n    mode: 'simulation',\n    message: input.message,\n    sessionId: input.sessionId,\n    agentConfig: input.agentConfig\n  }\n};"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1060,
+                760
+            ],
+            "id": "sim-set-mode",
+            "name": "Set Sim Mode"
+        },
+        {
+            "parameters": {},
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.2,
+            "position": [
+                1300,
+                600
+            ],
+            "id": "merge-inputs",
+            "name": "Merge Inputs"
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 3
+                                },
+                                "conditions": [
+                                    {
+                                        "leftValue": "={{ $json.mode }}",
+                                        "rightValue": "production",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        },
+                                        "id": "is-prod"
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 3
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "is-sim",
+                                        "leftValue": "={{ $json.mode }}",
+                                        "rightValue": "simulation",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3.4,
+            "position": [
+                1540,
+                600
+            ],
+            "id": "is-production",
+            "name": "Is Production?"
+        },
+        {
+            "parameters": {
+                "url": "http://vlow-api:5000/api/agents/integration/config",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "sessionId",
+                            "value": "={{ $('Set Prod Mode').item.json.metaSessionId }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                1780,
+                500
+            ],
+            "id": "fetch-config-db",
+            "name": "Fetch Config DB"
+        },
+        {
+            "parameters": {
+                "operation": "executeQuery",
+                "query": "SELECT \n  a.\"id\" AS agent_id,\n  cp.\"id\" AS platform_id,\n  a.\"name\" AS agent_name,\n  a.\"systemInstruction\" AS system_prompt,\n  a.\"welcomeMessage\" AS greeting,\n  a.\"welcomeImageUrl\" AS welcome_image,\n  a.\"followupConfig\" AS followup_config,\n  a.\"handoverConfig\" AS handover_config,\n  COALESCE(a.\"knowledgeBase\", '') || E'\\n\\n' || \n  COALESCE(\n    (\n      SELECT string_agg(\n        '=== ' || ks.title || ' ===' || E'\\n' || ks.description || \n        CASE WHEN ks.\"fileUrl\" IS NOT NULL \n          THEN E'\\nAttached File (' || COALESCE(ks.\"fileName\", 'file') || '): ' || ks.\"fileUrl\"\n          ELSE '' \n        END,\n        E'\\n\\n'\n      )\n      FROM \"KnowledgeSources\" ks\n      WHERE ks.\"agentId\" = a.id\n    ),\n    ''\n  ) AS knowledge\nFROM \"ConnectedPlatforms\" cp\nJOIN \"Agents\" a ON cp.\"agentId\" = a.id\nWHERE cp.\"sessionId\" = $1;\n",
+                "options": {
+                    "queryReplacement": "={{ $('Set Prod Mode').item.json.metaSessionId }}"
+                }
+            },
+            "type": "n8n-nodes-base.postgres",
+            "typeVersion": 2.6,
+            "position": [
+                1780,
+                700
+            ],
+            "id": "sql-query",
+            "name": "Execute a SQL query",
+            "credentials": {
+                "postgres": {
+                    "id": "HOsKCOW1hSA3Ltkd",
+                    "name": "Postgres account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\n\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n    \n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', kamu WAJIB menyertakan URL gambar tersebut di dalam response-mu.\\n\";\n        finalPrompt += \"Format: tulis URL gambar langsung di response, contoh: https://minio.example.com/gambar.jpg\\n\";\n        finalPrompt += \"Jangan sembunyikan URL gambar. Jika user bertanya tentang topik yang memiliki Attached File, SELALU sertakan URL file tersebut di response.\\n\";\n        finalPrompt += \"JANGAN escalate jika informasi (termasuk gambar) sudah tersedia di CONTEXT.\";\n    }\n    \n    let hc = data.handover_config;\n    if (typeof hc === 'string') {\n        try { hc = JSON.parse(hc); } catch(e) { hc = null; }\n    }\n    \n    if (hc && hc.enabled) {\n        const rules = [];\n        rules.push(\"\\nPENTING - ATURAN ESCALATION:\");\n        rules.push(\"Kamu WAJIB menyertakan JSON {\\\"escalate\\\": true, \\\"reason\\\": \\\"<alasan>\\\"} di BARIS TERAKHIR response-mu jika salah satu kondisi berikut terpenuhi:\");\n        if (hc.escalationPrompt && hc.escalationPrompt.trim()) {\n            rules.push(\"\");\n            rules.push(\"KONDISI ESCALATION:\");\n            hc.escalationPrompt.trim().split('\\n').forEach(line => {\n                if (line.trim()) rules.push(\"• \" + line.trim());\n            });\n        }\n        rules.push(\"\");\n        rules.push(\"PENTING: JANGAN escalate jika pertanyaan user BISA dijawab dari CONTEXT yang tersedia.\");\n        rules.push(\"\");\n        rules.push(\"FORMAT OUTPUT SAAT ESCALATION:\");\n        rules.push('Balas user dengan sopan, lalu DI BARIS TERAKHIR tulis: {\"escalate\": true, \"reason\": \"<alasan singkat>\"}');\n        rules.push(\"\");\n        rules.push(\"Jika TIDAK perlu escalation, JANGAN sertakan JSON escalate di response.\");\n        finalPrompt += \"\\n\\n\" + rules.join(\"\\n\");\n    }\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', kamu WAJIB menyertakan URL tersebut di dalam response-mu.\\n\";\n        finalPrompt += \"Format: tulis URL file langsung di response.\";\n    }\n}\n\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2020,
+                600
+            ],
+            "id": "finalize-context",
+            "name": "Finalize Context"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "is-active-check",
+                            "leftValue": "={{ $json.isActive !== false }}",
+                            "rightValue": "=true",
+                            "operator": {
+                                "type": "boolean",
+                                "operation": "true",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.2,
+            "position": [
+                2260,
+                600
+            ],
+            "id": "is-active",
+            "name": "IS ACTIVE?"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://api.vlow-ai.com/api/handover/check-keyword",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"chatId\": \"{{ $json.chatId }}\",\n  \"sessionId\": \"{{ $('Set Prod Mode').item.json.metaSessionId }}\",\n  \"message\": \"{{ $json.message }}\"\n}",
+                "options": {
+                    "timeout": 10000
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                2500,
+                600
+            ],
+            "id": "check-keyword",
+            "name": "Check Keyword",
+            "onError": "continueRegularOutput"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "id": "kw-match",
+                            "leftValue": "={{ $json.success }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "boolean",
+                                "operation": "true",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [
+                2720,
+                600
+            ],
+            "id": "if-keyword-match",
+            "name": "IF Keyword Match"
+        },
+        {
+            "parameters": {
+                "url": "=https://api.vlow-ai.com/api/handover/status/{{ encodeURIComponent($('Merge Inputs').item.json.chatId) }}",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "sessionId",
+                            "value": "={{ $('Set Prod Mode').item.json.metaSessionId }}"
+                        }
+                    ]
+                },
+                "options": {
+                    "timeout": 10000
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                2940,
+                600
+            ],
+            "id": "check-handover-status",
+            "name": "Check Handover Status",
+            "onError": "continueRegularOutput"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "id": "human-mode-check",
+                            "leftValue": "={{ $json.status }}",
+                            "rightValue": "human",
+                            "operator": {
+                                "type": "string",
+                                "operation": "equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [
+                3160,
+                600
+            ],
+            "id": "if-human-mode",
+            "name": "IF Human Mode"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "={{ $('Parse Meta Payload').isExecuted ? $('Parse Meta Payload').first().json.body : '' }} | {{ $('Finalize Context').isExecuted ? $('Finalize Context').first().json.message : '' }}",
+                "options": {
+                    "systemMessage": "={{ $('Finalize Context').item.json.finalSystemPrompt }}\n\nCONTEXT:\n{{ $('Finalize Context').item.json.finalKnowledge }}"
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 3.1,
+            "position": [
+                3400,
+                600
+            ],
+            "id": "ai-agent",
+            "name": "AI Agent"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                3400,
+                820
+            ],
+            "id": "gemini-model",
+            "name": "Google Gemini Chat Model",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "eDUp0Sb5vGEopF3y",
+                    "name": "Google Gemini(PaLM) Api account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "sessionIdType": "customKey",
+                "sessionKey": "=meta_{{ $('Set Prod Mode').isExecuted ? $('Set Prod Mode').item.json.sessionId : 'sim' }} | {{ $('Finalize Context').isExecuted ? $('Finalize Context').item.json.sessionId : 'ctx' }}"
+            },
+            "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+            "typeVersion": 1.3,
+            "position": [
+                3540,
+                820
+            ],
+            "id": "memory",
+            "name": "Simple Memory"
+        },
+        {
+            "parameters": {
+                "jsCode": "const aiOutput = items[0].json.output;\nconst agentData = $('AI Agent').item.json;\nlet finalMessageForUser = aiOutput;\nlet welcomeImageUrl = null;\nlet bookingData = { booking: false, escalate: false };\nlet promptTokens = agentData?.response_metadata?.tokenUsage?.promptTokens || agentData?.usage_metadata?.prompt_token_count || 0;\nlet completionTokens = agentData?.response_metadata?.tokenUsage?.completionTokens || agentData?.usage_metadata?.candidates_token_count || 0;\n\nif (promptTokens === 0 || completionTokens === 0) {\n    const ctx = $('Finalize Context').first().json;\n    const userMessage = $('Set Prod Mode').first().json.message || \"\";\n    const fullInputText = (ctx.finalSystemPrompt || \"\") + (ctx.finalKnowledge || \"\") + userMessage;\n    promptTokens = Math.ceil(fullInputText.length / 4);\n    completionTokens = Math.ceil((aiOutput || \"\").length / 4);\n}\nlet totalTokens = promptTokens + completionTokens;\n\ntry {\n    if (!aiOutput) throw new Error(\"Output kosong\");\n\n    const jsonMatch = aiOutput.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n        let jsonString = jsonMatch[0];\n        jsonString = jsonString.replace(/^json\\s*/i, \"\").replace(/$/i, \"\");\n        jsonString = jsonString.replace(/\\\\(?![\"\\\\bfnrtu])/g, \"\\\\\\\\\\\");\n        const parsed = JSON.parse(jsonString);\n        if (parsed.booking && String(parsed.booking).toLowerCase() === 'true') {\n            bookingData.booking = true;\n            bookingData.topic = parsed.topic;\n            bookingData.clientEmail = parsed.clientEmail;\n            let time = parsed.startTime ? parsed.startTime.replace(' ', 'T') : '';\n            if (time && time.split(':').length === 2) { time = time.includes('+') ? time.split('+')[0] + ':00+' + time.split('+')[1] : time + ':00'; }\n            if (time && !time.includes('+') && !time.endsWith('Z')) time += '+07:00';\n            bookingData.startTime = time;\n        }\n        if (parsed.escalate && String(parsed.escalate).toLowerCase() === 'true') { bookingData.escalate = true; }\n        \n        finalMessageForUser = aiOutput.replace(/json[\\s\\S]*/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/\\{[\\s\\S]*\\}/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/`/g, \"\").trim();\n    }\n\n    // Capture image URLs\n    const mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i;\n    const rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i;\n\n    const mdMatch = finalMessageForUser.match(mdRegex);\n    if (mdMatch) {\n        welcomeImageUrl = mdMatch[2];\n        finalMessageForUser = finalMessageForUser.replace(mdMatch[0], \"\").trim();\n    } else {\n        const rawMatch = finalMessageForUser.match(rawRegex);\n        if (rawMatch) {\n            welcomeImageUrl = rawMatch[1];\n            finalMessageForUser = finalMessageForUser.replace(rawMatch[0], \"\").trim();\n        }\n    }\n\n    const imgMatch = finalMessageForUser.match(/WELCOME_IMAGE_URL:\\s*(\\S+)/i);\n    if (imgMatch && imgMatch[1]) {\n        welcomeImageUrl = imgMatch[1].trim();\n        finalMessageForUser = finalMessageForUser.replace(/WELCOME_IMAGE_URL:\\s*\\S+/i, \"\").trim();\n    }\n} catch (error) { \n    bookingData.error = error.message; \n}\n\nreturn [{ \n    json: { \n        ...bookingData, \n        welcome_image_url: welcomeImageUrl,\n        text_for_wa: finalMessageForUser, \n        output: finalMessageForUser, \n        tokens: { prompt: promptTokens, completion: completionTokens, total: totalTokens } \n    } \n}];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                3640,
+                600
+            ],
+            "id": "code-js",
+            "name": "Code in JavaScript"
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 3
+                                },
+                                "conditions": [
+                                    {
+                                        "leftValue": "={{ $('Finalize Context').item.json.mode }}",
+                                        "rightValue": "production",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        },
+                                        "id": "is-prod-2"
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 3
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "is-sim-2",
+                                        "leftValue": "={{ $('Finalize Context').item.json.mode }}",
+                                        "rightValue": "simulation",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3.4,
+            "position": [
+                3880,
+                600
+            ],
+            "id": "is-simulator",
+            "name": "Is Simulator?"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "id": "escalate-check",
+                            "leftValue": "={{ $json.escalate }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "boolean",
+                                "operation": "true",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [
+                4120,
+                460
+            ],
+            "id": "if-escalate",
+            "name": "IF ESCALATE"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://graph.facebook.com/v22.0/{{ $('Set Prod Mode').item.json.phoneNumberId }}/messages",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "=Bearer {{ $('Fetch Config DB').item.json.systemUserAccessToken || $('Execute a SQL query').item.json.systemUserAccessToken }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": {{ JSON.stringify($json.text_for_wa || $json.output || '') }}\n  }\n}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                4360,
+                600
+            ],
+            "id": "send-text-meta",
+            "name": "Send Text (Meta Cloud)"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.vlow-ai.com/api/handover/activate",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"chatId\": \"{{ $('Set Prod Mode').item.json.chatId }}\",\n  \"sessionId\": \"{{ $('Set Prod Mode').item.json.metaSessionId }}\",\n  \"triggeredBy\": \"ai_escalate\"\n}",
+                "options": {
+                    "timeout": 10000
+                }
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                4360,
+                340
+            ],
+            "id": "activate-handover",
+            "name": "Activate Handover",
+            "onError": "continueRegularOutput"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 3
+                    },
+                    "conditions": [
+                        {
+                            "id": "has-img-check",
+                            "leftValue": "={{ $('Code in JavaScript').item.json.welcome_image_url }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "string",
+                                "operation": "exists",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [
+                4600,
+                600
+            ],
+            "id": "has-image",
+            "name": "HAS IMAGE?"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://graph.facebook.com/v22.0/{{ $('Set Prod Mode').item.json.phoneNumberId }}/messages",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "=Bearer {{ $('Fetch Config DB').item.json.systemUserAccessToken || $('Execute a SQL query').item.json.systemUserAccessToken }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"{{ $('Code in JavaScript').item.json.welcome_image_url }}\"\n  }\n}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                4840,
+                500
+            ],
+            "id": "send-image-meta",
+            "name": "Send Image (Meta Cloud)"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://api.vlow-ai.com/api/analytics/log",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"agentId\": \"{{ $('Fetch Config DB').item.json.agentId || $('Execute a SQL query').item.json.agent_id }}\",\n  \"platformId\": \"{{ $('Fetch Config DB').item.json.platformId || $('Execute a SQL query').item.json.platform_id }}\",\n  \"sessionId\": \"{{ $('Set Prod Mode').item.json.metaSessionId }}\",\n  \"chatId\": \"{{ $('Set Prod Mode').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('Set Prod Mode').item.json.message || '') }},\n  \"aiResponse\": {{ JSON.stringify($json.text_for_wa || '') }},\n  \"isHandoff\": \"{{ $json.escalate || false }}\",\n  \"mode\": \"production\"\n}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                5080,
+                600
+            ],
+            "id": "log-conversation",
+            "name": "Log Conversation"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict",
+                        "version": 2
+                    },
+                    "conditions": [
+                        {
+                            "id": "followup-check",
+                            "leftValue": "={{ $('Finalize Context').item.json.followupConfig?.isEnabled }}",
+                            "rightValue": "=true",
+                            "operator": {
+                                "type": "boolean",
+                                "operation": "true",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.2,
+            "position": [
+                5320,
+                600
+            ],
+            "id": "followup-enabled",
+            "name": "FOLLOWUP ENABLED?"
+        },
+        {
+            "parameters": {
+                "mode": "runOnceForEachItem",
+                "jsCode": "const ctx = $('Finalize Context').item.json;\nconst followup = ctx.followupConfig || {};\nconst delay = Number(followup.delay) || 15;\nconst unit = followup.unit === 'hours' ? 'hours' : 'minutes';\nlet text = followup.prompt || \"\";\ntext = text.replace(/<[^>]*>/g, \"\").replace(/&nbsp;/g, \" \").trim();\nreturn { json: { ...$json, followup_delay_amount: delay, followup_delay_unit: unit, followup_text: text } };"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                5560,
+                600
+            ],
+            "id": "prepare-followup",
+            "name": "Prepare Followup"
+        },
+        {
+            "parameters": {
+                "amount": "={{ $json.followup_delay_amount }}",
+                "unit": "={{ $json.followup_delay_unit }}"
+            },
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1.1,
+            "position": [
+                5800,
+                600
+            ],
+            "id": "followup-wait",
+            "name": "Followup Wait",
+            "webhookId": "meta-followup-wait-001"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://graph.facebook.com/v22.0/{{ $('Set Prod Mode').item.json.phoneNumberId }}/messages",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "=Bearer {{ $('Fetch Config DB').item.json.systemUserAccessToken || $('Execute a SQL query').item.json.systemUserAccessToken }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": {{ JSON.stringify($json.followup_text || '') }}\n  }\n}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                6040,
+                600
+            ],
+            "id": "send-followup-meta",
+            "name": "Send Followup (Meta Cloud)"
+        },
+        {
+            "parameters": {
+                "jsCode": "const aiOutput = items[0].json.output || \"\";\nlet text = aiOutput;\nlet imageUrl = null;\n\nconst mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i;\nconst rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i;\n\nconst mdMatch = text.match(mdRegex);\nif (mdMatch) {\n    imageUrl = mdMatch[2];\n    text = text.replace(mdMatch[0], \"\").trim();\n} else {\n    const rawMatch = text.match(rawRegex);\n    if (rawMatch) {\n        imageUrl = rawMatch[1];\n        text = text.replace(rawMatch[0], \"\").trim();\n    }\n}\n\nreturn [{ json: { output: text, welcome_image_url: imageUrl } }];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                4120,
+                760
+            ],
+            "id": "process-sim-response",
+            "name": "Process Sim Response"
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={\n\"output\": {{ JSON.stringify($json.output || '') }},\n\"welcome_image_url\": \"{{ $json.welcome_image_url }}\"\n}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.1,
+            "position": [
+                4360,
+                760
+            ],
+            "id": "respond-sim",
+            "name": "Respond Webhook Simulator"
+        },
+        {
+            "parameters": {
+                "content": "META CLOUD API TRIGGER",
+                "height": 200,
+                "width": 500,
+                "color": 4
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                300,
+                480
+            ],
+            "typeVersion": 1,
+            "id": "note-trigger",
+            "name": "Sticky Note - Trigger"
+        },
+        {
+            "parameters": {
+                "content": "AI AGENT + PROCESSING",
+                "height": 400,
+                "width": 1500,
+                "color": 3
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                3360,
+                420
+            ],
+            "typeVersion": 1,
+            "id": "note-ai",
+            "name": "Sticky Note - AI"
+        },
+        {
+            "parameters": {
+                "content": "SEND RESPONSE VIA META CLOUD API",
+                "height": 300,
+                "width": 800,
+                "color": 6
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                4320,
+                280
+            ],
+            "typeVersion": 1,
+            "id": "note-send",
+            "name": "Sticky Note - Send"
+        },
+        {
+            "parameters": {
+                "content": "HANDOVER CHECK",
+                "height": 260,
+                "width": 880,
+                "color": 5
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                2460,
+                500
+            ],
+            "typeVersion": 1,
+            "id": "note-handover",
+            "name": "Sticky Note - Handover"
+        }
+    ],
+    "connections": {
+        "Meta Cloud Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Parse Meta Payload",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Parse Meta Payload": {
+            "main": [
+                [
+                    {
+                        "node": "Has Message?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Has Message?": {
+            "main": [
+                [
+                    {
+                        "node": "Set Prod Mode",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        },
+        "Set Prod Mode": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Inputs",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Webhook (Simulator Mode)": {
+            "main": [
+                [
+                    {
+                        "node": "Set Sim Mode",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Set Sim Mode": {
+            "main": [
+                [
+                    {
+                        "node": "Merge Inputs",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Merge Inputs": {
+            "main": [
+                [
+                    {
+                        "node": "Is Production?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Is Production?": {
+            "main": [
+                [
+                    {
+                        "node": "Execute a SQL query",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Finalize Context",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Fetch Config DB": {
+            "main": [
+                [
+                    {
+                        "node": "Finalize Context",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Execute a SQL query": {
+            "main": [
+                [
+                    {
+                        "node": "Finalize Context",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Finalize Context": {
+            "main": [
+                [
+                    {
+                        "node": "IS ACTIVE?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "IS ACTIVE?": {
+            "main": [
+                [
+                    {
+                        "node": "Check Keyword",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        },
+        "Check Keyword": {
+            "main": [
+                [
+                    {
+                        "node": "IF Keyword Match",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "IF Keyword Match": {
+            "main": [
+                [],
+                [
+                    {
+                        "node": "Check Handover Status",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Check Handover Status": {
+            "main": [
+                [
+                    {
+                        "node": "IF Human Mode",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "IF Human Mode": {
+            "main": [
+                [],
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Simple Memory": {
+            "ai_memory": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_memory",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript": {
+            "main": [
+                [
+                    {
+                        "node": "Is Simulator?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Is Simulator?": {
+            "main": [
+                [
+                    {
+                        "node": "IF ESCALATE",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Process Sim Response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "IF ESCALATE": {
+            "main": [
+                [
+                    {
+                        "node": "Activate Handover",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Send Text (Meta Cloud)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Activate Handover": {
+            "main": [
+                [
+                    {
+                        "node": "Send Text (Meta Cloud)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Send Text (Meta Cloud)": {
+            "main": [
+                [
+                    {
+                        "node": "HAS IMAGE?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HAS IMAGE?": {
+            "main": [
+                [
+                    {
+                        "node": "Send Image (Meta Cloud)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Log Conversation",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Send Image (Meta Cloud)": {
+            "main": [
+                [
+                    {
+                        "node": "Log Conversation",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Log Conversation": {
+            "main": [
+                [
+                    {
+                        "node": "FOLLOWUP ENABLED?",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "FOLLOWUP ENABLED?": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Followup",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                []
+            ]
+        },
+        "Prepare Followup": {
+            "main": [
+                [
+                    {
+                        "node": "Followup Wait",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Followup Wait": {
+            "main": [
+                [
+                    {
+                        "node": "Send Followup (Meta Cloud)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Process Sim Response": {
+            "main": [
+                [
+                    {
+                        "node": "Respond Webhook Simulator",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "meta": {
+        "instanceId": "meta-cloud-vlow"
+    },
+    "tags": []
+}
