@@ -817,20 +817,6 @@
     },
     {
       "parameters": {
-        "respondWith": "allIncomingItems",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        55968,
-        10448
-      ],
-      "id": "9b4a2415-07e2-4ef3-9a58-d0586474aa04",
-      "name": "Respond to Webhook"
-    },
-    {
-      "parameters": {
         "resource": "Labels",
         "operation": "Put Chat Labels",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
