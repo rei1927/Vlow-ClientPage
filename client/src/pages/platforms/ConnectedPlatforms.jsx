@@ -171,6 +171,7 @@ const ConnectedPlatforms = () => {
         extras: {
           feature: "whatsapp_embedded_signup",
           sessionInfoVersion: "3",
+          featureType: "whatsapp_business_app_onboarding",
         },
       }
     );
@@ -195,7 +196,7 @@ const ConnectedPlatforms = () => {
         override_default_response_type: true,
         extras: {
           setup: {},
-          featureType: "",
+          featureType: "whatsapp_business_app_onboarding",
           sessionInfoVersion: "3",
         },
       }
