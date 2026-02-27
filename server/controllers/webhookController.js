@@ -45,6 +45,7 @@ export const receiveMetaWebhook = async (req, res) => {
                         if (!change.value) continue;
 
                         const phoneNumberId = change.value.metadata?.phone_number_id;
+                        console.log("[Webhook] Looking up platform for phoneNumberId:", phoneNumberId);
 
                         // Identifikasi milik siapa pesan ini berdasarkan Phone Number ID Meta
                         const platform = await ConnectedPlatform.findOne({
@@ -56,7 +57,18 @@ export const receiveMetaWebhook = async (req, res) => {
                             include: [{ model: User, attributes: ["n8nWebhookUrl"] }]
                         });
 
-                        if (!platform) continue;
+                        if (!platform) {
+                            console.error("[Webhook] ⚠️ No platform found for phoneNumberId:", phoneNumberId);
+                            // List all meta_cloud platforms for debugging
+                            const allPlatforms = await ConnectedPlatform.findAll({
+                                where: { provider: "meta_cloud" },
+                                attributes: ["id", "phoneNumberId", "status"],
+                                raw: true,
+                            });
+                            console.log("[Webhook] Existing meta_cloud platforms:", JSON.stringify(allPlatforms));
+                            continue;
+                        }
+                        console.log("[Webhook] ✅ Platform found:", platform.id);
 
                         // --- Store incoming messages ---
                         if (change.value.messages && change.value.messages.length > 0) {
