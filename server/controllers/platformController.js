@@ -286,7 +286,7 @@ export const getMyPlatforms = async (req, res, next) => {
 export const updatePlatform = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, agentId } = req.body;
+    const { name, agentId, systemUserAccessToken } = req.body;
 
     const platform = await ConnectedPlatform.findOne({
       where: { id, userId: req.user.id },
@@ -297,6 +297,7 @@ export const updatePlatform = async (req, res, next) => {
     // Update field
     if (name) platform.name = name;
     if (agentId !== undefined) platform.agentId = agentId;
+    if (systemUserAccessToken) platform.systemUserAccessToken = systemUserAccessToken;
 
     await platform.save();
 
