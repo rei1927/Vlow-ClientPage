@@ -131,6 +131,10 @@ const ConnectedPlatforms = () => {
         config_id: "1190767959562870",
         response_type: "code",
         override_default_response_type: true,
+        extras: {
+          feature: "whatsapp_embedded_signup",
+          sessionInfoVersion: "3",
+        },
       }
     );
   };
