@@ -16,12 +16,12 @@ export const exchangeAuthCode = async (code) => {
         console.log("Exchanging Meta code for token. App ID:", appId, "Code length:", code?.length);
 
         // Step 1: Exchange code for short-lived access token
+        // NOTE: No redirect_uri needed for FB.login JS SDK flow
         const response = await axios.get(`${META_API_URL}/oauth/access_token`, {
             params: {
                 client_id: appId,
                 client_secret: appSecret,
                 code: code,
-                redirect_uri: `https://login.vlow-ai.com/platforms`,
             },
         });
 
