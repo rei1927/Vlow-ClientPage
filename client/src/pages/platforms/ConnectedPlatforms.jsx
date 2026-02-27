@@ -97,6 +97,7 @@ const ConnectedPlatforms = () => {
 
   const sendMetaCodeToBackend = async (code, wabaId, phoneNumberId) => {
     try {
+      console.log("Sending to backend - code length:", code?.length, "wabaId:", wabaId, "phoneNumberId:", phoneNumberId);
       const response = await axiosInstance.post("/platforms/whatsapp/connect", {
         code,
         wabaId,
@@ -123,15 +124,22 @@ const ConnectedPlatforms = () => {
       return;
     }
 
-    // Listener to capture WABA ID & Phone Number from Embedded Signup dialog
+    // Store embedded signup data - persists across async boundaries
     let embeddedData = {};
+
+    // Message event listener to capture WABA ID & Phone Number
+    // This fires DURING the Embedded Signup dialog (before FB.login callback)
     const sessionInfoListener = (event) => {
-      if (!event.origin.includes("facebook.com")) return;
+      if (event.origin !== "https://www.facebook.com" && event.origin !== "https://web.facebook.com") return;
       try {
         const data = JSON.parse(event.data);
+        console.log("[FB Message Event]", data.type, data);
         if (data.type === "WA_EMBEDDED_SIGNUP") {
-          embeddedData = data.data || {};
-          console.log("Embedded Signup data:", embeddedData);
+          // data.data.event can be 'SUBMIT' or 'FINISH' or 'CANCEL'
+          if (data.data) {
+            embeddedData = data.data;
+            console.log("[Embedded Signup] Captured:", embeddedData);
+          }
         }
       } catch (e) { /* ignore non-JSON messages */ }
     };
@@ -139,14 +147,20 @@ const ConnectedPlatforms = () => {
 
     window.FB.login(
       (response) => {
-        window.removeEventListener("message", sessionInfoListener);
         if (response.authResponse && response.authResponse.code) {
-          sendMetaCodeToBackend(
-            response.authResponse.code,
-            embeddedData.waba_id,
-            embeddedData.phone_number_id
-          );
+          // Wait briefly for the WA_EMBEDDED_SIGNUP event (race condition fix)
+          // The message event may arrive slightly after or before FB.login callback
+          setTimeout(() => {
+            window.removeEventListener("message", sessionInfoListener);
+            console.log("[FB.login] Embedded data at send time:", embeddedData);
+            sendMetaCodeToBackend(
+              response.authResponse.code,
+              embeddedData.phone_number_id ? embeddedData.waba_id : undefined,
+              embeddedData.phone_number_id
+            );
+          }, 1500);
         } else {
+          window.removeEventListener("message", sessionInfoListener);
           toast.error("Login Meta dibatalkan.");
         }
       },

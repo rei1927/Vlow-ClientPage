@@ -43,22 +43,55 @@ export const exchangeAuthCode = async (code) => {
 // Get WABA ID and Phone Number details
 export const getWhatsAppBusinessAccounts = async (accessToken) => {
     try {
-        // 1. Get WABA IDs associated with this token.
-        // If /me/client_whatsapp_business_accounts throws "nonexisting field",
-        // it usually means the token doesn't have `whatsapp_business_management` permission,
-        // or the Facebook App doesn't have the "WhatsApp" product enabled.
-        const wabaResponse = await axios.get(`${META_API_URL}/me/client_whatsapp_business_accounts`, {
-            headers: { Authorization: `Bearer ${accessToken}` },
+        // First, debug the token to see what scopes we have
+        const debugRes = await axios.get(`${META_API_URL}/debug_token`, {
+            params: { input_token: accessToken, access_token: accessToken },
         });
+        console.log("Token scopes:", debugRes.data?.data?.scopes);
+        console.log("Token granular_scopes:", JSON.stringify(debugRes.data?.data?.granular_scopes));
 
-        // Pada Embedded Signup, struktur return-nya di dalam data
-        return wabaResponse.data.data; // Array of WABA objects
+        // Try approach 1: /me/businesses → /{business_id}/owned_whatsapp_business_accounts
+        try {
+            const bizRes = await axios.get(`${META_API_URL}/me/businesses`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+            console.log("Businesses:", JSON.stringify(bizRes.data?.data));
+
+            if (bizRes.data?.data?.length > 0) {
+                for (const biz of bizRes.data.data) {
+                    try {
+                        const wabaRes = await axios.get(`${META_API_URL}/${biz.id}/owned_whatsapp_business_accounts`, {
+                            headers: { Authorization: `Bearer ${accessToken}` },
+                        });
+                        if (wabaRes.data?.data?.length > 0) {
+                            return wabaRes.data.data;
+                        }
+                    } catch (e) {
+                        console.log(`No WABA for business ${biz.id}:`, e?.response?.data?.error?.message);
+                    }
+                }
+            }
+        } catch (e) {
+            console.log("Businesses fetch failed:", e?.response?.data?.error?.message);
+        }
+
+        // Try approach 2: Direct /me/client_whatsapp_business_accounts (legacy)
+        try {
+            const wabaResponse = await axios.get(`${META_API_URL}/me/client_whatsapp_business_accounts`, {
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+            return wabaResponse.data.data;
+        } catch (e) {
+            console.log("client_whatsapp_business_accounts failed:", e?.response?.data?.error?.message);
+        }
+
+        throw new AppError("Tidak dapat menemukan WhatsApp Business Account. Pastikan Embedded Signup dialog tampil lengkap.", 400);
     } catch (error) {
+        if (error instanceof AppError) throw error;
         console.error("Meta WABA Fetch Error FULL:", JSON.stringify(error?.response?.data || error.message, null, 2));
 
-        // Debug info if it's the "#100" error
         if (error?.response?.data?.error?.code === 100) {
-            throw new AppError("Aplikasi Meta Anda belum memiliki Produk 'WhatsApp' atau 권 izin 'whatsapp_business_management' tidak disetujui saat login.", 400);
+            throw new AppError("Aplikasi Meta Anda belum memiliki Produk 'WhatsApp' atau izin 'whatsapp_business_management' tidak disetujui saat login.", 400);
         }
 
         throw new AppError("Gagal mengambil data WhatsApp Business Account dari profil Anda.", 400);
