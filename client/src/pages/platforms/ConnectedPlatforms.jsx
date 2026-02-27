@@ -95,9 +95,13 @@ const ConnectedPlatforms = () => {
     }
   }, [isError, message, dispatch]);
 
-  const sendMetaCodeToBackend = async (code) => {
+  const sendMetaCodeToBackend = async (code, wabaId, phoneNumberId) => {
     try {
-      const response = await axiosInstance.post("/platforms/whatsapp/connect", { code });
+      const response = await axiosInstance.post("/platforms/whatsapp/connect", {
+        code,
+        wabaId,
+        phoneNumberId,
+      });
 
       if (response.data && response.data.success) {
         toast.success("WhatsApp berhasil terhubung melalui Meta!");
@@ -119,10 +123,29 @@ const ConnectedPlatforms = () => {
       return;
     }
 
+    // Listener to capture WABA ID & Phone Number from Embedded Signup dialog
+    let embeddedData = {};
+    const sessionInfoListener = (event) => {
+      if (!event.origin.includes("facebook.com")) return;
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "WA_EMBEDDED_SIGNUP") {
+          embeddedData = data.data || {};
+          console.log("Embedded Signup data:", embeddedData);
+        }
+      } catch (e) { /* ignore non-JSON messages */ }
+    };
+    window.addEventListener("message", sessionInfoListener);
+
     window.FB.login(
       (response) => {
+        window.removeEventListener("message", sessionInfoListener);
         if (response.authResponse && response.authResponse.code) {
-          sendMetaCodeToBackend(response.authResponse.code);
+          sendMetaCodeToBackend(
+            response.authResponse.code,
+            embeddedData.waba_id,
+            embeddedData.phone_number_id
+          );
         } else {
           toast.error("Login Meta dibatalkan.");
         }

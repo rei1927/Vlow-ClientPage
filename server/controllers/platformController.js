@@ -339,7 +339,7 @@ export const deletePlatform = async (req, res, next) => {
 // @route   POST /api/platforms/whatsapp/connect
 export const connectMetaWhatsApp = async (req, res, next) => {
   try {
-    const { code } = req.body;
+    const { code, wabaId: embeddedWabaId, phoneNumberId: embeddedPhoneNumberId } = req.body;
 
     if (!code) {
       return next(new AppError("Meta Auth Code tidak ditemukan", 400));
@@ -347,31 +347,46 @@ export const connectMetaWhatsApp = async (req, res, next) => {
 
     const user = await User.findByPk(req.user.id);
 
-    // 1. Tanya Meta Token
+    // 1. Exchange code for access token
     const tokenData = await metaService.exchangeAuthCode(code);
     const accessToken = tokenData.access_token;
 
-    // 2. Ambil WABA ID dan Phone Numbers
-    const wabas = await metaService.getWhatsAppBusinessAccounts(accessToken);
-    if (!wabas || wabas.length === 0) {
-      return next(new AppError("Tidak ada WhatsApp Business Account yang tersedia di Meta Anda.", 404));
+    let wabaId, phoneNumberId, phoneNumberDisplay;
+
+    // 2. Use WABA data from Embedded Signup dialog (preferred) or fallback to API
+    if (embeddedWabaId && embeddedPhoneNumberId) {
+      console.log("Using Embedded Signup data - WABA:", embeddedWabaId, "Phone:", embeddedPhoneNumberId);
+      wabaId = embeddedWabaId;
+      phoneNumberId = embeddedPhoneNumberId;
+
+      // Get phone number display from API
+      try {
+        const phoneNumbers = await metaService.getPhoneNumbers(wabaId, accessToken);
+        const phoneData = phoneNumbers.find(p => p.id === phoneNumberId);
+        phoneNumberDisplay = phoneData?.display_phone_number || phoneNumberId;
+      } catch (e) {
+        console.log("Could not fetch phone display, using ID:", e.message);
+        phoneNumberDisplay = phoneNumberId;
+      }
+    } else {
+      // Fallback: try API approach
+      console.log("No Embedded Signup data, trying API approach...");
+      const wabas = await metaService.getWhatsAppBusinessAccounts(accessToken);
+      if (!wabas || wabas.length === 0) {
+        return next(new AppError("Tidak ada WhatsApp Business Account yang tersedia di Meta Anda.", 404));
+      }
+
+      wabaId = wabas[0].id;
+      const phoneNumbers = await metaService.getPhoneNumbers(wabaId, accessToken);
+      if (!phoneNumbers || phoneNumbers.length === 0) {
+        return next(new AppError("Tidak ada Nomor Telepon yang terdaftar pada WABA ini.", 404));
+      }
+
+      phoneNumberId = phoneNumbers[0].id;
+      phoneNumberDisplay = phoneNumbers[0].display_phone_number;
     }
 
-    const wabaId = wabas[0].id;
-    const phoneNumbers = await metaService.getPhoneNumbers(wabaId, accessToken);
-    if (!phoneNumbers || phoneNumbers.length === 0) {
-      return next(new AppError("Tidak ada Nomor Telepon yang terdaftar pada WABA ini.", 404));
-    }
-
-    // Ambil nomor pertama sebagai default
-    const phoneNumberId = phoneNumbers[0].id;
-    const phoneNumberDisplay = phoneNumbers[0].display_phone_number;
-
-    // 3. (Opsional) Subscribe ke Webhook App Vlow ke WABA Meta
-    // asalkan webhook server ini sudah lolos review Meta.
-    // await metaService.subscribeAppToWABA(wabaId, accessToken);
-
-    // CREATE PLATFORM
+    // 3. CREATE PLATFORM
     const newPlatform = await ConnectedPlatform.create({
       userId: req.user.id,
       name: `Meta Inbox (${phoneNumberDisplay})`,
