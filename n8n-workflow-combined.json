@@ -1,0 +1,3540 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "amount": "=5"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        52720,
+        10352
+      ],
+      "id": "6aef7e3b-42c1-46b3-bfa4-adcb848bf8df",
+      "name": "Wait",
+      "webhookId": "8f8cfbb8-3482-44a5-bd25-54086424ae9f"
+    },
+    {
+      "parameters": {
+        "resource": "Contacts",
+        "operation": "Get",
+        "contactId": "={{ $json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        51376,
+        10096
+      ],
+      "id": "c94bc33e-1c1c-43f1-ac3b-00f6f3ab2935",
+      "name": "Get contact basic info",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Labels",
+        "operation": "Put Chat Labels",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.to }}",
+        "labels": "=[\n  {\n    \"id\": \"{{ $json.handoverConfig.handoverLabelId || \"1\" }}\"\n  }\n]",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        52496,
+        9904
+      ],
+      "id": "134a44f7-e07f-4acb-9940-af1c5f29ccae",
+      "name": "Save labels for the chat",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ceaa9ef7-9a60-4e05-9a4d-c03690169bdd",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "@g.us",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        51600,
+        10096
+      ],
+      "id": "69077909-c6dc-4fb6-84b5-69330d883763",
+      "name": "CEK GRUP ATAU BUKAN"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6b4e5201-9682-42a8-b2fc-82d441634226",
+              "leftValue": "={{ $('WAHA Trigger').item.json.payload._data.ctwaContext }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c16986c2-0998-4e19-bf5e-bca7870a27fc",
+              "leftValue": "={{ $('WAHA Trigger').item.json.payload._data.ctwaContext.automatedGreetingMessageShown }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        51152,
+        9904
+      ],
+      "id": "1419abb6-1fda-4d39-962e-43a9d3d35061",
+      "name": "CEK DARI IKLAN"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4b9e27ad-2689-448b-b88c-bc4495a8e9e1",
+              "leftValue": "={{ $json.payload.source }}",
+              "rightValue": "api",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        51376,
+        9904
+      ],
+      "id": "edd81184-b5e8-477b-881c-237cc26a477f",
+      "name": "CEK BOT"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "05cc99f6-392c-4c5a-99bc-dbd26c90d582",
+              "leftValue": "={{ $json.labels }}",
+              "rightValue": "=1",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        52048,
+        9904
+      ],
+      "id": "c7486bb3-e3f1-4d76-9ca4-86a11b9f3b76",
+      "name": "CEK LABEL1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "942f2fae-299e-47d8-9896-5d115f8545cc",
+              "leftValue": "={{ $json.payload.source }}",
+              "rightValue": "api",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        51152,
+        10096
+      ],
+      "id": "e757210a-945f-4530-8e89-4ea8aa3499a8",
+      "name": "CEK API"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "944efa20-e157-4664-83d9-953ed6ea231e",
+              "leftValue": "={{ $('WAHA Trigger').item.json.payload.fromMe }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        50928,
+        10000
+      ],
+      "id": "93c29802-9015-4dd6-b1e7-e83e262352d1",
+      "name": "ME or NOT"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1aea3e17-7a6e-4885-957e-33bcd4204a90",
+              "leftValue": "={{ $('WAHA Trigger').item.json.payload.media.url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        52496,
+        10096
+      ],
+      "id": "7c07b92e-72f4-4eb1-ad2b-e20257b56034",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('WAHA Trigger').item.json.payload.media.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "apikey"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        54512,
+        10032
+      ],
+      "id": "39d63e51-8de2-4f38-8163-cff64637b525",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "={{ $('WAHA Trigger').item.json.payload.body }}",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        54960,
+        9936
+      ],
+      "id": "7c3803d5-ce84-4734-a323-84f63ac17fc8",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eDUp0Sb5vGEopF3y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Text",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "text": "={{ $json.content.parts[0].text }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        55760,
+        9936
+      ],
+      "id": "e7117547-c9f6-49d9-ba2d-7c38049f219d",
+      "name": "Send a text message1",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "PROSES GAMBAR",
+        "height": 208,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        55008,
+        9856
+      ],
+      "typeVersion": 1,
+      "id": "ecd7d868-5afd-4844-a8e4-cba40cee6d54",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "PROSES TEXT",
+        "height": 800,
+        "width": 5728,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        52544,
+        9920
+      ],
+      "typeVersion": 1,
+      "id": "1b724ec7-5dc6-475d-948d-0eef77d7a8d5",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "LABELING",
+        "height": 240,
+        "width": 1312,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        51216,
+        9824
+      ],
+      "typeVersion": 1,
+      "id": "f7544cc6-6472-45ab-ba5f-1aeddb7b91d1",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "08e00eeb-8d66-4188-86be-935f34b1314c",
+              "leftValue": "={{ $('WAHA Trigger').item.json.payload.media.mimetype }}",
+              "rightValue": "audio/ogg",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        54736,
+        10032
+      ],
+      "id": "d0bb71c2-f513-447e-a0f6-82642b7638b3",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "Kamu adalah mesin transkripsi. Tugasmu: Dengarkan file audio user. Output: Tuliskan ulang apa yang diucapkan user dalam teks.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        54960,
+        10176
+      ],
+      "id": "43b20360-cad4-44a6-891a-b43956a29eb7",
+      "name": "Analyze audio",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eDUp0Sb5vGEopF3y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Start Typing",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        55248,
+        9936
+      ],
+      "id": "51fdd31a-542d-48c0-9473-366e3d124193",
+      "name": "Start Typing2",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Stop Typing",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        55536,
+        9936
+      ],
+      "id": "7314255c-e3c2-4125-aee9-39b0702ab93c",
+      "name": "Stop Typing2",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiOutput = items[0].json.output;\nconst agentData = $('AI Agent2').item.json;\nlet finalMessageForUser = aiOutput;\nlet welcomeImageUrl = null;\nlet bookingData = { booking: false, escalate: false };\nlet promptTokens = agentData?.response_metadata?.tokenUsage?.promptTokens || agentData?.usage_metadata?.prompt_token_count || 0;\nlet completionTokens = agentData?.response_metadata?.tokenUsage?.completionTokens || agentData?.usage_metadata?.candidates_token_count || 0;\n\nif (promptTokens === 0 || completionTokens === 0) {\n    const ctx = $('Finalize Context').first().json;\n    const userMessage = $('Set Prod Mode').first().json.message || \"\";\n    const fullInputText = (ctx.finalSystemPrompt || \"\") + (ctx.finalKnowledge || \"\") + userMessage;\n    promptTokens = Math.ceil(fullInputText.length / 4);\n    completionTokens = Math.ceil((aiOutput || \"\").length / 4);\n}\nlet totalTokens = promptTokens + completionTokens;\n\ntry {\n    if (!aiOutput) throw new Error(\"Output kosong\");\n\n    // 1. Tangkap output JSON Booking/Escalate jika ada\n    const jsonMatch = aiOutput.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n        let jsonString = jsonMatch[0];\n        jsonString = jsonString.replace(/^json\\s*/i, \"\").replace(/$/i, \"\");\n        jsonString = jsonString.replace(/\\\\(?![\"\\\\bfnrtu])/g, \"\\\\\\\\\");\n        const parsed = JSON.parse(jsonString);\n        if (parsed.booking && String(parsed.booking).toLowerCase() === 'true') {\n            bookingData.booking = true;\n            bookingData.topic = parsed.topic;\n            bookingData.clientEmail = parsed.clientEmail;\n            let time = parsed.startTime ? parsed.startTime.replace(' ', 'T') : '';\n            if (time && time.split(':').length === 2) { time = time.includes('+') ? time.split('+')[0] + ':00+' + time.split('+')[1] : time + ':00'; }\n            if (time && !time.includes('+') && !time.endsWith('Z')) time += '+07:00';\n            bookingData.startTime = time;\n        }\n        if (parsed.escalate && String(parsed.escalate).toLowerCase() === 'true') { bookingData.escalate = true; }\n        \n        finalMessageForUser = aiOutput.replace(/json[\\s\\S]*/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/\\{[\\s\\S]*\\}/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/`/g, \"\").trim();\n    }\n\n    // 2. TANGKAP SEMUA LINK GAMBAR (REGEX BARU)\n    // Cek format markdown [nama](https://...jpg)\n    const mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i;\n    // Cek format link biasa https://...jpg\n    const rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i;\n\n    const mdMatch = finalMessageForUser.match(mdRegex);\n    if (mdMatch) {\n        welcomeImageUrl = mdMatch[2]; // Ambil URL-nya\n        finalMessageForUser = finalMessageForUser.replace(mdMatch[0], \"\").trim(); // Hapus dari teks balik ke user\n    } else {\n        const rawMatch = finalMessageForUser.match(rawRegex);\n        if (rawMatch) {\n            welcomeImageUrl = rawMatch[1];\n            finalMessageForUser = finalMessageForUser.replace(rawMatch[0], \"\").trim();\n        }\n    }\n\n    // 3. Fallback jika format lama (WELCOME_IMAGE_URL:) masih dipakai\n    const imgMatch = finalMessageForUser.match(/WELCOME_IMAGE_URL:\\s*(\\S+)/i);\n    if (imgMatch && imgMatch[1]) {\n        welcomeImageUrl = imgMatch[1].trim();\n        finalMessageForUser = finalMessageForUser.replace(/WELCOME_IMAGE_URL:\\s*\\S+/i, \"\").trim();\n    }\n\n} catch (error) { \n    bookingData.error = error.message; \n}\n\nreturn [{ \n    json: { \n        ...bookingData, \n        welcome_image_url: welcomeImageUrl, waha_image_url: welcomeImageUrl,\n        text_for_wa: finalMessageForUser, \n        output: finalMessageForUser, \n        tokens: { prompt: promptTokens, completion: completionTokens, total: totalTokens } \n    } \n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        55760,
+        10256
+      ],
+      "id": "f61c8a95-ed6f-42b2-9125-1e72ecc2c925",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').first().json.payload.body : ($('Parse Meta Payload').isExecuted ? $('Parse Meta Payload').first().json.body : '') }} | {{ $('Finalize Context').isExecuted ? $('Finalize Context').first().json.message : '' }}",
+        "options": {
+          "systemMessage": "={{ $('Finalize Context').item.json.finalSystemPrompt }}\n\nCONTEXT:\n{{ $('Finalize Context').item.json.finalKnowledge }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        55184,
+        10352
+      ],
+      "id": "977121a2-9f87-4af0-9618-070f258f1562",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        55200,
+        10576
+      ],
+      "id": "f70d052b-7077-43cb-a73e-7f82a7e68924",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eDUp0Sb5vGEopF3y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $if($('WAHA Trigger').isExecuted, $('WAHA Trigger').item.json.session, $if($('Parse Meta Payload').isExecuted, 'meta_' + $('Parse Meta Payload').item.json.from, 'trigger-kosong')) }} | {{ $if($('Finalize Context').isExecuted, $('Finalize Context').item.json.sessionId, 'Context-kosong') }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        55328,
+        10576
+      ],
+      "id": "ead1eec4-7032-4f71-b3b1-8512b30dd304",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/simulator-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        52720,
+        10544
+      ],
+      "id": "2af733a1-8636-4ba2-95d1-56377b6e84c5",
+      "name": "Webhook (Simulator Mode)",
+      "webhookId": "3bcbcc00-e3c0-462d-81de-66c395f40d8a"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.body\nreturn {\n    json: {\n        mode: 'simulation',\n        message: input.message,\n        sessionId: input.sessionId,\n        agentConfig: input.agentConfig \n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        52944,
+        10544
+      ],
+      "id": "62b3383b-43ec-4e16-ae67-a464264a3345",
+      "name": "Set Sim Mode"
+    },
+    {
+      "parameters": {
+        "jsCode": "const trigger = $('WAHA Trigger').item.json;\nconst payload = trigger.payload || {};\nlet senderId = payload.from || \"\";\nif (payload.author) { senderId = payload.author; }\nconst message = payload.body || \"\";\nif (!senderId) { throw new Error('Sender ID tidak ditemukan dari WAHA Trigger'); }\nreturn { json: { mode: 'production', message: message, sessionId: senderId, chatId: senderId, platform: 'waha', wahaSession: trigger.session, agentConfig: null } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        52944,
+        10352
+      ],
+      "id": "265e1c68-a5ec-4805-b9b9-0e4979fed16d",
+      "name": "Set Prod Mode"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        53168,
+        10448
+      ],
+      "id": "43ad1b8c-2866-4c3d-bcf9-8b6ab6676ab0",
+      "name": "Merge Inputs"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mode }}",
+                    "rightValue": "production",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "16220bec-4619-4e30-9b0a-a94eb62dfcd3"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bae44cd0-951f-4dbd-88b1-dc3f76c753eb",
+                    "leftValue": "={{ $json.mode }}",
+                    "rightValue": "simulation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        53392,
+        10448
+      ],
+      "id": "41d288c6-0973-4abc-8876-bac53b6e2167",
+      "name": "Is Production?"
+    },
+    {
+      "parameters": {
+        "url": "http://vlow-api:5000/api/agents/integration/config",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : $json.sessionId) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        50480,
+        10768
+      ],
+      "id": "add86981-fafa-42e5-89bf-b44bf1218de1",
+      "name": "Fetch Config DB"
+    },
+    {
+      "parameters": {
+        "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\n\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n    \n    // Tambahkan instruksi GAMBAR otomatis jika knowledge mengandung 'Attached File'\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', kamu WAJIB menyertakan URL gambar tersebut di dalam response-mu.\\n\";\n        finalPrompt += \"Format: tulis URL gambar langsung di response, contoh: https://minio.example.com/gambar.jpg\\n\";\n        finalPrompt += \"Jangan sembunyikan URL gambar. Jika user bertanya tentang topik yang memiliki Attached File, SELALU sertakan URL file tersebut di response.\\n\";\n        finalPrompt += \"JANGAN escalate jika informasi (termasuk gambar) sudah tersedia di CONTEXT.\";\n    }\n    \n    // Parse handover_config (might be string from Postgres)\n    let hc = data.handover_config;\n    if (typeof hc === 'string') {\n        try { hc = JSON.parse(hc); } catch(e) { hc = null; }\n    }\n    \n    if (hc && hc.enabled) {\n        const rules = [];\n        rules.push(\"\\nPENTING - ATURAN ESCALATION:\");\n        rules.push(\"Kamu WAJIB menyertakan JSON {\\\"escalate\\\": true, \\\"reason\\\": \\\"<alasan>\\\"} di BARIS TERAKHIR response-mu jika salah satu kondisi berikut terpenuhi:\");\n\n        if (hc.escalationPrompt && hc.escalationPrompt.trim()) {\n            rules.push(\"\");\n            rules.push(\"KONDISI ESCALATION:\");\n            hc.escalationPrompt.trim().split('\\n').forEach(line => {\n                if (line.trim()) rules.push(\"• \" + line.trim());\n            });\n        }\n        \n        rules.push(\"\");\n        rules.push(\"PENTING: JANGAN escalate jika pertanyaan user BISA dijawab dari CONTEXT yang tersedia (termasuk gambar/file yang terlampir).\");\n        rules.push(\"\");\n        rules.push(\"FORMAT OUTPUT SAAT ESCALATION:\");\n        rules.push('Balas user dengan sopan, lalu DI BARIS TERAKHIR tulis: {\"escalate\": true, \"reason\": \"<alasan singkat>\"}');\n        rules.push(\"\");\n        rules.push(\"CONTOH OUTPUT ESCALATION:\");\n        rules.push('Mohon maaf, saya belum memiliki informasi mengenai hal tersebut. Saya akan menghubungkan Anda dengan tim kami.');\n        rules.push('{\"escalate\": true, \"reason\": \"Pertanyaan di luar knowledge base\"}');\n        rules.push(\"\");\n        rules.push(\"Jika TIDAK perlu escalation, JANGAN sertakan JSON escalate di response.\");\n        \n        finalPrompt += \"\\n\\n\" + rules.join(\"\\n\");\n    }\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n    \n    // Add file instruction for simulator mode (mirrors production path)\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', kamu WAJIB menyertakan URL tersebut di dalam response-mu.\\n\";\n        finalPrompt += \"Format: tulis URL file langsung di response, contoh: https://minio.example.com/gambar.jpg\\n\";\n        finalPrompt += \"Jika user bertanya tentang topik yang memiliki Attached File, SELALU sertakan URL file tersebut di response.\";\n    }\n}\n\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        53840,
+        10448
+      ],
+      "id": "3c8cad38-0c3c-4112-9ea0-3b803a235382",
+      "name": "Finalize Context"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Finalize Context').item.json.mode }}",
+                    "rightValue": "production",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b92e5b5d-a707-460e-9e51-eedcbc635601"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3c836921-b58c-4929-bb97-7492312515bd",
+                    "leftValue": "={{ $('Finalize Context').item.json.mode }}",
+                    "rightValue": "simulation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        55536,
+        10352
+      ],
+      "id": "dc7ee983-0e77-40e3-b037-cabdaf80d8cc",
+      "name": "Is Simulator?"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        55968,
+        10448
+      ],
+      "id": "9b4a2415-07e2-4ef3-9a58-d0586474aa04",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "resource": "Labels",
+        "operation": "Put Chat Labels",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "labels": "[\n  {\n    \"id\": \"2\"\n  }\n]",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        56432,
+        10160
+      ],
+      "id": "5f821a38-b9bf-47bb-a410-9dea7c251004",
+      "name": "Save labels for the chat2",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Contacts",
+        "operation": "Get",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "contactId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        56208,
+        10160
+      ],
+      "id": "7fcfcfd8-39c3-472c-b2bf-4d260c561a85",
+      "name": "Get contact basic info3",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Start Typing",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        56208,
+        10352
+      ],
+      "id": "2450f3d2-fdbf-4ce6-8162-86ca6c492433",
+      "name": "Start Typing",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Stop Typing",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.me.id }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        56880,
+        10496
+      ],
+      "id": "5c4e44fb-22a8-413f-b97b-3cedd646ca91",
+      "name": "Stop Typing",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f11dcd72-b2c0-46b0-b644-638c307a5d23",
+              "leftValue": "={{ $('Code in JavaScript').item.json.booking }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        56656,
+        10352
+      ],
+      "id": "daf80040-5f1b-4f0f-8986-7e40ec5f8aa1",
+      "name": "SCHEDULE"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $('AI Agent2').item.json.output.length/25 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        56432,
+        10352
+      ],
+      "id": "b4470719-9f94-414f-b2c4-679633e23cef",
+      "name": "Wait4",
+      "webhookId": "3c8d1cb9-9c7f-4d0e-b199-3c159ec30a3c"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "unosega@gmail.com",
+          "mode": "list",
+          "cachedResultName": "unosega@gmail.com"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        56880,
+        10208
+      ],
+      "id": "98731d70-dd15-44de-9f7c-89da32b2d914",
+      "name": "Create an event",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Text",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "text": "={{ $json.text_for_wa }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        57552,
+        10208
+      ],
+      "id": "0e3657ad-b5db-42d2-b625-1b1280c30334",
+      "name": "Send a text message8",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "09e1f07e-3b98-4f2e-8a47-7d1b66b1f6a1",
+              "leftValue": "={{ $('Code in JavaScript').item.json.welcome_image_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        57104,
+        10496
+      ],
+      "id": "6e6ec787-ea04-4bdd-b8a2-e6944bd78c27",
+      "name": "HAS WELCOME IMAGE"
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Image",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        57328,
+        10416
+      ],
+      "id": "6e353c31-9b79-450f-8129-3786b06f3de6",
+      "name": "Send welcome image1",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Text",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "text": "={{ $('Code in JavaScript').item.json.text_for_wa }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        57552,
+        10496
+      ],
+      "id": "e76756dd-adfc-4684-917e-d025627d921e",
+      "name": "Send a text message4",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        50704,
+        10000
+      ],
+      "id": "805fbf39-6127-40e2-ab38-ea34c5608f85",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1b0a2f26-9b21-4d9b-8c65-4ebcd6e7b1a5",
+              "leftValue": "={{ $json.isActive !== false }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        54064,
+        10448
+      ],
+      "id": "a7f03faa-7730-4a83-a7b9-4eee61f19e8f",
+      "name": "IS ACTIVE?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "22a5b3c1-6d9c-4b6b-9f6c-2df96c4f7a12",
+              "leftValue": "={{ $('Code in JavaScript').item.json.welcome_image_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        57104,
+        10208
+      ],
+      "id": "5c828f15-2f8e-4caf-b719-ed0fc428923f",
+      "name": "HAS WELCOME IMAGE (BOOKING)"
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Image",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        57328,
+        10128
+      ],
+      "id": "201134cf-02d3-48dc-b9e9-5ada355ea10f",
+      "name": "Send welcome image (booking)",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d0bb4d5a-5a9e-4a63-bfdf-7c176e4aa36d",
+              "leftValue": "={{ $('Finalize Context').item.json.followupConfig?.isEnabled }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        58000,
+        10352
+      ],
+      "id": "ac7c4fb6-229d-4bae-a4a2-4504058c85ba",
+      "name": "FOLLOWUP ENABLED?"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.followup_delay_amount }}",
+        "unit": "={{ $json.followup_delay_unit }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        58448,
+        10352
+      ],
+      "id": "5b391fdf-c694-48af-855c-59f049747e8f",
+      "name": "Followup Wait",
+      "webhookId": "fb0c5c98-9c47-4829-a6b5-f9137efc6b9e"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8d1416d7-4c60-4ff2-a2b4-f9a4545b43b0",
+              "leftValue": "={{ $json.followup_text }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        58672,
+        10352
+      ],
+      "id": "5d9927aa-b38f-4224-bf43-eeebb31745ee",
+      "name": "FOLLOWUP HAS TEXT?"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const ctx = $('Finalize Context').item.json;\nconst followup = ctx.followupConfig || {};\nconst delay = Number(followup.delay) || 15;\nconst unit = followup.unit === 'hours' ? 'hours' : 'minutes';\nlet text = followup.prompt || \"\";\ntext = text.replace(/<[^>]*>/g, \"\").replace(/&nbsp;/g, \" \").trim();\nreturn { json: { ...$json, followup_delay_amount: delay, followup_delay_unit: unit, followup_text: text } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        58224,
+        10352
+      ],
+      "id": "bcb2a579-5281-4d98-bbd6-7d60eb95ddb6",
+      "name": "Prepare Followup"
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Text",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "text": "={{ $json.followup_text }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        58896,
+        10352
+      ],
+      "id": "ffc18e8a-d955-4612-8209-d43a4ca9b841",
+      "name": "Send Followup",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d90bec43-5aef-444a-a692-bec64d775031",
+              "leftValue": "={{ $json.escalate }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        55984,
+        10256
+      ],
+      "id": "08fcaa0f-b423-4aa2-aecf-87d74f3de989",
+      "name": "IF ESCALATE"
+    },
+    {
+      "parameters": {
+        "url": "http://172.26.224.1:5000/api/analytics/log",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agentId\": \"{{ $('Fetch Config DB').item.json.agentId }}\",\n  \"platformId\": \"{{ $('Fetch Config DB').item.json.platformId }}\",\n  \"sessionId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}\",\n  \"chatId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.payload.from : ($('Parse Meta Payload').isExecuted ? $('Parse Meta Payload').item.json.from : '') }}\",\n  \"userMessage\": \"{{ $('Set Prod Mode').isExecuted ? $('Set Prod Mode').item.json.message : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.message : '') }}\",\n  \"aiResponse\": \"{{ $json.text_for_wa }}\",\n  \"isHandoff\": \"{{ $json.escalate || false }}\",\n  \"mode\": \"production\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        57776,
+        10208
+      ],
+      "id": "09a2559c-b4fc-477a-8c30-37f463ea299e",
+      "name": "Log Conversation"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/analytics/log",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agentId\": \"{{ $('IS ACTIVE?').item.json.agent_id }}\",\n  \"sessionId\": \"{{ $('IS ACTIVE?').item.json.sessionId }}\",\n  \"chatId\": \"{{ $('IS ACTIVE?').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('IS ACTIVE?').item.json.message || \"\") }},\n  \"aiResponse\": {{ JSON.stringify($json._data.body || \"\") }},\n  \"mode\": \"production\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        57776,
+        10496
+      ],
+      "id": "80effd8c-6bdb-444b-b9a3-5accb8733997",
+      "name": "Log Conversation (Alt)"
+    },
+    {
+      "parameters": {},
+      "type": "@devlikeapro/n8n-nodes-waha.wahaTrigger",
+      "typeVersion": 202502,
+      "position": [
+        50480,
+        9616
+      ],
+      "id": "d496867a-310c-4c32-a826-0daa68885f3b",
+      "name": "WAHA Trigger",
+      "webhookId": "20d16051-147e-4463-a36c-d98a15cf35ff"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  a.\"id\" AS agent_id,\n  cp.\"id\" AS platform_id,\n  a.\"name\" AS agent_name,\n  a.\"systemInstruction\" AS system_prompt,\n  a.\"welcomeMessage\" AS greeting,\n  a.\"welcomeImageUrl\" AS welcome_image,\n  a.\"followupConfig\" AS followup_config,\n  a.\"handoverConfig\" AS handover_config,\n  COALESCE(a.\"knowledgeBase\", '') || E'\\n\\n' || \n  COALESCE(\n    (\n      SELECT string_agg(\n        '=== ' || ks.title || ' ===' || E'\\n' || ks.description || \n        CASE WHEN ks.\"fileUrl\" IS NOT NULL \n          THEN E'\\nAttached File (' || COALESCE(ks.\"fileName\", 'file') || '): ' || ks.\"fileUrl\"\n          ELSE '' \n        END,\n        E'\\n\\n'\n      )\n      FROM \"KnowledgeSources\" ks\n      WHERE ks.\"agentId\" = a.id\n    ),\n    ''\n  ) AS knowledge\nFROM \"ConnectedPlatforms\" cp\nJOIN \"Agents\" a ON cp.\"agentId\" = a.id\nWHERE cp.\"sessionId\" = $1;\n",
+        "options": {
+          "queryReplacement": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        53616,
+        10352
+      ],
+      "id": "f772d2d9-cff8-46c1-b1a2-17e078875387",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "HOsKCOW1hSA3Ltkd",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Contacts",
+        "operation": "Get",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "contactId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        51824,
+        9904
+      ],
+      "id": "07657631-ebf4-4f39-8b01-6056245cd590",
+      "name": "Get contact basic info1",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/handover/activate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chatId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.payload.from : ($('Parse Meta Payload').isExecuted ? $('Parse Meta Payload').item.json.from : '') }}\",\n  \"sessionId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}\",\n  \"triggeredBy\": \"ai_escalate\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        56656,
+        10160
+      ],
+      "id": "58d997b7-7da1-4772-a7f1-eea880d4b12a",
+      "name": "Activate Handover",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/handover/check-keyword",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chatId\": \"{{ $json.chatId }}\",\n  \"sessionId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}\",\n  \"message\": \"{{ $json.message }}\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        54288,
+        10448
+      ],
+      "id": "d7a90971-0b1c-41a5-a5fa-4b0d2622d946",
+      "name": "Check Keyword",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "hnd-kw-cond-001",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        54512,
+        10448
+      ],
+      "id": "26a5aeb8-b38b-4e10-a42e-88a2ac8b1710",
+      "name": "IF Keyword Match"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.vlow-ai.com/api/handover/status/{{ encodeURIComponent($('Merge Inputs').item.json.chatId) }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        54736,
+        10448
+      ],
+      "id": "d8676db1-463d-4ccb-aa82-813a33f5db7e",
+      "name": "Check Handover Status",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "hnd-status-cond-001",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "human",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        54960,
+        10448
+      ],
+      "id": "0519588a-abb9-4727-aa1b-38f62f2a3934",
+      "name": "IF Human Mode"
+    },
+    {
+      "parameters": {
+        "content": "HANDOVER CHECK",
+        "height": 260,
+        "width": 880,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        54640,
+        10336
+      ],
+      "typeVersion": 1,
+      "id": "6d422ba1-dee7-48e9-a2a8-ea4d513c3936",
+      "name": "Sticky Note Handover"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/handover/activate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chatId\": \"{{ $(\"WAHA Trigger\").item.json.payload.to || $(\"WAHA Trigger\").item.json.payload.chatId || $(\"WAHA Trigger\").item.json.payload.from }}\",\n  \"sessionId\": \"{{ $(\"WAHA Trigger\").item.json.session }}\",\n  \"triggeredBy\": \"manual_reply\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        51600,
+        9904
+      ],
+      "id": "71e28ca2-a939-45d8-8214-e720b6c15a40",
+      "name": "Auto Label Human",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.vlow-ai.com/api/agents/integration/config",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        52272,
+        9904
+      ],
+      "id": "7b1c9e38-0c7a-43ab-8a91-79c4c7585d82",
+      "name": "Fetch Handover Config",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.vlow-ai.com/api/agents/integration/config",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        51824,
+        10096
+      ],
+      "id": "dff77114-f43f-45e6-8344-e20ab1fa1246",
+      "name": "Fetch Label Config",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const contactData = $('Get contact basic info').item.json;\nconst configData = items[0].json;\nconst chatLabels = contactData.labels || [];\n\n// Parse handoverConfig\nlet hc = configData.handoverConfig;\nif (typeof hc === 'string') { try { hc = JSON.parse(hc); } catch(e) { hc = {}; } }\nhc = hc || {};\n\nconst humanLabelId = String(hc.handoverLabelId || '1');\n\n// Check if any of the chat's labels match the human label ID\nconst hasHumanLabel = chatLabels.some(l => {\n  const labelId = typeof l === 'object' ? String(l.id) : String(l);\n  return labelId === humanLabelId;\n});\n\nreturn [{ json: { ...contactData, hasHumanLabel, humanLabelId, chatLabels } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        52048,
+        10096
+      ],
+      "id": "2849f60b-5fc4-41e8-a2f7-f8af4ddfb013",
+      "name": "CEK LABEL Logic"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cek-label-human-cond",
+              "leftValue": "={{ $json.hasHumanLabel }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        52272,
+        10096
+      ],
+      "id": "7b0b2481-f5b6-439e-8fb5-3552ab69c468",
+      "name": "CEK LABEL"
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiOutput = items[0].json.output || \"\";\nlet text = aiOutput;\nlet imageUrl = null;\n\n// Cek format markdown [nama](url.jpg)\nconst mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i;\nconst rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i;\n\nconst mdMatch = text.match(mdRegex);\nif (mdMatch) {\n    imageUrl = mdMatch[2];\n    text = text.replace(mdMatch[0], \"\").trim();\n} else {\n    const rawMatch = text.match(rawRegex);\n    if (rawMatch) {\n        imageUrl = rawMatch[1];\n        text = text.replace(rawMatch[0], \"\").trim();\n    }\n}\n\nreturn [{ json: { output: text, welcome_image_url: imageUrl, waha_image_url: imageUrl } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        55728,
+        10448
+      ],
+      "id": "5ccdb578-1471-427e-8d05-5da11f9073ae",
+      "name": "Process Sim Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e7c2e9b0-4f51-4f1b-85d8-c89b7888b64e",
+              "leftValue": "={{ $json.welcome_image_url }}",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        55960,
+        10256
+      ],
+      "id": "if-has-image-1772015892310",
+      "name": "Check If Image Exists"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e7c2e9b0-4f51-4f1b-85d8-c89b7888b64e",
+              "leftValue": "={{ $json.welcome_image_url }}",
+              "rightValue": ".pdf",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        56100,
+        10256
+      ],
+      "id": "if-is-pdf-1772015892310",
+      "name": "Check If is PDF"
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Image",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
+        "caption": "",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        56160,
+        10156
+      ],
+      "id": "waha-send-image-1772015892310",
+      "name": "WAHA Send Image",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send File",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "file": "={\n  \"mimetype\": \"application/pdf\",\n  \"filename\": \"document.pdf\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
+        "caption": "",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        56160,
+        10356
+      ],
+      "id": "waha-send-file-1772015892310",
+      "name": "WAHA Send File",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n\"output\": \"{{ $json.output }}\",\n\"welcome_image_url\": \"{{ $json.welcome_image_url }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        56000,
+        10500
+      ],
+      "id": "sim-respond-to-webhook",
+      "name": "Respond Webhook Simulator"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        57128,
+        10416
+      ],
+      "id": "http-dl-1772094912991-0",
+      "name": "Download Image"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        57328,
+        10416
+      ],
+      "id": "extract-b64-1772094912992-1",
+      "name": "To Base64"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        57128,
+        10128
+      ],
+      "id": "http-dl-1772094912995-2",
+      "name": "Download Image (Booking)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        57328,
+        10128
+      ],
+      "id": "extract-b64-1772094912995-3",
+      "name": "To Base64 (Booking)"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        55960,
+        10156
+      ],
+      "id": "http-dl-1772094912995-4",
+      "name": "Download Image (Escalate)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56160,
+        10156
+      ],
+      "id": "extract-b64-1772094912995-5",
+      "name": "To Base64 (Escalate)"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        55960,
+        10356
+      ],
+      "id": "http-dl-1772094912995-6",
+      "name": "Download File (Escalate)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        56160,
+        10356
+      ],
+      "id": "extract-b64-1772094912995-7",
+      "name": "To Base64 (File)"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/meta-cloud-webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        50480,
+        9200
+      ],
+      "id": "meta-cloud-trigger",
+      "name": "Meta Cloud Webhook",
+      "webhookId": "meta-cloud-combined-001"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Parse Meta Cloud API webhook payload\nconst body = $json.body || $json;\nconst entry = body.entry || [];\n\nif (!entry.length) return [{ json: { skip: true } }];\n\nconst changes = entry[0]?.changes || [];\nif (!changes.length) return [{ json: { skip: true } }];\n\nconst value = changes[0]?.value;\nif (!value || !value.messages || !value.messages.length) {\n  return [{ json: { skip: true } }];\n}\n\nconst msg = value.messages[0];\nconst contacts = value.contacts || [];\nconst contact = contacts.find(c => c.wa_id === msg.from) || {};\nconst metadata = value.metadata || {};\n\nlet messageBody = '';\nswitch (msg.type) {\n  case 'text': messageBody = msg.text?.body || ''; break;\n  case 'image': messageBody = msg.image?.caption || ''; break;\n  case 'video': messageBody = msg.video?.caption || ''; break;\n  case 'audio': messageBody = ''; break;\n  case 'document': messageBody = msg.document?.caption || msg.document?.filename || ''; break;\n  case 'location': messageBody = '📍 Lokasi: ' + (msg.location?.latitude || '') + ', ' + (msg.location?.longitude || ''); break;\n  default: messageBody = '(' + msg.type + ')';\n}\n\nreturn [{\n  json: {\n    skip: false,\n    phoneNumberId: metadata.phone_number_id,\n    from: msg.from,\n    messageId: msg.id,\n    timestamp: msg.timestamp,\n    type: msg.type,\n    body: messageBody,\n    contactName: contact.profile?.name || msg.from,\n    sessionId: 'meta_' + metadata.phone_number_id\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        50704,
+        9200
+      ],
+      "id": "meta-parse-payload",
+      "name": "Parse Meta Payload"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "meta-skip-check",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        50928,
+        9200
+      ],
+      "id": "meta-has-message",
+      "name": "Has Message?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const trigger = $('Parse Meta Payload').item.json;\nconst senderId = trigger.from || '';\nconst message = trigger.body || '';\n\nif (!senderId) { throw new Error('Sender ID tidak ditemukan dari Meta webhook'); }\n\nreturn {\n  json: {\n    mode: 'production',\n    message: message,\n    sessionId: senderId,\n    chatId: senderId,\n    platform: 'meta_cloud',\n    phoneNumberId: trigger.phoneNumberId,\n    metaSessionId: trigger.sessionId,\n    contactName: trigger.contactName,\n    agentConfig: null\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        51152,
+        9200
+      ],
+      "id": "meta-set-prod",
+      "name": "Meta Set Prod Mode"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Finalize Context').item.json.platform }}",
+                    "rightValue": "meta_cloud",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "is-meta"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "is-waha",
+                    "leftValue": "={{ $('Finalize Context').item.json.platform }}",
+                    "rightValue": "waha",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        55760,
+        10160
+      ],
+      "id": "which-platform",
+      "name": "Which Platform?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "meta-esc-check",
+              "leftValue": "={{ $('Code in JavaScript').item.json.escalate }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        56208,
+        9200
+      ],
+      "id": "meta-if-escalate",
+      "name": "Meta IF ESCALATE"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/handover/activate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chatId\": \"{{ $('Parse Meta Payload').item.json.from }}\",\n  \"sessionId\": \"{{ $('Meta Set Prod Mode').item.json.metaSessionId }}\",\n  \"triggeredBy\": \"ai_escalate\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        56432,
+        9100
+      ],
+      "id": "meta-activate-handover",
+      "name": "Meta Activate Handover",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Meta Set Prod Mode').item.json.phoneNumberId }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": {{ JSON.stringify($('Code in JavaScript').item.json.text_for_wa || '') }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        56656,
+        9200
+      ],
+      "id": "meta-send-text",
+      "name": "Meta Send Text"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "meta-img-check",
+              "leftValue": "={{ $('Code in JavaScript').item.json.welcome_image_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        56880,
+        9200
+      ],
+      "id": "meta-has-image",
+      "name": "Meta HAS IMAGE?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Meta Set Prod Mode').item.json.phoneNumberId }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"{{ $('Code in JavaScript').item.json.welcome_image_url }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        57104,
+        9100
+      ],
+      "id": "meta-send-image",
+      "name": "Meta Send Image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/analytics/log",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agentId\": \"{{ $('Execute a SQL query').isExecuted ? $('Execute a SQL query').first().json.agent_id : '' }}\",\n  \"sessionId\": \"{{ $('Meta Set Prod Mode').item.json.metaSessionId }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('Meta Set Prod Mode').item.json.message || '') }},\n  \"aiResponse\": {{ JSON.stringify($('Code in JavaScript').item.json.text_for_wa || '') }},\n  \"isHandoff\": \"{{ $('Code in JavaScript').item.json.escalate || false }}\",\n  \"mode\": \"production\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        57328,
+        9200
+      ],
+      "id": "meta-log-conversation",
+      "name": "Meta Log Conversation"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "meta-followup-check",
+              "leftValue": "={{ $('Finalize Context').item.json.followupConfig?.isEnabled }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        57552,
+        9200
+      ],
+      "id": "meta-followup-enabled",
+      "name": "Meta FOLLOWUP?"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const ctx = $('Finalize Context').item.json;\nconst followup = ctx.followupConfig || {};\nconst delay = Number(followup.delay) || 15;\nconst unit = followup.unit === 'hours' ? 'hours' : 'minutes';\nlet text = followup.prompt || \"\";\ntext = text.replace(/<[^>]*>/g, \"\").replace(/&nbsp;/g, \" \").trim();\nreturn { json: { ...$json, followup_delay_amount: delay, followup_delay_unit: unit, followup_text: text } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        57776,
+        9200
+      ],
+      "id": "meta-prepare-followup",
+      "name": "Meta Prepare Followup"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $json.followup_delay_amount }}",
+        "unit": "={{ $json.followup_delay_unit }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        58000,
+        9200
+      ],
+      "id": "meta-followup-wait",
+      "name": "Meta Followup Wait",
+      "webhookId": "meta-followup-wait-combined"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Meta Set Prod Mode').item.json.phoneNumberId }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": {{ JSON.stringify($json.followup_text || '') }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        58224,
+        9200
+      ],
+      "id": "meta-send-followup",
+      "name": "Meta Send Followup"
+    },
+    {
+      "parameters": {
+        "content": "META CLOUD API PATH",
+        "height": 200,
+        "width": 8200,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        50440,
+        9060
+      ],
+      "typeVersion": 1,
+      "id": "note-meta-cloud",
+      "name": "Sticky Note Meta Cloud"
+    },
+    {
+      "parameters": {
+        "content": "PLATFORM ROUTER",
+        "height": 200,
+        "width": 300,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        55720,
+        10080
+      ],
+      "typeVersion": 1,
+      "id": "note-platform-router",
+      "name": "Sticky Note Router"
+    }
+  ],
+  "connections": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Set Prod Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get contact basic info": {
+      "main": [
+        [
+          {
+            "node": "CEK GRUP ATAU BUKAN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK GRUP ATAU BUKAN": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Fetch Label Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK DARI IKLAN": {
+      "main": [
+        [],
+        [
+          {
+            "node": "CEK BOT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK BOT": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Auto Label Human",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK LABEL1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Fetch Handover Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK API": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get contact basic info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ME or NOT": {
+      "main": [
+        [
+          {
+            "node": "CEK DARI IKLAN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CEK API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Start Typing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Typing2": {
+      "main": [
+        [
+          {
+            "node": "Stop Typing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stop Typing2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Check If Image Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Is Simulator?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook (Simulator Mode)": {
+      "main": [
+        [
+          {
+            "node": "Set Sim Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Sim Mode": {
+      "main": [
+        [
+          {
+            "node": "Merge Inputs",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set Prod Mode": {
+      "main": [
+        [
+          {
+            "node": "Merge Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Inputs": {
+      "main": [
+        [
+          {
+            "node": "Is Production?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Production?": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finalize Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalize Context": {
+      "main": [
+        [
+          {
+            "node": "IS ACTIVE?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Simulator?": {
+      "main": [
+        [
+          {
+            "node": "Which Platform?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Process Sim Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save labels for the chat2": {
+      "main": [
+        [
+          {
+            "node": "Activate Handover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get contact basic info3": {
+      "main": [
+        [
+          {
+            "node": "Save labels for the chat2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Typing": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stop Typing": {
+      "main": [
+        [
+          {
+            "node": "HAS WELCOME IMAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SCHEDULE": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop Typing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "SCHEDULE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "HAS WELCOME IMAGE (BOOKING)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message8": {
+      "main": [
+        [
+          {
+            "node": "Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HAS WELCOME IMAGE": {
+      "main": [
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send welcome image1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message4": {
+      "main": [
+        [
+          {
+            "node": "Log Conversation (Alt)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "ME or NOT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IS ACTIVE?": {
+      "main": [
+        [
+          {
+            "node": "Check Keyword",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HAS WELCOME IMAGE (BOOKING)": {
+      "main": [
+        [
+          {
+            "node": "Download Image (Booking)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send welcome image (booking)": {
+      "main": [
+        [
+          {
+            "node": "Send a text message8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FOLLOWUP ENABLED?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Followup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Followup Wait": {
+      "main": [
+        [
+          {
+            "node": "FOLLOWUP HAS TEXT?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FOLLOWUP HAS TEXT?": {
+      "main": [
+        [
+          {
+            "node": "Send Followup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Followup": {
+      "main": [
+        [
+          {
+            "node": "Followup Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF ESCALATE": {
+      "main": [
+        [
+          {
+            "node": "Get contact basic info3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start Typing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Conversation": {
+      "main": [
+        [
+          {
+            "node": "FOLLOWUP ENABLED?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Conversation (Alt)": {
+      "main": [
+        [
+          {
+            "node": "FOLLOWUP ENABLED?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAHA Trigger": {
+      "main": [
+        [],
+        [],
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Finalize Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get contact basic info1": {
+      "main": [
+        [
+          {
+            "node": "CEK LABEL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Keyword": {
+      "main": [
+        [
+          {
+            "node": "IF Keyword Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Keyword Match": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Check Handover Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Handover Status": {
+      "main": [
+        [
+          {
+            "node": "IF Human Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Human Mode": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto Label Human": {
+      "main": [
+        [
+          {
+            "node": "Get contact basic info1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Handover Config": {
+      "main": [
+        [
+          {
+            "node": "Save labels for the chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Label Config": {
+      "main": [
+        [
+          {
+            "node": "CEK LABEL Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK LABEL Logic": {
+      "main": [
+        [
+          {
+            "node": "CEK LABEL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK LABEL": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Sim Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Webhook Simulator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Image Exists": {
+      "main": [
+        [
+          {
+            "node": "Check If is PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If is PDF": {
+      "main": [
+        [
+          {
+            "node": "Download File (Escalate)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Image (Escalate)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAHA Send Image": {
+      "main": [
+        [
+          {
+            "node": "IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAHA Send File": {
+      "main": [
+        [
+          {
+            "node": "IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "To Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64": {
+      "main": [
+        [
+          {
+            "node": "Send welcome image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image (Booking)": {
+      "main": [
+        [
+          {
+            "node": "To Base64 (Booking)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64 (Booking)": {
+      "main": [
+        [
+          {
+            "node": "Send welcome image (booking)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image (Escalate)": {
+      "main": [
+        [
+          {
+            "node": "To Base64 (Escalate)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64 (Escalate)": {
+      "main": [
+        [
+          {
+            "node": "WAHA Send Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File (Escalate)": {
+      "main": [
+        [
+          {
+            "node": "To Base64 (File)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64 (File)": {
+      "main": [
+        [
+          {
+            "node": "WAHA Send File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Cloud Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Meta Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Meta Payload": {
+      "main": [
+        [
+          {
+            "node": "Has Message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Message?": {
+      "main": [
+        [
+          {
+            "node": "Meta Set Prod Mode",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Meta Set Prod Mode": {
+      "main": [
+        [
+          {
+            "node": "Merge Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Which Platform?": {
+      "main": [
+        [
+          {
+            "node": "Meta IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta IF ESCALATE": {
+      "main": [
+        [
+          {
+            "node": "Meta Activate Handover",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Meta Send Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Activate Handover": {
+      "main": [
+        [
+          {
+            "node": "Meta Send Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Send Text": {
+      "main": [
+        [
+          {
+            "node": "Meta HAS IMAGE?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta HAS IMAGE?": {
+      "main": [
+        [
+          {
+            "node": "Meta Send Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Meta Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Send Image": {
+      "main": [
+        [
+          {
+            "node": "Meta Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Log Conversation": {
+      "main": [
+        [
+          {
+            "node": "Meta FOLLOWUP?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta FOLLOWUP?": {
+      "main": [
+        [
+          {
+            "node": "Meta Prepare Followup",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Meta Prepare Followup": {
+      "main": [
+        [
+          {
+            "node": "Meta Followup Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Followup Wait": {
+      "main": [
+        [
+          {
+            "node": "Meta Send Followup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Webhook (Simulator Mode)": [
+      {
+        "headers": {
+          "host": "n8n.dayamedialangit.co.id"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+          "mode": "simulation",
+          "sessionId": "sess-1771822442056",
+          "message": "hallo",
+          "agentConfig": {
+            "name": "pawshop",
+            "systemInstruction": "kamu adalah ai agent petshop bernama pawshop",
+            "knowledgeBase": "",
+            "followupConfig": {
+              "unit": "minutes",
+              "delay": 15,
+              "prompt": "",
+              "isEnabled": false
+            }
+          }
+        },
+        "webhookUrl": "https://n8n.dayamedialangit.co.id/webhook/simulator-chat",
+        "executionMode": "production"
+      }
+    ]
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "df79904fa755120452f87c707b84f5f3a64d828f8411fb0ae2fc99bc78f2c37b"
+  },
+  "name": "Vlow AI Agent - Combined (WAHA + Meta Cloud)"
+}
