@@ -155,7 +155,7 @@ const ConnectedPlatforms = () => {
             console.log("[FB.login] Embedded data at send time:", embeddedData);
             sendMetaCodeToBackend(
               response.authResponse.code,
-              embeddedData.phone_number_id ? embeddedData.waba_id : undefined,
+              embeddedData.waba_id,
               embeddedData.phone_number_id
             );
           }, 1500);

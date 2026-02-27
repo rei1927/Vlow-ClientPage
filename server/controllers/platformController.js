@@ -354,19 +354,35 @@ export const connectMetaWhatsApp = async (req, res, next) => {
     let wabaId, phoneNumberId, phoneNumberDisplay;
 
     // 2. Use WABA data from Embedded Signup dialog (preferred) or fallback to API
-    if (embeddedWabaId && embeddedPhoneNumberId) {
-      console.log("Using Embedded Signup data - WABA:", embeddedWabaId, "Phone:", embeddedPhoneNumberId);
+    if (embeddedWabaId) {
+      console.log("Using Embedded Signup data - WABA:", embeddedWabaId, "Phone:", embeddedPhoneNumberId || "not provided");
       wabaId = embeddedWabaId;
-      phoneNumberId = embeddedPhoneNumberId;
 
-      // Get phone number display from API
+      // Get phone numbers from this WABA
       try {
         const phoneNumbers = await metaService.getPhoneNumbers(wabaId, accessToken);
-        const phoneData = phoneNumbers.find(p => p.id === phoneNumberId);
-        phoneNumberDisplay = phoneData?.display_phone_number || phoneNumberId;
+        console.log("Phone numbers found:", phoneNumbers?.length, JSON.stringify(phoneNumbers?.map(p => ({ id: p.id, display: p.display_phone_number }))));
+
+        if (embeddedPhoneNumberId) {
+          // Use the specific phone from Embedded Signup
+          phoneNumberId = embeddedPhoneNumberId;
+          const phoneData = phoneNumbers?.find(p => p.id === phoneNumberId);
+          phoneNumberDisplay = phoneData?.display_phone_number || phoneNumberId;
+        } else if (phoneNumbers && phoneNumbers.length > 0) {
+          // Use first available phone number
+          phoneNumberId = phoneNumbers[0].id;
+          phoneNumberDisplay = phoneNumbers[0].display_phone_number;
+        } else {
+          return next(new AppError("Nomor WhatsApp belum terdaftar di WABA Anda. Silakan selesaikan proses Embedded Signup terlebih dahulu.", 400));
+        }
       } catch (e) {
-        console.log("Could not fetch phone display, using ID:", e.message);
-        phoneNumberDisplay = phoneNumberId;
+        console.log("Could not fetch phone numbers:", e.message);
+        if (embeddedPhoneNumberId) {
+          phoneNumberId = embeddedPhoneNumberId;
+          phoneNumberDisplay = embeddedPhoneNumberId;
+        } else {
+          return next(new AppError("Gagal mengambil data nomor telepon dari WABA. Silakan coba lagi.", 400));
+        }
       }
     } else {
       // Fallback: try API approach
