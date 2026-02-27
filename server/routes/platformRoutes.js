@@ -10,6 +10,7 @@ import {
   connectMetaWhatsApp,
   subscribeWebhook,
   diagnoseWebhook,
+  registerPhone,
 } from "../controllers/platformController.js";
 
 const router = express.Router();
@@ -31,6 +32,9 @@ router.post("/:id/subscribe-webhook", subscribeWebhook);
 
 // Diagnose webhook issues for meta_cloud platform
 router.get("/:id/diagnose-webhook", diagnoseWebhook);
+
+// Register phone number for Cloud API
+router.post("/:id/register-phone", registerPhone);
 
 export default router;
 

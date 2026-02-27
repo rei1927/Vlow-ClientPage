@@ -540,3 +540,32 @@ export const diagnoseWebhook = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Register phone number for Cloud API messaging
+// @route   POST /api/platforms/:id/register-phone
+// @access  Private
+export const registerPhone = async (req, res, next) => {
+  try {
+    const platform = await ConnectedPlatform.findOne({
+      where: { id: req.params.id, userId: req.user.id, provider: "meta_cloud" },
+    });
+
+    if (!platform) {
+      return next(new AppError("Platform Meta Cloud tidak ditemukan.", 404));
+    }
+
+    const result = await metaService.registerPhoneNumber(
+      platform.phoneNumberId,
+      platform.systemUserAccessToken
+    );
+    console.log("[Meta] Phone registration result:", result);
+
+    res.status(200).json({
+      success: true,
+      message: "Nomor telepon berhasil didaftarkan untuk Cloud API",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

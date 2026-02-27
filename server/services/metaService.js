@@ -152,3 +152,26 @@ export const sendCloudMessage = async (phoneNumberId, accessToken, to, messageTe
         throw new AppError("Gagal mengirim pesan via WhatsApp Cloud API", 500);
     }
 };
+
+// Register phone number for Cloud API messaging
+export const registerPhoneNumber = async (phoneNumberId, accessToken, pin = "123456") => {
+    try {
+        const response = await axios.post(
+            `${META_API_URL}/${phoneNumberId}/register`,
+            {
+                messaging_product: "whatsapp",
+                pin: pin,
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error("Meta Register Phone Error:", error?.response?.data || error.message);
+        throw new AppError(`Gagal mendaftarkan nomor untuk Cloud API: ${error?.response?.data?.error?.message || error.message}`, 400);
+    }
+};
