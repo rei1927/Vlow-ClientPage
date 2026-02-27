@@ -28,6 +28,7 @@ import KnowledgeSource from "./models/KnowledgeSource.js";
 import ConversationLog from "./models/ConversationLog.js";
 import ConnectedPlatform from "./models/ConnectedPlatform.js";
 import ChatHandover from "./models/ChatHandover.js";
+import MetaMessage from "./models/MetaMessage.js";
 import { startHandoverScheduler } from "./utils/handoverScheduler.js";
 
 dotenv.config();
@@ -113,6 +114,10 @@ Agent.hasMany(ChatHandover, { foreignKey: "agentId", onDelete: "CASCADE" });
 ChatHandover.belongsTo(Agent, { foreignKey: "agentId" });
 ConnectedPlatform.hasMany(ChatHandover, { foreignKey: "platformId", onDelete: "CASCADE" });
 ChatHandover.belongsTo(ConnectedPlatform, { foreignKey: "platformId" });
+
+// 8. ConnectedPlatform -> MetaMessage (Meta Cloud API message storage)
+ConnectedPlatform.hasMany(MetaMessage, { foreignKey: "platformId", onDelete: "CASCADE" });
+MetaMessage.belongsTo(ConnectedPlatform, { foreignKey: "platformId" });
 
 const startServer = async () => {
   try {

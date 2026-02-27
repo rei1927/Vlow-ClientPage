@@ -1,8 +1,11 @@
+import { Op, fn, col, literal } from "sequelize";
 import ConnectedPlatform from "../models/ConnectedPlatform.js";
+import MetaMessage from "../models/MetaMessage.js";
 import Agent from "../models/Agent.js";
 import ChatHandover from "../models/ChatHandover.js";
 import AppError from "../utils/AppError.js";
 import * as wahaService from "../services/wahaService.js";
+import * as metaService from "../services/metaService.js";
 
 // Helper: swap WA labels for dashboard reply
 const swapLabelsForDashboard = async (sessionId, chatId, handoverConfig) => {
@@ -94,11 +97,51 @@ export const getChats = async (req, res, next) => {
         const { platformId } = req.params;
         const platform = await getValidPlatform(platformId, req.user.id);
 
-        // Meta Cloud API platforms don't use WAHA for chat history
+        // Meta Cloud API: query messages DB grouped by chatId
         if (platform.provider === 'meta_cloud') {
+            // Get distinct chatIds with their latest message
+            const chatGroups = await MetaMessage.findAll({
+                where: { platformId: platform.id },
+                attributes: [
+                    'chatId',
+                    [fn('MAX', col('timestamp')), 'lastTimestamp'],
+                    [fn('MAX', col('contactName')), 'contactName'],
+                ],
+                group: ['chatId'],
+                order: [[fn('MAX', col('timestamp')), 'DESC']],
+                raw: true,
+            });
+
+            // For each chat, get the latest message
+            const chats = await Promise.all(chatGroups.map(async (group) => {
+                const lastMsg = await MetaMessage.findOne({
+                    where: { platformId: platform.id, chatId: group.chatId },
+                    order: [['timestamp', 'DESC']],
+                    raw: true,
+                });
+
+                // Count unread (received messages not read)
+                const unreadCount = await MetaMessage.count({
+                    where: {
+                        platformId: platform.id,
+                        chatId: group.chatId,
+                        fromMe: false,
+                        status: { [Op.ne]: 'read' },
+                    },
+                });
+
+                return {
+                    id: group.chatId,
+                    name: group.contactName || group.chatId.replace('@s.whatsapp.net', ''),
+                    timestamp: group.lastTimestamp,
+                    unreadCount,
+                    lastMessage: lastMsg ? { body: lastMsg.body } : null,
+                };
+            }));
+
             return res.status(200).json({
                 success: true,
-                data: [],
+                data: chats,
             });
         }
 
@@ -122,6 +165,33 @@ export const getMessages = async (req, res, next) => {
         const platform = await getValidPlatform(platformId, req.user.id);
 
         const limit = Number(req.query.limit) || 50;
+
+        // Meta Cloud API: query from DB
+        if (platform.provider === 'meta_cloud') {
+            const messages = await MetaMessage.findAll({
+                where: { platformId: platform.id, chatId },
+                order: [['timestamp', 'DESC']],
+                limit,
+                raw: true,
+            });
+
+            // Map to WAHA-compatible format for the frontend
+            const formatted = messages.map(msg => ({
+                id: msg.waMessageId || msg.id,
+                fromMe: msg.fromMe,
+                body: msg.body,
+                type: msg.type,
+                timestamp: msg.timestamp,
+                status: msg.status,
+                ack: msg.status === 'read' ? 3 : msg.status === 'delivered' ? 2 : 1,
+            }));
+
+            return res.status(200).json({
+                success: true,
+                data: formatted, // newest first, frontend will .reverse()
+            });
+        }
+
         const messages = await wahaService.getMessages(platform.sessionId, chatId, limit);
 
         res.status(200).json({
@@ -147,7 +217,32 @@ export const sendMessage = async (req, res, next) => {
 
         const platform = await getValidPlatform(platformId, req.user.id);
 
-        const result = await wahaService.sendTextMessage(platform.sessionId, chatId, text);
+        let result;
+
+        // Meta Cloud API: send via Graph API
+        if (platform.provider === 'meta_cloud') {
+            result = await metaService.sendCloudMessage(
+                platform.phoneNumberId,
+                platform.systemUserAccessToken,
+                chatId,
+                text
+            );
+
+            // Store outgoing message in DB
+            const waMessageId = result?.messages?.[0]?.id || null;
+            await MetaMessage.create({
+                platformId: platform.id,
+                waMessageId,
+                chatId,
+                fromMe: true,
+                body: text,
+                type: "text",
+                timestamp: Math.floor(Date.now() / 1000),
+                status: "sent",
+            });
+        } else {
+            result = await wahaService.sendTextMessage(platform.sessionId, chatId, text);
+        }
 
         // Auto-activate handover + label when admin sends from dashboard
         try {

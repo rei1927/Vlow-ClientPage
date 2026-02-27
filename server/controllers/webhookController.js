@@ -1,4 +1,5 @@
 import ConnectedPlatform from "../models/ConnectedPlatform.js";
+import MetaMessage from "../models/MetaMessage.js";
 import User from "../models/User.js";
 import axios from "axios";
 
@@ -40,32 +41,104 @@ export const receiveMetaWebhook = async (req, res) => {
             for (const ent of entry) {
                 if (ent.changes && ent.changes.length > 0) {
                     for (const change of ent.changes) {
+                        if (!change.value) continue;
 
-                        // Kita fokus pada 'messages' atau 'statuses'
-                        if (change.value && (change.value.messages || change.value.statuses)) {
-                            const phoneNumberId = change.value.metadata.phone_number_id;
+                        const phoneNumberId = change.value.metadata?.phone_number_id;
 
-                            // Identifikasi milik siapa pesan ini berdasarkan Phone Number ID Meta
-                            const platform = await ConnectedPlatform.findOne({
-                                where: {
-                                    phoneNumberId: phoneNumberId,
-                                    provider: "meta_cloud",
-                                    status: "WORKING"
-                                },
-                                include: [{ model: User, attributes: ["n8nWebhookUrl"] }]
-                            });
+                        // Identifikasi milik siapa pesan ini berdasarkan Phone Number ID Meta
+                        const platform = await ConnectedPlatform.findOne({
+                            where: {
+                                phoneNumberId: phoneNumberId,
+                                provider: "meta_cloud",
+                                status: "WORKING"
+                            },
+                            include: [{ model: User, attributes: ["n8nWebhookUrl"] }]
+                        });
 
-                            // Jika Client/User ini sudah mensetup n8n Webhook URL...
-                            if (platform && platform.User && platform.User.n8nWebhookUrl) {
-                                // ...Teruskan Mentah-Mentah (Forward) ke n8n mereka!
-                                try {
-                                    await axios.post(platform.User.n8nWebhookUrl, req.body, {
-                                        headers: { "Content-Type": "application/json" }
-                                    });
-                                    console.log(`[Webhook] Forwarded Meta event to n8n for User: ${platform.User.id}`);
-                                } catch (err) {
-                                    console.error(`[Webhook] Failed to forward to n8n:`, err?.response?.data || err.message);
+                        if (!platform) continue;
+
+                        // --- Store incoming messages ---
+                        if (change.value.messages && change.value.messages.length > 0) {
+                            const contacts = change.value.contacts || [];
+
+                            for (const msg of change.value.messages) {
+                                const contact = contacts.find(c => c.wa_id === msg.from) || {};
+
+                                // Extract message body based on type
+                                let body = "";
+                                switch (msg.type) {
+                                    case "text":
+                                        body = msg.text?.body || "";
+                                        break;
+                                    case "image":
+                                        body = msg.image?.caption || "📷 Gambar";
+                                        break;
+                                    case "video":
+                                        body = msg.video?.caption || "🎥 Video";
+                                        break;
+                                    case "audio":
+                                        body = "🎵 Pesan Suara";
+                                        break;
+                                    case "document":
+                                        body = msg.document?.filename || "📄 Dokumen";
+                                        break;
+                                    case "sticker":
+                                        body = "🌟 Stiker";
+                                        break;
+                                    case "location":
+                                        body = `📍 Lokasi: ${msg.location?.latitude}, ${msg.location?.longitude}`;
+                                        break;
+                                    case "contacts":
+                                        body = "👤 Kontak";
+                                        break;
+                                    case "reaction":
+                                        body = msg.reaction?.emoji || "👍";
+                                        break;
+                                    default:
+                                        body = `(${msg.type})`;
                                 }
+
+                                try {
+                                    await MetaMessage.findOrCreate({
+                                        where: { waMessageId: msg.id },
+                                        defaults: {
+                                            platformId: platform.id,
+                                            chatId: msg.from,
+                                            contactName: contact.profile?.name || null,
+                                            fromMe: false,
+                                            body: body,
+                                            type: msg.type || "text",
+                                            timestamp: parseInt(msg.timestamp) || Math.floor(Date.now() / 1000),
+                                            status: "received",
+                                        }
+                                    });
+                                } catch (dbErr) {
+                                    console.error("[Webhook] DB save error:", dbErr.message);
+                                }
+                            }
+                        }
+
+                        // --- Update message statuses (delivered, read) ---
+                        if (change.value.statuses && change.value.statuses.length > 0) {
+                            for (const status of change.value.statuses) {
+                                try {
+                                    await MetaMessage.update(
+                                        { status: status.status },
+                                        { where: { waMessageId: status.id, platformId: platform.id } }
+                                    );
+                                } catch (e) { /* ignore status update failures */ }
+                            }
+                        }
+
+                        // --- Forward to n8n (existing behavior) ---
+                        if (platform.User && platform.User.n8nWebhookUrl) {
+                            try {
+                                await axios.post(platform.User.n8nWebhookUrl, req.body, {
+                                    headers: { "Content-Type": "application/json" }
+                                });
+                                console.log(`[Webhook] Forwarded Meta event to n8n for platform: ${platform.id}`);
+                            } catch (err) {
+                                console.error(`[Webhook] Failed to forward to n8n:`, err?.response?.data || err.message);
                             }
                         }
                     }
