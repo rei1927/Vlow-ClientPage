@@ -49,6 +49,15 @@ export const getChatMeta = async (req, res, next) => {
         const { platformId } = req.params;
         const platform = await getValidPlatform(platformId, req.user.id);
 
+        // Meta Cloud API platforms don't use WAHA
+        if (platform.provider === 'meta_cloud') {
+            return res.status(200).json({
+                success: true,
+                isBusiness: true,
+                labels: []
+            });
+        }
+
         const me = await wahaService.getMe(platform.sessionId);
         let isBusiness = me?.isBusiness || false;
 
@@ -84,6 +93,14 @@ export const getChats = async (req, res, next) => {
     try {
         const { platformId } = req.params;
         const platform = await getValidPlatform(platformId, req.user.id);
+
+        // Meta Cloud API platforms don't use WAHA for chat history
+        if (platform.provider === 'meta_cloud') {
+            return res.status(200).json({
+                success: true,
+                data: [],
+            });
+        }
 
         const chats = await wahaService.getChats(platform.sessionId);
 
