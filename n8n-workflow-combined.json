@@ -2486,6 +2486,36 @@
       "id": "save-ai-reply-text",
       "name": "Save AI Reply",
       "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/webhooks/n8n/outgoing-message",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"phoneNumberId\": \"{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"body\": \"📷 Gambar Produk\",\n  \"waMessageId\": \"{{ $json.messages ? $json.messages[0].id : 'n8n_img_' + Date.now() }}\",\n  \"type\": \"image\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        57552,
+        9300
+      ],
+      "id": "save-ai-image-reply",
+      "name": "Save AI Image Reply",
+      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
@@ -3529,6 +3559,11 @@
         [
           {
             "node": "Meta Log Conversation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save AI Image Reply",
             "type": "main",
             "index": 0
           }
