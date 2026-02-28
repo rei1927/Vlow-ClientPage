@@ -2171,7 +2171,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.facebook.com/v22.0/{{ $('Meta Set Prod Mode').item.json.phoneNumberId }}/messages",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -2232,7 +2232,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.facebook.com/v22.0/{{ $('Meta Set Prod Mode').item.json.phoneNumberId }}/messages",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -2340,7 +2340,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.facebook.com/v22.0/{{ $('Meta Set Prod Mode').item.json.phoneNumberId }}/messages",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
