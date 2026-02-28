@@ -455,31 +455,39 @@ export const proxyMinioImage = async (req, res, next) => {
     const { url } = req.query;
     if (!url) return res.status(400).send("Missing url parameter");
 
-    // Extract the object path from the public MinIO URL
-    // e.g. "https://minio.dayamedialangit.co.id/vlow-client/knowledge/xxx.jpeg" -> "knowledge/xxx.jpeg"
-    // Handle cases where the bucket name might be different
-    let internalUrl = url;
+    // Extract bucket and object path from the public MinIO URL
+    // e.g. "https://minio.dayamedialangit.co.id/vlow-client/knowledge/xxx.jpeg"
+    //   -> bucket: "vlow-client", objectName: "knowledge/xxx.jpeg"
+    let targetBucket = bucketName; // default from env
+    let objectName = null;
+
     if (url.includes('minio.dayamedialangit.co.id')) {
-      const pathPart = url.split('minio.dayamedialangit.co.id/')[1]; // -> vlow-client/knowledge/xxx.jpeg
+      const pathPart = url.split('minio.dayamedialangit.co.id/')[1];
       if (pathPart) {
-        // Use MinIO internal docker DNS 'minio:9000'
-        internalUrl = `http://minio:9000/${pathPart}`;
+        const slashIdx = pathPart.indexOf('/');
+        if (slashIdx > 0) {
+          targetBucket = pathPart.substring(0, slashIdx);
+          objectName = pathPart.substring(slashIdx + 1);
+        }
       }
     }
 
-    const fetch = (await import('node-fetch')).default;
-    const response = await fetch(internalUrl);
-
-    if (!response.ok) {
-      return res.status(response.status).send(`Failed to fetch image: ${response.statusText}`);
+    if (!objectName) {
+      return res.status(400).send("Could not parse object path from URL");
     }
 
-    // Set correct headers
-    res.setHeader('Content-Type', response.headers.get('content-type') || 'image/jpeg');
-    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+    // Guess content type from extension
+    const ext = objectName.split('.').pop()?.toLowerCase();
+    const mimeMap = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp', pdf: 'application/pdf' };
+    const contentType = mimeMap[ext] || 'application/octet-stream';
 
-    // Pipe the stream directly back to the client
-    response.body.pipe(res);
+    // Use the already-configured minioClient SDK (correct endpoint, SSL, credentials)
+    const stream = await minioClient.getObject(targetBucket, objectName);
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+
+    stream.pipe(res);
 
   } catch (error) {
     console.error("Proxy Image Error:", error.message);
