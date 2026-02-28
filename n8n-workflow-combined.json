@@ -2207,11 +2207,11 @@
           "conditions": [
             {
               "id": "meta-img-check",
-              "leftValue": "={{ $json.welcome_image_url || '' }}",
+              "leftValue": "={{ $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : '' }}",
               "rightValue": "",
               "operator": {
                 "type": "string",
-                "operation": "exists",
+                "operation": "isNotEmpty",
                 "singleValue": true
               }
             }
@@ -2244,7 +2244,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"{{ $json.welcome_image_url || '' }}\"\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"{{ $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : '' }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -2593,7 +2593,7 @@
       "main": [
         [
           {
-            "node": "Check If Image Exists",
+            "node": "Which Platform?",
             "type": "main",
             "index": 0
           }
@@ -2710,7 +2710,7 @@
       "main": [
         [
           {
-            "node": "Which Platform?",
+            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
@@ -3334,14 +3334,14 @@
         ],
         [
           {
-            "node": "IF ESCALATE",
+            "node": "Check If Image Exists",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "IF ESCALATE",
+            "node": "Check If Image Exists",
             "type": "main",
             "index": 0
           }
