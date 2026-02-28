@@ -2125,7 +2125,7 @@
           "conditions": [
             {
               "id": "meta-esc-check",
-              "leftValue": "={{ $node[\"Code in JavaScript\"].json[\"escalate\"] }}",
+              "leftValue": "={{ $json.escalate || false }}",
               "rightValue": "",
               "operator": {
                 "type": "boolean",
@@ -2183,7 +2183,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": {{ JSON.stringify($node[\"Code in JavaScript\"].json[\"text_for_wa\"] || '') }}\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": {{ JSON.stringify($json.text_for_wa || $json.output || '') }}\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -2207,7 +2207,7 @@
           "conditions": [
             {
               "id": "meta-img-check",
-              "leftValue": "={{ $node[\"Code in JavaScript\"].json[\"welcome_image_url\"] }}",
+              "leftValue": "={{ $json.welcome_image_url || '' }}",
               "rightValue": "",
               "operator": {
                 "type": "string",
@@ -2244,7 +2244,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"{{ $node[\"Code in JavaScript\"].json[\"welcome_image_url\"] }}\"\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"{{ $json.welcome_image_url || '' }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -2262,7 +2262,7 @@
         "url": "https://api.vlow-ai.com/api/analytics/log",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"agentId\": \"{{ $('Execute a SQL query').isExecuted ? $('Execute a SQL query').first().json.agent_id : '' }}\",\n  \"sessionId\": \"{{ $('Meta Set Prod Mode').item.json.metaSessionId }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('Meta Set Prod Mode').item.json.message || '') }},\n  \"aiResponse\": {{ JSON.stringify($node[\"Code in JavaScript\"].json[\"text_for_wa\"] || '') }},\n  \"isHandoff\": \"{{ $node[\"Code in JavaScript\"].json[\"escalate\"] || false }}\",\n  \"mode\": \"production\"\n}",
+        "jsonBody": "={\n  \"agentId\": \"{{ $('Execute a SQL query').isExecuted ? $('Execute a SQL query').first().json.agent_id : '' }}\",\n  \"sessionId\": \"{{ $('Meta Set Prod Mode').item.json.metaSessionId }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('Meta Set Prod Mode').item.json.message || '') }},\n  \"aiResponse\": {{ JSON.stringify($json.text_for_wa || $json.output || '') }},\n  \"isHandoff\": \"{{ $json.escalate || false }}\",\n  \"mode\": \"production\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
