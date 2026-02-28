@@ -1839,7 +1839,7 @@
     },
     {
       "parameters": {
-        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url ? $('Code in JavaScript').item.json.waha_image_url.replace('https://minio.dayamedialangit.co.id', 'http://172.17.0.6:9000') : '' }}",
         "options": {
           "response": {
             "response": {
@@ -1873,7 +1873,7 @@
     },
     {
       "parameters": {
-        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url ? $('Code in JavaScript').item.json.waha_image_url.replace('https://minio.dayamedialangit.co.id', 'http://172.17.0.6:9000') : '' }}",
         "options": {
           "response": {
             "response": {
@@ -1907,7 +1907,7 @@
     },
     {
       "parameters": {
-        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "url": "={{ $('Code in JavaScript').item.json.waha_image_url ? $('Code in JavaScript').item.json.waha_image_url.replace('https://minio.dayamedialangit.co.id', 'http://172.17.0.6:9000') : '' }}",
         "options": {
           "response": {
             "response": {
