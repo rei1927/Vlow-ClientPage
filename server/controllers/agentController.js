@@ -232,7 +232,18 @@ export const getAgentById = async (req, res, next) => {
     if (agentData.KnowledgeSources) {
       agentData.KnowledgeSources = agentData.KnowledgeSources.map(ks => {
         if (ks.fileUrl && ks.fileUrl.includes('minio.dayamedialangit.co.id')) {
-          ks.fileUrl = `/api/agents/knowledge/proxy-image?url=${encodeURIComponent(ks.fileUrl)}`;
+          // Extract bucket and object path from URL
+          // e.g. https://minio.dayamedialangit.co.id/vlow-client/knowledge/xxx.jpeg
+          const pathPart = ks.fileUrl.split('minio.dayamedialangit.co.id/')[1];
+          if (pathPart) {
+            const slashIdx = pathPart.indexOf('/');
+            if (slashIdx > 0) {
+              const bucket = pathPart.substring(0, slashIdx);
+              const object = pathPart.substring(slashIdx + 1);
+              // Use bucket+object format so domain doesn't appear in URL (avoids double-proxy)
+              ks.fileUrl = `/api/agents/knowledge/proxy-image?bucket=${encodeURIComponent(bucket)}&object=${encodeURIComponent(object)}`;
+            }
+          }
         }
         return ks;
       });
@@ -463,27 +474,29 @@ export const deleteKnowledge = async (req, res, next) => {
 // @route   GET /api/agents/knowledge/proxy-image
 export const proxyMinioImage = async (req, res, next) => {
   try {
-    const { url } = req.query;
-    if (!url) return res.status(400).send("Missing url parameter");
+    const { url, bucket, object } = req.query;
 
-    // Extract bucket and object path from the public MinIO URL
-    // e.g. "https://minio.dayamedialangit.co.id/vlow-client/knowledge/xxx.jpeg"
-    //   -> bucket: "vlow-client", objectName: "knowledge/xxx.jpeg"
-    let targetBucket = bucketName; // default from env
-    let objectName = null;
+    let targetBucket, objectName;
 
-    if (url.includes('minio.dayamedialangit.co.id')) {
-      const pathPart = url.split('minio.dayamedialangit.co.id/')[1];
-      if (pathPart) {
-        const slashIdx = pathPart.indexOf('/');
-        if (slashIdx > 0) {
-          targetBucket = pathPart.substring(0, slashIdx);
-          objectName = pathPart.substring(slashIdx + 1);
+    if (bucket && object) {
+      // New format: ?bucket=vlow-client&object=knowledge/xxx.jpeg
+      targetBucket = bucket;
+      objectName = object;
+    } else if (url) {
+      // Legacy format: ?url=https://minio.dayamedialangit.co.id/vlow-client/knowledge/xxx.jpeg
+      if (url.includes('minio.dayamedialangit.co.id')) {
+        const pathPart = url.split('minio.dayamedialangit.co.id/')[1];
+        if (pathPart) {
+          const slashIdx = pathPart.indexOf('/');
+          if (slashIdx > 0) {
+            targetBucket = pathPart.substring(0, slashIdx);
+            objectName = pathPart.substring(slashIdx + 1);
+          }
         }
       }
     }
 
-    if (!objectName) {
+    if (!targetBucket || !objectName) {
       return res.status(400).send("Could not parse object path from URL");
     }
 
