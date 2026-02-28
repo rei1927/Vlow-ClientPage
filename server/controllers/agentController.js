@@ -227,7 +227,18 @@ export const getAgentById = async (req, res, next) => {
 
     if (!agent) return next(new AppError("Agent tidak ditemukan.", 404));
 
-    res.status(200).json({ success: true, data: agent });
+    // Rewrite MinIO fileUrls to proxy URLs so frontend can render them
+    const agentData = agent.toJSON();
+    if (agentData.KnowledgeSources) {
+      agentData.KnowledgeSources = agentData.KnowledgeSources.map(ks => {
+        if (ks.fileUrl && ks.fileUrl.includes('minio.dayamedialangit.co.id')) {
+          ks.fileUrl = `/api/agents/knowledge/proxy-image?url=${encodeURIComponent(ks.fileUrl)}`;
+        }
+        return ks;
+      });
+    }
+
+    res.status(200).json({ success: true, data: agentData });
   } catch (error) {
     next(error);
   }
