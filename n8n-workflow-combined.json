@@ -2231,6 +2231,67 @@
     },
     {
       "parameters": {
+        "method": "GET",
+        "url": "={{ $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : '' }}",
+        "sendBody": false,
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        57104,
+        9100
+      ],
+      "id": "meta-dl-image",
+      "name": "Meta DL Image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/media",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "messaging_product",
+              "value": "whatsapp"
+            },
+            {
+              "name": "file",
+              "parameterType": "formBinaryData",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        57328,
+        9100
+      ],
+      "id": "meta-upload-media",
+      "name": "Meta Upload Media"
+    },
+    {
+      "parameters": {
         "method": "POST",
         "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
         "sendHeaders": true,
@@ -2244,13 +2305,13 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"{{ $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : '' }}\"\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"id\": \"{{ $json.id || '' }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        57104,
+        57552,
         9100
       ],
       "id": "meta-send-image",
@@ -3392,7 +3453,7 @@
       "main": [
         [
           {
-            "node": "Meta Send Image",
+            "node": "Meta DL Image",
             "type": "main",
             "index": 0
           }
@@ -3400,6 +3461,28 @@
         [
           {
             "node": "Meta Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta DL Image": {
+      "main": [
+        [
+          {
+            "node": "Meta Upload Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Upload Media": {
+      "main": [
+        [
+          {
+            "node": "Meta Send Image",
             "type": "main",
             "index": 0
           }
