@@ -180,8 +180,20 @@ const KnowledgeTab = ({
   };
 
   // Render file preview thumbnail
-  const renderFilePreview = (fileUrl, fileName, fileType, isSmall = false) => {
-    if (!fileUrl) return null;
+  const renderFilePreview = (fileUrl, fileName, fileType, isSmall = false, description = "") => {
+    // Try to extract image from description if fileUrl is not available
+    let extractedUrl = fileUrl;
+    if (!extractedUrl && description) {
+      const urlMatch = description.match(/(https?:\/\/[^\s"'<>()]+(?:png|jpg|jpeg|gif|webp)[^\s"'<>()]*)/i) ||
+        description.match(/<img[^>]+src=["']([^"']+)["']/i);
+      if (urlMatch && urlMatch[1]) {
+        extractedUrl = urlMatch[1];
+      } else if (urlMatch && urlMatch[0]) {
+        extractedUrl = urlMatch[0];
+      }
+    }
+
+    if (!extractedUrl) return null;
 
     // Determine type safely
     let isImage = false;
@@ -195,10 +207,10 @@ const KnowledgeTab = ({
       const ext = fileName.split('.').pop()?.toLowerCase();
       isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(ext);
       isPdf = ext === "pdf";
-    } else if (fileUrl) {
+    } else if (extractedUrl) {
       // Last resort fallback using URL extension
-      const ext = fileUrl.split('?')[0].split('.').pop()?.toLowerCase();
-      isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(ext);
+      const ext = extractedUrl.split('?')[0].split('.').pop()?.toLowerCase();
+      isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(ext) || extractedUrl.includes('minio');
       isPdf = ext === "pdf";
     }
 
@@ -207,7 +219,7 @@ const KnowledgeTab = ({
     return (
       <div className={`${size} rounded-lg overflow-hidden border border-[var(--color-border)] bg-[var(--color-bg)] flex items-center justify-center flex-shrink-0`}>
         {isImage ? (
-          <img src={fileUrl} alt={fileName || "Knowledge Image"} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/150?text=Image+Error'; }} />
+          <img src={extractedUrl} alt={fileName || "Knowledge Image"} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/150?text=Image+Error'; }} />
         ) : isPdf ? (
           <FaFilePdf className="text-red-500" size={isSmall ? 20 : 28} />
         ) : (
@@ -215,6 +227,15 @@ const KnowledgeTab = ({
         )}
       </div>
     );
+  };
+
+  // Helper to extract URL for parent wrapper link
+  const getPreviewUrl = (fileUrl, description) => {
+    if (fileUrl) return fileUrl;
+    if (!description) return null;
+    const urlMatch = description.match(/(https?:\/\/[^\s"'<>()]+(?:png|jpg|jpeg|gif|webp)[^\s"'<>()]*)/i) ||
+      description.match(/<img[^>]+src=["']([^"']+)["']/i);
+    return urlMatch ? (urlMatch[1] || urlMatch[0]) : null;
   };
 
   // Current file display in form (either selected or existing)
@@ -425,9 +446,9 @@ const KnowledgeTab = ({
             >
               <div className="flex gap-4">
                 {/* File Thumbnail */}
-                {item.fileUrl && (
-                  <a href={item.fileUrl} target="_blank" rel="noopener noreferrer" title={item.fileName}>
-                    {renderFilePreview(item.fileUrl, item.fileName, item.fileType, false)}
+                {getPreviewUrl(item.fileUrl, item.description) && (
+                  <a href={getPreviewUrl(item.fileUrl, item.description)} target="_blank" rel="noopener noreferrer" title={item.fileName || "Embedded Image"}>
+                    {renderFilePreview(item.fileUrl, item.fileName, item.fileType, false, item.description)}
                   </a>
                 )}
 
