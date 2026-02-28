@@ -694,11 +694,11 @@ const ChatDashboard = () => {
                                                     {msg.type === 'image' && safeBody && (safeBody.startsWith('http') || safeBody.startsWith('/api/')) ? (
                                                         <div>
                                                             <img
-                                                                src={safeBody.startsWith('/api/') ? `${import.meta.env.VITE_API_URL || 'https://api.vlow-ai.com'}${safeBody}` : safeBody}
+                                                                src={safeBody}
                                                                 alt="📷 Gambar"
                                                                 className="rounded-lg max-w-[250px] max-h-[300px] object-cover cursor-pointer"
-                                                                onClick={() => window.open(safeBody.startsWith('/api/') ? `${import.meta.env.VITE_API_URL || 'https://api.vlow-ai.com'}${safeBody}` : safeBody, '_blank')}
-                                                                onError={(e) => { e.target.onerror = null; e.target.parentElement.innerHTML = '<p class="text-sm">📷 Gambar</p>'; }}
+                                                                onClick={() => window.open(safeBody, '_blank')}
+                                                                onError={(e) => { e.target.onerror = null; e.target.parentElement.innerHTML = '<p class="text-sm">📷 Gambar (gagal memuat)</p>'; }}
                                                             />
                                                         </div>
                                                     ) : (
