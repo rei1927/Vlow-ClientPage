@@ -605,8 +605,8 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "/simulator-chat",
-        "responseMode": "responseNode",
-        "options": {}
+        "options": {},
+        "responseMode": "lastNode"
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
@@ -1709,7 +1709,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const aiOutput = items[0].json.output || \"\";\nlet text = aiOutput;\nlet imageUrl = null;\n\n// Cek format markdown [nama](url.jpg)\nconst mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i;\nconst rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i;\n\nconst mdMatch = text.match(mdRegex);\nif (mdMatch) {\n    imageUrl = mdMatch[2];\n    text = text.replace(mdMatch[0], \"\").trim();\n} else {\n    const rawMatch = text.match(rawRegex);\n    if (rawMatch) {\n        imageUrl = rawMatch[1];\n        text = text.replace(rawMatch[0], \"\").trim();\n    }\n}\n\nreturn [{ json: { output: text, welcome_image_url: imageUrl, waha_image_url: imageUrl } }];\n"
+        "jsCode": "const aiOutput = items[0].json.output || \"\";\nlet text = aiOutput;\nlet imageUrl = null;\n\nconst mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i;\nconst rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i;\n\nconst mdMatch = text.match(mdRegex);\nif (mdMatch) {\n    imageUrl = mdMatch[2];\n    text = text.replace(mdMatch[0], \"\").trim();\n} else {\n    const rawMatch = text.match(rawRegex);\n    if (rawMatch) {\n        imageUrl = rawMatch[1];\n        text = text.replace(rawMatch[0], \"\").trim();\n    }\n}\n\nreturn [{ json: { output: text, welcome_image_url: imageUrl } }];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1836,21 +1836,6 @@
           "name": "WAHA account"
         }
       }
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "={\n\"output\": \"{{ $json.output }}\",\n\"welcome_image_url\": \"{{ $json.welcome_image_url }}\"\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.1,
-      "position": [
-        56000,
-        10500
-      ],
-      "id": "sim-respond-to-webhook",
-      "name": "Respond Webhook Simulator"
     },
     {
       "parameters": {
@@ -3141,17 +3126,6 @@
         [
           {
             "node": "If",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Process Sim Response": {
-      "main": [
-        [
-          {
-            "node": "Respond Webhook Simulator",
             "type": "main",
             "index": 0
           }
