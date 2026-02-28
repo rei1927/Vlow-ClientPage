@@ -2171,13 +2171,13 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Authorization",
-              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
             }
           ]
         },
@@ -2232,13 +2232,13 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Authorization",
-              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
             }
           ]
         },
@@ -2340,13 +2340,13 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Authorization",
-              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').item.json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
             }
           ]
         },
