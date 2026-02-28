@@ -62,9 +62,12 @@ const knowledgeUpload = multer({
 const router = express.Router();
 
 // ==========================================
-// 1. PUBLIC ROUTES (Integrasi n8n)
+// 1. PUBLIC ROUTES (Integrasi n8n & Proxy)
 // ==========================================
 router.get("/integration/config", getIntegrationConfig);
+
+// Proxy MinIO images to bypass UI rendering blocks
+router.get("/knowledge/proxy-image", proxyMinioImage);
 
 // ==========================================
 // 2. PROTECTED ROUTES (Dashboard User)
@@ -109,9 +112,6 @@ router
 router.post("/test-chat", testChatAgent);
 
 // --- KNOWLEDGE BASE ROUTES ---
-
-// Proxy MinIO images to bypass UI rendering blocks
-router.get("/knowledge/proxy-image", proxyMinioImage);
 
 // Add Knowledge (optional file: image or PDF)
 router.post("/:id/knowledge", validateAgentId, runValidation, knowledgeUpload.single("file"), addKnowledge);
