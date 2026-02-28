@@ -216,10 +216,15 @@ const KnowledgeTab = ({
 
     const size = isSmall ? "w-12 h-12" : "w-20 h-20";
 
+    // Setup Proxy URL
+    const proxyUrl = extractedUrl?.includes("dayamedialangit.co.id")
+      ? `${import.meta.env.VITE_API_URL || 'https://api.vlow-ai.com'}/api/agents/knowledge/proxy-image?url=${encodeURIComponent(extractedUrl)}`
+      : extractedUrl;
+
     return (
       <div className={`${size} rounded-lg overflow-hidden border border-[var(--color-border)] bg-[var(--color-bg)] flex items-center justify-center flex-shrink-0`}>
         {isImage ? (
-          <img src={extractedUrl} alt={fileName || "Knowledge Image"} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/150?text=Image+Error'; }} />
+          <img src={proxyUrl} alt={fileName || "Knowledge Image"} className="w-full h-full object-cover" onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/150?text=Image+Error'; }} />
         ) : isPdf ? (
           <FaFilePdf className="text-red-500" size={isSmall ? 20 : 28} />
         ) : (
@@ -231,11 +236,19 @@ const KnowledgeTab = ({
 
   // Helper to extract URL for parent wrapper link
   const getPreviewUrl = (fileUrl, description) => {
-    if (fileUrl) return fileUrl;
-    if (!description) return null;
-    const urlMatch = description.match(/(https?:\/\/[^\s"'<>()]+(?:png|jpg|jpeg|gif|webp)[^\s"'<>()]*)/i) ||
-      description.match(/<img[^>]+src=["']([^"']+)["']/i);
-    return urlMatch ? (urlMatch[1] || urlMatch[0]) : null;
+    let extractedUrl = fileUrl;
+    if (!extractedUrl && description) {
+      const urlMatch = description.match(/(https?:\/\/[^\s"'<>()]+(?:png|jpg|jpeg|gif|webp)[^\s"'<>()]*)/i) ||
+        description.match(/<img[^>]+src=["']([^"']+)["']/i);
+      extractedUrl = urlMatch ? (urlMatch[1] || urlMatch[0]) : null;
+    }
+
+    if (!extractedUrl) return null;
+
+    // Setup Proxy URL
+    return extractedUrl.includes("dayamedialangit.co.id")
+      ? `${import.meta.env.VITE_API_URL || 'https://api.vlow-ai.com'}/api/agents/knowledge/proxy-image?url=${encodeURIComponent(extractedUrl)}`
+      : extractedUrl;
   };
 
   // Current file display in form (either selected or existing)

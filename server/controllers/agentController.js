@@ -448,6 +448,45 @@ export const deleteKnowledge = async (req, res, next) => {
   }
 };
 
+// @desc    Proxy MinIO Image to bypass Cloudflare/NGINX HTML blocking
+// @route   GET /api/agents/knowledge/proxy-image
+export const proxyMinioImage = async (req, res, next) => {
+  try {
+    const { url } = req.query;
+    if (!url) return res.status(400).send("Missing url parameter");
+
+    // Extract the object path from the public MinIO URL
+    // e.g. "https://minio.dayamedialangit.co.id/vlow-client/knowledge/xxx.jpeg" -> "knowledge/xxx.jpeg"
+    // Handle cases where the bucket name might be different
+    let internalUrl = url;
+    if (url.includes('minio.dayamedialangit.co.id')) {
+      const pathPart = url.split('minio.dayamedialangit.co.id/')[1]; // -> vlow-client/knowledge/xxx.jpeg
+      if (pathPart) {
+        // Use MinIO internal docker DNS 'minio:9000'
+        internalUrl = `http://minio:9000/${pathPart}`;
+      }
+    }
+
+    const fetch = (await import('node-fetch')).default;
+    const response = await fetch(internalUrl);
+
+    if (!response.ok) {
+      return res.status(response.status).send(`Failed to fetch image: ${response.statusText}`);
+    }
+
+    // Set correct headers
+    res.setHeader('Content-Type', response.headers.get('content-type') || 'image/jpeg');
+    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+
+    // Pipe the stream directly back to the client
+    response.body.pipe(res);
+
+  } catch (error) {
+    console.error("Proxy Image Error:", error.message);
+    res.status(500).send("Internal Server Error proxying image.");
+  }
+};
+
 // @desc    Delete Agent
 // @route   DELETE /api/agents/:id
 export const deleteAgent = async (req, res, next) => {

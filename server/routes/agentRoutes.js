@@ -13,6 +13,7 @@ import {
   getIntegrationConfig,
   updateKnowledge,
   testChatAgent, // Controller Baru (n8n)
+  proxyMinioImage,
 } from "../controllers/agentController.js";
 import { getAgentAnalytics } from "../controllers/analyticsController.js";
 
@@ -108,6 +109,10 @@ router
 router.post("/test-chat", testChatAgent);
 
 // --- KNOWLEDGE BASE ROUTES ---
+
+// Proxy MinIO images to bypass UI rendering blocks
+router.get("/knowledge/proxy-image", proxyMinioImage);
+
 // Add Knowledge (optional file: image or PDF)
 router.post("/:id/knowledge", validateAgentId, runValidation, knowledgeUpload.single("file"), addKnowledge);
 
