@@ -2502,7 +2502,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"phoneNumberId\": \"{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"body\": \"📷 Gambar Produk\",\n  \"waMessageId\": \"{{ $json.messages ? $json.messages[0].id : 'n8n_img_' + Date.now() }}\",\n  \"type\": \"image\"\n}",
+        "jsonBody": "={\n  \"phoneNumberId\": \"{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"body\": \"{{ (() => { const img = $('Code in JavaScript').first().json.welcome_image_url; if (!img) return '📷 Gambar Produk'; const parts = img.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return '/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}\",\n  \"waMessageId\": \"{{ $json.messages ? $json.messages[0].id : 'n8n_img_' + Date.now() }}\",\n  \"type\": \"image\"\n}",
         "options": {
           "timeout": 10000
         }

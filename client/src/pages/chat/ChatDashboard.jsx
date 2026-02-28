@@ -691,7 +691,19 @@ const ChatDashboard = () => {
                                             <div className={`flex relative z-10 ${isMe ? 'justify-end' : 'justify-start'}`}>
                                                 <div className={`max-w-[85%] md:max-w-[75%] rounded-lg p-3 shadow-sm relative ${isMe ? 'bg-[#d9fdd3] dark:bg-[#005c4b] text-[#111b21] dark:text-[#e9edef] rounded-tr-none' : 'bg-white dark:bg-[#202c33] text-[#111b21] dark:text-[#e9edef] rounded-tl-none'}`}>
 
-                                                    <p className="text-sm whitespace-pre-wrap">{safeBody || (msg.hasMedia && "(Pilih Media)") || ""}</p>
+                                                    {msg.type === 'image' && safeBody && (safeBody.startsWith('http') || safeBody.startsWith('/api/')) ? (
+                                                        <div>
+                                                            <img
+                                                                src={safeBody.startsWith('/api/') ? `${import.meta.env.VITE_API_URL || 'https://api.vlow-ai.com'}${safeBody}` : safeBody}
+                                                                alt="📷 Gambar"
+                                                                className="rounded-lg max-w-[250px] max-h-[300px] object-cover cursor-pointer"
+                                                                onClick={() => window.open(safeBody.startsWith('/api/') ? `${import.meta.env.VITE_API_URL || 'https://api.vlow-ai.com'}${safeBody}` : safeBody, '_blank')}
+                                                                onError={(e) => { e.target.onerror = null; e.target.parentElement.innerHTML = '<p class="text-sm">📷 Gambar</p>'; }}
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-sm whitespace-pre-wrap">{safeBody || (msg.hasMedia && "(Pilih Media)") || ""}</p>
+                                                    )}
 
                                                     <div className="flex justify-end items-center gap-1 mt-1">
                                                         <span className="text-[10px] opacity-70">{formatTime(msg.timestamp)}</span>
