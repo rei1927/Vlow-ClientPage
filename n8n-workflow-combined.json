@@ -2472,7 +2472,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"phoneNumberId\": \"{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"body\": {{ JSON.stringify($('Meta Send Text').first().json.messages ? ($json.text_for_wa || $json.output || '') : '') }},\n  \"waMessageId\": \"{{ $('Meta Send Text').first().json.messages ? $('Meta Send Text').first().json.messages[0].id : '' }}\",\n  \"type\": \"text\"\n}",
+        "jsonBody": "={\n  \"phoneNumberId\": \"{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"body\": {{ JSON.stringify($('Code in JavaScript').first().json.text_for_wa || $('Code in JavaScript').first().json.output || 'AI Reply') }},\n  \"waMessageId\": \"{{ $json.messages ? $json.messages[0].id : 'n8n_' + Date.now() }}\",\n  \"type\": \"text\"\n}",
         "options": {
           "timeout": 10000
         }
