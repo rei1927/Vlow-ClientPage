@@ -66,9 +66,6 @@ const router = express.Router();
 // ==========================================
 router.get("/integration/config", getIntegrationConfig);
 
-// Proxy MinIO images to bypass UI rendering blocks
-router.get("/knowledge/proxy-image", proxyMinioImage);
-
 // ==========================================
 // 2. PROTECTED ROUTES (Dashboard User)
 // ==========================================

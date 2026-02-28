@@ -20,6 +20,7 @@ import analyticsRoutes from "./routes/analyticsRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import webhookRoutes from "./routes/webhookRoutes.js";
 import handoverRoutes from "./routes/handoverRoutes.js";
+import { proxyMinioImage } from "./controllers/agentController.js";
 
 // Models
 import User from "./models/User.js";
@@ -64,6 +65,9 @@ app.get("/", (req, res) => {
 });
 
 // --- Routes ---
+// Proxy route for images (public)
+app.get("/api/agents/knowledge/proxy-image", proxyMinioImage);
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/agents", agentRoutes);
