@@ -2202,17 +2202,15 @@
             "caseSensitive": true,
             "leftValue": "",
             "typeValidation": "strict",
-            "version": 3
+            "version": 2
           },
           "conditions": [
             {
               "id": "meta-img-check",
               "leftValue": "={{ $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : '' }}",
-              "rightValue": "",
               "operator": {
                 "type": "string",
-                "operation": "isNotEmpty",
-                "singleValue": true
+                "operation": "isNotEmpty"
               }
             }
           ],
