@@ -184,3 +184,58 @@ export const receiveN8nWebhook = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error processing n8n webhook" });
     }
 };
+
+// @desc    Save outgoing AI message to MetaMessage DB so it appears in dashboard chat
+// @route   POST /api/webhooks/n8n/outgoing-message
+// @access  Public (called by n8n after sending AI reply)
+export const receiveN8nOutgoingMessage = async (req, res) => {
+    try {
+        const { phoneNumberId, chatId, body, waMessageId, type } = req.body;
+
+        console.log(`📤 [n8n Outgoing] Saving AI reply for chat ${chatId}: "${body?.substring(0, 80)}..."`);
+
+        if (!phoneNumberId || !chatId || !body) {
+            return res.status(400).json({
+                success: false,
+                message: "Missing required fields: phoneNumberId, chatId, body"
+            });
+        }
+
+        // Find the platform by phoneNumberId
+        const platform = await ConnectedPlatform.findOne({
+            where: {
+                phoneNumberId: phoneNumberId,
+                provider: "meta_cloud",
+                status: "WORKING"
+            }
+        });
+
+        if (!platform) {
+            console.error("[n8n Outgoing] ⚠️ No platform found for phoneNumberId:", phoneNumberId);
+            return res.status(404).json({ success: false, message: "Platform not found" });
+        }
+
+        // Save the outgoing AI message
+        await MetaMessage.create({
+            platformId: platform.id,
+            waMessageId: waMessageId || `n8n_${Date.now()}`,
+            chatId: chatId,
+            fromMe: true,
+            body: body,
+            type: type || "text",
+            timestamp: Math.floor(Date.now() / 1000),
+            status: "sent",
+        });
+
+        console.log(`✅ [n8n Outgoing] AI message saved for chat ${chatId}`);
+
+        return res.status(200).json({
+            success: true,
+            message: "Outgoing message saved successfully"
+        });
+
+    } catch (error) {
+        console.error("❌ [n8n Outgoing] Error:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
