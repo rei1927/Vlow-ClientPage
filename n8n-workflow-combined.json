@@ -2232,7 +2232,7 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "={{ $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : '' }}",
+        "url": "={{ $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '').replace('https://minio.dayamedialangit.co.id', 'http://172.17.0.6:9000') : '' }}",
         "sendBody": false,
         "options": {
           "response": {
