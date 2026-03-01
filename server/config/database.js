@@ -8,16 +8,20 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
   host: process.env.DB_HOST,
   dialect: "postgres", // Explicitly set for production
   logging: (msg) => logger.debug(msg),
-  dialectOptions: process.env.DB_SSL === "true" ? {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false
-    }
-  } : {},
+  dialectOptions: {
+    ...(process.env.DB_SSL === "true" ? {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    } : {}),
+    statement_timeout: 120000, // 120 seconds for sync/alter queries
+    query_timeout: 120000,
+  },
   pool: {
     max: 5,
     min: 0,
-    acquire: 30000,
+    acquire: 60000,
     idle: 10000,
   },
 });
