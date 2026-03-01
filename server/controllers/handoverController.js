@@ -207,6 +207,32 @@ export const getHandoverStatus = async (req, res, next) => {
     }
 };
 
+// @desc    Get batch handover statuses for all chats in a session
+// @route   GET /api/handover/batch-status
+// @access  Private
+export const getBatchHandoverStatus = async (req, res, next) => {
+    try {
+        const { sessionId } = req.query;
+
+        if (!sessionId) {
+            return res.status(400).json({ statuses: {} });
+        }
+
+        const handovers = await ChatHandover.findAll({
+            where: { sessionId, status: "human" },
+        });
+
+        const statuses = {};
+        for (const h of handovers) {
+            statuses[h.chatId] = "human";
+        }
+
+        res.status(200).json({ statuses });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // @desc    Check if incoming message matches handover keywords
 // @route   POST /api/handover/check-keyword
 // @access  Public (called by n8n)

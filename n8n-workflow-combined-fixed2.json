@@ -540,7 +540,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const aiOutput = items[0].json.output;\nconst agentData = $('AI Agent2').item.json;\nlet finalMessageForUser = aiOutput;\nlet welcomeImageUrl = null;\nlet bookingData = { booking: false, escalate: false };\nlet promptTokens = agentData?.response_metadata?.tokenUsage?.promptTokens || agentData?.usage_metadata?.prompt_token_count || 0;\nlet completionTokens = agentData?.response_metadata?.tokenUsage?.completionTokens || agentData?.usage_metadata?.candidates_token_count || 0;\n\nif (promptTokens === 0 || completionTokens === 0) {\n    const ctx = $('Finalize Context').first().json;\n    const userMessage = ($('Set Prod Mode').isExecuted ? $('Set Prod Mode').first().json.message : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').first().json.message : \"\"));\n    const fullInputText = (ctx.finalSystemPrompt || \"\") + (ctx.finalKnowledge || \"\") + userMessage;\n    promptTokens = Math.ceil(fullInputText.length / 4);\n    completionTokens = Math.ceil((aiOutput || \"\").length / 4);\n}\nlet totalTokens = promptTokens + completionTokens;\n\ntry {\n    if (!aiOutput) throw new Error(\"Output kosong\");\n\n    // 1. Tangkap output JSON Booking/Escalate jika ada\n    const jsonMatch = aiOutput.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n        let jsonString = jsonMatch[0];\n        jsonString = jsonString.replace(/^json\\s*/i, \"\").replace(/$/i, \"\");\n        jsonString = jsonString.replace(/\\\\(?![\"\\\\bfnrtu])/g, \"\\\\\\\\\");\n        const parsed = JSON.parse(jsonString);\n        if (parsed.booking && String(parsed.booking).toLowerCase() === 'true') {\n            bookingData.booking = true;\n            bookingData.topic = parsed.topic;\n            bookingData.clientEmail = parsed.clientEmail;\n            let time = parsed.startTime ? parsed.startTime.replace(' ', 'T') : '';\n            if (time && time.split(':').length === 2) { time = time.includes('+') ? time.split('+')[0] + ':00+' + time.split('+')[1] : time + ':00'; }\n            if (time && !time.includes('+') && !time.endsWith('Z')) time += '+07:00';\n            bookingData.startTime = time;\n        }\n        if (parsed.escalate && String(parsed.escalate).toLowerCase() === 'true') { bookingData.escalate = true; }\n        \n        finalMessageForUser = aiOutput.replace(/json[\\s\\S]*/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/\\{[\\s\\S]*\\}/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/`/g, \"\").trim();\n    }\n\n    // 2. TANGKAP SEMUA LINK GAMBAR/FILE DAN HAPUS SEMUA DARI TEKS\n    // Cek format markdown [nama](https://...jpg)\n    const mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/gi;\n    // Cek format link biasa https://...jpg/pdf\n    const rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/gi;\n    // Cek semua link minio (apapun extensionnya)\n    const minioRegex = /https?:\\/\\/minio[^\\s]*/gi;\n\n    // Tangkap URL pertama untuk attachment\n    const firstMd = finalMessageForUser.match(/\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i);\n    const firstRaw = finalMessageForUser.match(/(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i);\n    \n    if (firstMd) {\n        welcomeImageUrl = firstMd[2];\n    } else if (firstRaw) {\n        welcomeImageUrl = firstRaw[1];\n    }\n    \n    // Hapus SEMUA link markdown gambar/file\n    finalMessageForUser = finalMessageForUser.replace(mdRegex, \"\");\n    // Hapus SEMUA link raw gambar/file\n    finalMessageForUser = finalMessageForUser.replace(rawRegex, \"\");\n    // Hapus SEMUA link minio (termasuk yang bukan gambar/pdf)\n    finalMessageForUser = finalMessageForUser.replace(minioRegex, \"\");\n    // Bersihkan whitespace/baris kosong berlebih\n    finalMessageForUser = finalMessageForUser.replace(/\\n{3,}/g, \"\\n\\n\").trim()\n\n    // 3. Fallback jika format lama (WELCOME_IMAGE_URL:) masih dipakai\n    const imgMatch = finalMessageForUser.match(/WELCOME_IMAGE_URL:\\s*(\\S+)/i);\n    if (imgMatch && imgMatch[1]) {\n        welcomeImageUrl = imgMatch[1].trim();\n        finalMessageForUser = finalMessageForUser.replace(/WELCOME_IMAGE_URL:\\s*\\S+/i, \"\").trim();\n    }\n\n} catch (error) { \n    bookingData.error = error.message; \n}\n\nreturn [{ \n    json: { \n        ...bookingData, \n        welcome_image_url: welcomeImageUrl, waha_image_url: welcomeImageUrl,\n        text_for_wa: finalMessageForUser, \n        output: finalMessageForUser, \n        tokens: { prompt: promptTokens, completion: completionTokens, total: totalTokens } \n    } \n}];\n"
+        "jsCode": "const aiOutput = items[0].json.output;\nconst agentData = $('AI Agent2').item.json;\nlet finalMessageForUser = aiOutput;\nlet welcomeImageUrl = null;\nlet bookingData = { booking: false, escalate: false };\nlet promptTokens = agentData?.response_metadata?.tokenUsage?.promptTokens || agentData?.usage_metadata?.prompt_token_count || 0;\nlet completionTokens = agentData?.response_metadata?.tokenUsage?.completionTokens || agentData?.usage_metadata?.candidates_token_count || 0;\n\nif (promptTokens === 0 || completionTokens === 0) {\n    const ctx = $('Finalize Context').first().json;\n    const userMessage = ($('Set Prod Mode').isExecuted ? $('Set Prod Mode').first().json.message : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').first().json.message : \"\"));\n    const fullInputText = (ctx.finalSystemPrompt || \"\") + (ctx.finalKnowledge || \"\") + userMessage;\n    promptTokens = Math.ceil(fullInputText.length / 4);\n    completionTokens = Math.ceil((aiOutput || \"\").length / 4);\n}\nlet totalTokens = promptTokens + completionTokens;\n\ntry {\n    if (!aiOutput) throw new Error(\"Output kosong\");\n\n    // 1. Tangkap output JSON Booking/Escalate jika ada\n    const jsonMatch = aiOutput.match(/\\{[\\s\\S]*\\}/);\n    if (jsonMatch) {\n        let jsonString = jsonMatch[0];\n        jsonString = jsonString.replace(/^json\\s*/i, \"\").replace(/$/i, \"\");\n        jsonString = jsonString.replace(/\\\\(?![\"\\\\bfnrtu])/g, \"\\\\\\\\\");\n        const parsed = JSON.parse(jsonString);\n        if (parsed.booking && String(parsed.booking).toLowerCase() === 'true') {\n            bookingData.booking = true;\n            bookingData.topic = parsed.topic;\n            bookingData.clientEmail = parsed.clientEmail;\n            let time = parsed.startTime ? parsed.startTime.replace(' ', 'T') : '';\n            if (time && time.split(':').length === 2) { time = time.includes('+') ? time.split('+')[0] + ':00+' + time.split('+')[1] : time + ':00'; }\n            if (time && !time.includes('+') && !time.endsWith('Z')) time += '+07:00';\n            bookingData.startTime = time;\n        }\n        if (parsed.escalate && String(parsed.escalate).toLowerCase() === 'true') { bookingData.escalate = true; }\n        \n        finalMessageForUser = aiOutput.replace(/json[\\s\\S]*/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/\\{[\\s\\S]*\\}/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/`/g, \"\").trim();\n    }\n\n    // 2. TANGKAP SEMUA LINK GAMBAR (REGEX BARU)\n    // Cek format markdown [nama](https://...jpg)\n    const mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i;\n    // Cek format link biasa https://...jpg\n    const rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i;\n\n    const mdMatch = finalMessageForUser.match(mdRegex);\n    if (mdMatch) {\n        welcomeImageUrl = mdMatch[2]; // Ambil URL-nya\n        finalMessageForUser = finalMessageForUser.replace(mdMatch[0], \"\").trim(); // Hapus dari teks balik ke user\n    } else {\n        const rawMatch = finalMessageForUser.match(rawRegex);\n        if (rawMatch) {\n            welcomeImageUrl = rawMatch[1];\n            finalMessageForUser = finalMessageForUser.replace(rawMatch[0], \"\").trim();\n        }\n    }\n\n    // 3. Fallback jika format lama (WELCOME_IMAGE_URL:) masih dipakai\n    const imgMatch = finalMessageForUser.match(/WELCOME_IMAGE_URL:\\s*(\\S+)/i);\n    if (imgMatch && imgMatch[1]) {\n        welcomeImageUrl = imgMatch[1].trim();\n        finalMessageForUser = finalMessageForUser.replace(/WELCOME_IMAGE_URL:\\s*\\S+/i, \"\").trim();\n    }\n\n} catch (error) { \n    bookingData.error = error.message; \n}\n\nreturn [{ \n    json: { \n        ...bookingData, \n        welcome_image_url: welcomeImageUrl, waha_image_url: welcomeImageUrl,\n        text_for_wa: finalMessageForUser, \n        output: finalMessageForUser, \n        tokens: { prompt: promptTokens, completion: completionTokens, total: totalTokens } \n    } \n}];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -742,7 +742,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\n\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n    \n    // Tambahkan instruksi GAMBAR otomatis jika knowledge mengandung 'Attached File'\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', file tersebut akan OTOMATIS dikirim oleh sistem.\\n\";\n        finalPrompt += \"JANGAN sertakan URL minio/file di dalam response-mu. JANGAN tulis link apapun yang mengandung 'minio' atau URL file.\\n\";\n        finalPrompt += \"Cukup sebutkan bahwa file/gambar tersedia, contoh: 'Berikut detail produknya:' lalu sistem akan otomatis mengirim file-nya.\\n\";\n        finalPrompt += \"JANGAN escalate jika informasi (termasuk gambar) sudah tersedia di CONTEXT.\";\n    }\n    \n    // Parse handover_config (might be string from Postgres)\n    let hc = data.handover_config;\n    if (typeof hc === 'string') {\n        try { hc = JSON.parse(hc); } catch(e) { hc = null; }\n    }\n    \n    if (hc && hc.enabled) {\n        const rules = [];\n        rules.push(\"\\nPENTING - ATURAN ESCALATION:\");\n        rules.push(\"Kamu WAJIB menyertakan JSON {\\\"escalate\\\": true, \\\"reason\\\": \\\"<alasan>\\\"} di BARIS TERAKHIR response-mu jika salah satu kondisi berikut terpenuhi:\");\n\n        if (hc.escalationPrompt && hc.escalationPrompt.trim()) {\n            rules.push(\"\");\n            rules.push(\"KONDISI ESCALATION:\");\n            hc.escalationPrompt.trim().split('\\n').forEach(line => {\n                if (line.trim()) rules.push(\"• \" + line.trim());\n            });\n        }\n        \n        rules.push(\"\");\n        rules.push(\"PENTING: JANGAN escalate jika pertanyaan user BISA dijawab dari CONTEXT yang tersedia (termasuk gambar/file yang terlampir).\");\n        rules.push(\"\");\n        rules.push(\"FORMAT OUTPUT SAAT ESCALATION:\");\n        rules.push('Balas user dengan sopan, lalu DI BARIS TERAKHIR tulis: {\"escalate\": true, \"reason\": \"<alasan singkat>\"}');\n        rules.push(\"\");\n        rules.push(\"CONTOH OUTPUT ESCALATION:\");\n        rules.push('Mohon maaf, saya belum memiliki informasi mengenai hal tersebut. Saya akan menghubungkan Anda dengan tim kami.');\n        rules.push('{\"escalate\": true, \"reason\": \"Pertanyaan di luar knowledge base\"}');\n        rules.push(\"\");\n        rules.push(\"Jika TIDAK perlu escalation, JANGAN sertakan JSON escalate di response.\");\n        \n        finalPrompt += \"\\n\\n\" + rules.join(\"\\n\");\n    }\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n    \n    // Add file instruction for simulator mode (mirrors production path)\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', file tersebut akan OTOMATIS dikirim oleh sistem.\\n\";\n        finalPrompt += \"JANGAN sertakan URL minio/file di dalam response-mu. Cukup sebutkan bahwa file/gambar tersedia.\\n\";\n        finalPrompt += \"Jika user bertanya tentang topik yang memiliki Attached File, cukup jelaskan isinya tanpa URL.\";\n    }\n}\n\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
+        "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\n\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n    \n    // Tambahkan instruksi GAMBAR otomatis jika knowledge mengandung 'Attached File'\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', kamu WAJIB menyertakan URL gambar tersebut di dalam response-mu.\\n\";\n        finalPrompt += \"Format: tulis URL gambar langsung di response, contoh: https://minio.example.com/gambar.jpg\\n\";\n        finalPrompt += \"Jangan sembunyikan URL gambar. Jika user bertanya tentang topik yang memiliki Attached File, SELALU sertakan URL file tersebut di response.\\n\";\n        finalPrompt += \"JANGAN escalate jika informasi (termasuk gambar) sudah tersedia di CONTEXT.\";\n    }\n    \n    // Parse handover_config (might be string from Postgres)\n    let hc = data.handover_config;\n    if (typeof hc === 'string') {\n        try { hc = JSON.parse(hc); } catch(e) { hc = null; }\n    }\n    \n    if (hc && hc.enabled) {\n        const rules = [];\n        rules.push(\"\\nPENTING - ATURAN ESCALATION:\");\n        rules.push(\"Kamu WAJIB menyertakan JSON {\\\"escalate\\\": true, \\\"reason\\\": \\\"<alasan>\\\"} di BARIS TERAKHIR response-mu jika salah satu kondisi berikut terpenuhi:\");\n\n        if (hc.escalationPrompt && hc.escalationPrompt.trim()) {\n            rules.push(\"\");\n            rules.push(\"KONDISI ESCALATION:\");\n            hc.escalationPrompt.trim().split('\\n').forEach(line => {\n                if (line.trim()) rules.push(\"• \" + line.trim());\n            });\n        }\n        \n        rules.push(\"\");\n        rules.push(\"PENTING: JANGAN escalate jika pertanyaan user BISA dijawab dari CONTEXT yang tersedia (termasuk gambar/file yang terlampir).\");\n        rules.push(\"\");\n        rules.push(\"FORMAT OUTPUT SAAT ESCALATION:\");\n        rules.push('Balas user dengan sopan, lalu DI BARIS TERAKHIR tulis: {\"escalate\": true, \"reason\": \"<alasan singkat>\"}');\n        rules.push(\"\");\n        rules.push(\"CONTOH OUTPUT ESCALATION:\");\n        rules.push('Mohon maaf, saya belum memiliki informasi mengenai hal tersebut. Saya akan menghubungkan Anda dengan tim kami.');\n        rules.push('{\"escalate\": true, \"reason\": \"Pertanyaan di luar knowledge base\"}');\n        rules.push(\"\");\n        rules.push(\"Jika TIDAK perlu escalation, JANGAN sertakan JSON escalate di response.\");\n        \n        finalPrompt += \"\\n\\n\" + rules.join(\"\\n\");\n    }\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n    \n    // Add file instruction for simulator mode (mirrors production path)\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', kamu WAJIB menyertakan URL tersebut di dalam response-mu.\\n\";\n        finalPrompt += \"Format: tulis URL file langsung di response, contoh: https://minio.example.com/gambar.jpg\\n\";\n        finalPrompt += \"Jika user bertanya tentang topik yang memiliki Attached File, SELALU sertakan URL file tersebut di response.\";\n    }\n}\n\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -2183,7 +2183,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": {{ JSON.stringify($('Code in JavaScript').first().json.text_for_wa || $('Code in JavaScript').first().json.output || '') }}\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": {{ JSON.stringify($json.text_for_wa || $json.output || '') }}\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -2244,14 +2244,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"id\": \"{{ $('Meta Upload Media').first().json.id }}\"\n  }\n}",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"link\": \"{{ (() => { const imgUrl = $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : ''; if (!imgUrl) return ''; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return 'https://api.vlow-ai.com/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        136816,
-        17620
+        57552,
+        9100
       ],
       "id": "meta-send-image",
       "name": "Meta Send Image"
@@ -2462,7 +2462,7 @@
         "url": "https://api.vlow-ai.com/api/webhooks/n8n/outgoing-message",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"phoneNumberId\": \"{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"body\": \"{{ (() => { const imgUrl = $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : ''; if (!imgUrl) return ''; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return '/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}\",\n  \"waMessageId\": \"{{ $json.messages[0].id }}\",\n  \"type\": \"image\"\n}",
+        "jsonBody": "={\n  \"phoneNumberId\": \"{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"body\": \"={{ (() => { const imgUrl = $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : ''; if (!imgUrl) return ''; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return 'https://api.vlow-ai.com/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}\",\n  \"waMessageId\": \"{{ $json.messages[0].id }}\",\n  \"type\": \"image\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -2473,158 +2473,6 @@
       ],
       "id": "vlow-save-image-db",
       "name": "Vlow Save Image DB"
-    },
-    {
-      "parameters": {
-        "url": "={{ (() => { const imgUrl = $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : ''; if (!imgUrl) return ''; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return 'https://login.vlow-ai.com/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}",
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file"
-            }
-          }
-        }
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        136144,
-        17520
-      ],
-      "id": "meta-dl-image-v3",
-      "name": "Meta DL Image",
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/media",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
-            }
-          ]
-        },
-        "sendBody": true,
-        "contentType": "multipart-form-data",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "messaging_product",
-              "value": "whatsapp"
-            },
-            {
-              "parameterType": "formBinaryData",
-              "name": "file",
-              "inputDataFieldName": "data"
-            },
-            {
-              "name": "type",
-              "value": "={{ ($('Code in JavaScript').first().json.welcome_image_url || '').toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg' }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        136368,
-        17520
-      ],
-      "id": "meta-upload-media-v3",
-      "name": "Meta Upload Media"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 2
-          },
-          "conditions": [
-            {
-              "id": "pdf-check-v3",
-              "leftValue": "={{ ($('Code in JavaScript').first().json.welcome_image_url || '').toLowerCase() }}",
-              "rightValue": ".pdf",
-              "operator": {
-                "type": "string",
-                "operation": "endsWith"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.2,
-      "position": [
-        136592,
-        17520
-      ],
-      "id": "meta-is-pdf-v3",
-      "name": "Meta Is PDF?"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"document\",\n  \"document\": {\n    \"id\": \"{{ $('Meta Upload Media').first().json.id }}\",\n    \"filename\": \"{{ ($('Code in JavaScript').first().json.welcome_image_url || 'document.pdf').split('/').pop() }}\"\n  }\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        136816,
-        17420
-      ],
-      "id": "meta-send-document-v3",
-      "name": "Meta Send Document"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"status\": \"read\",\n  \"message_id\": \"{{ $('Parse Meta Payload').first().json.messageId }}\",\n  \"typing_indicator\": {\n    \"type\": \"text\"\n  }\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        56432,
-        9400
-      ],
-      "id": "meta-start-typing",
-      "name": "Meta Start Typing",
-      "onError": "continueRegularOutput"
     }
   ],
   "connections": {
@@ -3557,7 +3405,7 @@
       "main": [
         [
           {
-            "node": "Meta Start Typing",
+            "node": "Meta IF ESCALATE",
             "type": "main",
             "index": 0
           }
@@ -3627,7 +3475,7 @@
       "main": [
         [
           {
-            "node": "Meta DL Image",
+            "node": "Meta Send Image",
             "type": "main",
             "index": 0
           }
@@ -3686,17 +3534,6 @@
         ]
       ]
     },
-    "Vlow Save Image DB": {
-      "main": [
-        [
-          {
-            "node": "Meta Log Conversation",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Meta Send Image": {
       "main": [
         [
@@ -3708,62 +3545,11 @@
         ]
       ]
     },
-    "Meta DL Image": {
+    "Vlow Save Image DB": {
       "main": [
         [
           {
-            "node": "Meta Upload Media",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Meta Upload Media": {
-      "main": [
-        [
-          {
-            "node": "Meta Is PDF?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Meta Is PDF?": {
-      "main": [
-        [
-          {
-            "node": "Meta Send Document",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Meta Send Image",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Meta Send Document": {
-      "main": [
-        [
-          {
-            "node": "Vlow Save Image DB",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Meta Start Typing": {
-      "main": [
-        [
-          {
-            "node": "Meta IF ESCALATE",
+            "node": "Meta Log Conversation",
             "type": "main",
             "index": 0
           }

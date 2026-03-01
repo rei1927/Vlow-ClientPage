@@ -4,6 +4,7 @@ import {
     activateHandover,
     releaseHandover,
     getHandoverStatus,
+    getBatchHandoverStatus,
     checkKeyword,
     autoReleaseExpired,
 } from "../controllers/handoverController.js";
@@ -13,6 +14,7 @@ const router = express.Router();
 // Dashboard endpoints (protected)
 router.post("/activate", protect, activateHandover);
 router.post("/release", protect, releaseHandover);
+router.get("/batch-status", protect, getBatchHandoverStatus);
 
 // n8n integration endpoints (public — called from n8n workflow)
 router.get("/status/:chatId", getHandoverStatus);

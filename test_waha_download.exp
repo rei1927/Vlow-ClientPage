@@ -1,0 +1,9 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no root@pve.dayamedialangit.co.id
+expect "*?assword:*"
+send "Alamatgue123\r"
+expect "# "
+send "pct exec 100 -- bash -c 'docker exec -i \$(docker ps -q --filter name=waha) curl -v http://vlow_minio:9000/vlow-client/knowledge/85701e7f-2123-4ab9-a80d-24f3d0125e34/088530fb-612c-4093-a987-de5c84718b6b.jpeg'\r"
+expect "# "
+send "exit\r"

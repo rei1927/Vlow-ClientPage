@@ -1,0 +1,37 @@
+#!/usr/bin/expect -f
+set timeout 300
+spawn ssh -o StrictHostKeyChecking=no root@pve.dayamedialangit.co.id
+expect {
+    "*?assword:*" { send "Alamatgue123\r" }
+    "Connection refused" { puts "SSH connection refused"; exit 1 }
+}
+expect "# "
+
+# Step 1: Clone fresh code
+send "pct exec 100 -- bash -c 'rm -rf /tmp/vlow-update && git clone https://github.com/rei1927/Vlow-ClientPage.git /tmp/vlow-update 2>&1 | tail -3'\r"
+expect "# "
+
+# Step 2: Copy server files
+send "pct exec 100 -- bash -c 'cp -r /tmp/vlow-update/server/* /var/lib/docker/volumes/portainer_data/_data/compose/7/server/ && echo SERVER_COPIED_OK'\r"
+expect "SERVER_COPIED_OK"
+expect "# "
+
+# Step 3: Copy client files
+send "pct exec 100 -- bash -c 'cp -r /tmp/vlow-update/client/* /var/lib/docker/volumes/portainer_data/_data/compose/7/client/ && echo CLIENT_COPIED_OK'\r"
+expect "CLIENT_COPIED_OK"
+expect "# "
+
+# Step 4: Rebuild server only (faster)
+send "pct exec 100 -- bash -c 'cd /var/lib/docker/volumes/portainer_data/_data/compose/7 && docker compose build --no-cache server 2>&1 | tail -5'\r"
+expect "# "
+
+# Step 5: Restart
+send "pct exec 100 -- bash -c 'cd /var/lib/docker/volumes/portainer_data/_data/compose/7 && docker compose --env-file stack.env up -d 2>&1'\r"
+expect "# "
+
+send "echo DEPLOY_COMPLETE\r"
+expect "DEPLOY_COMPLETE"
+expect "# "
+
+send "exit\r"
+expect eof

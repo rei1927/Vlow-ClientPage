@@ -42,6 +42,7 @@ const ChatDashboard = () => {
     // Human Handover State
     const [handoverStatus, setHandoverStatus] = useState(null); // null | 'ai' | 'human'
     const [isHandoverLoading, setIsHandoverLoading] = useState(false);
+    const [chatHandoverMap, setChatHandoverMap] = useState({}); // { chatId: 'human' }
 
     const messagesEndRef = useRef(null);
 
@@ -127,11 +128,34 @@ const ChatDashboard = () => {
                 triggeredBy: 'manual',
             });
             setHandoverStatus(action === 'activate' ? 'human' : 'ai');
+            // Update sidebar badge instantly
+            setChatHandoverMap(prev => {
+                const updated = { ...prev };
+                if (action === 'activate') {
+                    updated[chatId] = 'human';
+                } else {
+                    delete updated[chatId];
+                }
+                return updated;
+            });
             toast.success(action === 'activate' ? '🙋 Chat dialihkan ke Anda' : '🤖 Chat dikembalikan ke AI');
         } catch (err) {
             toast.error('Gagal mengubah status handover');
         } finally {
             setIsHandoverLoading(false);
+        }
+    };
+
+    // Fetch handover statuses for all chats in bulk
+    const fetchBatchHandoverStatuses = async () => {
+        if (!selectedPlatform?.sessionId) return;
+        try {
+            const res = await axiosInstance.get(`/handover/batch-status`, {
+                params: { sessionId: selectedPlatform.sessionId }
+            });
+            setChatHandoverMap(res.data?.statuses || {});
+        } catch (error) {
+            console.error("Error fetching batch handover statuses:", error);
         }
     };
 
@@ -155,6 +179,8 @@ const ChatDashboard = () => {
             const res = await axiosInstance.get(`/chats/${selectedPlatform.id}`);
             if (res.data?.success) {
                 setChats(res.data.data);
+                // Fetch batch handover statuses for all chats
+                fetchBatchHandoverStatuses();
             }
         } catch (error) {
             console.error("Error fetching chats:", error);
@@ -483,7 +509,19 @@ const ChatDashboard = () => {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-baseline mb-1">
                                         <h3 className="font-bold text-[var(--color-text)] text-sm truncate">{chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0]}</h3>
-                                        <span className="text-xs text-[var(--color-text-muted)] ml-2">{formatTime(chat.timestamp)}</span>
+                                        <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
+                                            {(() => {
+                                                const chatIdStr = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.user) : String(chat.id);
+                                                const cleanId = chatIdStr.split('@')[0];
+                                                const isHuman = chatHandoverMap[chatIdStr] === 'human' || chatHandoverMap[cleanId] === 'human';
+                                                return (
+                                                    <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold whitespace-nowrap ${isHuman ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
+                                                        {isHuman ? '👤 Human' : '🤖 AI'}
+                                                    </span>
+                                                );
+                                            })()}
+                                            <span className="text-xs text-[var(--color-text-muted)]">{formatTime(chat.timestamp)}</span>
+                                        </div>
                                     </div>
                                     <div className="flex justify-between items-center mb-1">
                                         <p className="text-xs text-[var(--color-text-muted)] truncate pr-2">

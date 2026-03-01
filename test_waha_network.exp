@@ -1,0 +1,11 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no root@pve.dayamedialangit.co.id
+expect "*?assword:*"
+send "Alamatgue123\r"
+expect "# "
+send "pct exec 100 -- bash -c 'docker exec -i \$(docker ps -q --filter name=waha) curl -I -s https://minio.dayamedialangit.co.id/vlow-client/'\r"
+expect "# "
+send "pct exec 100 -- bash -c 'docker network ls'\r"
+expect "# "
+send "exit\r"

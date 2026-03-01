@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no root@pve.dayamedialangit.co.id
+expect "*?assword:*"
+send "Alamatgue123\r"
+expect "# "
+# Test WAHA API with base64 payload instead of URL
+send "pct exec 100 -- bash -c 'docker exec -i \$(docker ps -q --filter name=waha) curl -X POST -H \"Content-Type: application/json\" -d \\'{\"session\":\"default\",\"chatId\":\"62812345678@c.us\",\"file\":{\"mimetype\":\"image/png\",\"filename\":\"test.png\",\"data\":\"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==\"}}\\'' http://localhost:3000/api/sendImage'\r"
+expect "# "
+send "exit\r"
