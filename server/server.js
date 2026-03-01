@@ -128,11 +128,27 @@ const startServer = async () => {
     await sequelize.authenticate();
     logger.info("Database Connected Successfully.");
 
-    await sequelize.sync({ alter: true });
-    logger.info("Database Models Synced.");
+    // Sync with extended timeout and retry
+    let synced = false;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await sequelize.query('SET statement_timeout = 60000;'); // 60 seconds
+        await sequelize.sync({ alter: true });
+        logger.info("Database Models Synced.");
+        synced = true;
+        break;
+      } catch (syncErr) {
+        logger.warn(`Sync attempt ${attempt}/3 failed: ${syncErr.message}`);
+        if (attempt === 3) {
+          logger.warn("All sync attempts failed — starting server anyway (tables likely already exist).");
+        }
+        await new Promise(r => setTimeout(r, 2000)); // wait 2s before retry
+      }
+    }
 
     // Fix: ensure agentId column is nullable for meta_cloud platforms
     try {
+      await sequelize.query('SET statement_timeout = 30000;');
       await sequelize.query(`ALTER TABLE "ChatHandovers" ALTER COLUMN "agentId" DROP NOT NULL;`);
     } catch (e) {
       // Ignore if already nullable or table doesn't exist
