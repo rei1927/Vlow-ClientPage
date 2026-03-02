@@ -37,6 +37,11 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    metaCloudWebhookUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "URL Webhook n8n khusus untuk Meta Cloud API",
+    },
     maxPlatforms: {
       type: DataTypes.INTEGER,
       allowNull: false,

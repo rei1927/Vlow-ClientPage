@@ -27,6 +27,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
     maxPlatforms: 1,
     n8nWebhookUrl: "",
     n8nSimulatorWebhookUrl: "",
+    metaCloudWebhookUrl: "",
   });
 
   useEffect(() => {
@@ -45,6 +46,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
           maxPlatforms: initialData.maxPlatforms || 1,
           n8nWebhookUrl: initialData.n8nWebhookUrl || "",
           n8nSimulatorWebhookUrl: initialData.n8nSimulatorWebhookUrl || "",
+          metaCloudWebhookUrl: initialData.metaCloudWebhookUrl || "",
         });
       } else {
         setFormData({
@@ -58,6 +60,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
           maxPlatforms: 1,
           n8nWebhookUrl: "",
           n8nSimulatorWebhookUrl: "",
+          metaCloudWebhookUrl: "",
         });
       }
     }
@@ -326,7 +329,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
               {formData.role === "customer" && (
                 <div className="form-control">
                   <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                    URL Webhook n8n <span className="text-red-500">*</span>
+                    URL Webhook WAHA N8N <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
@@ -344,7 +347,33 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
                     />
                   </div>
                   <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
-                    *Wajib diisi. Harus berupa link URL (http atau https) untuk webhook n8n.
+                    *Wajib diisi. Harus berupa link URL (http atau https) untuk webhook WAHA n8n.
+                  </span>
+                </div>
+              )}
+
+              {/* Meta Cloud Webhook URL - Only for Customer */}
+              {formData.role === "customer" && (
+                <div className="form-control">
+                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                    URL Webhook Meta Cloud <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
+                      <FaLink />
+                    </div>
+                    <input
+                      type="url"
+                      className="input input-bordered w-full pl-10 rounded-xl bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] placeholder-[var(--color-text-muted)]"
+                      placeholder="https://n8n.example.com/webhook/meta-cloud-webhook"
+                      value={formData.metaCloudWebhookUrl}
+                      onChange={(e) => setFormData({ ...formData, metaCloudWebhookUrl: e.target.value })}
+                      pattern="https?://.+"
+                      title="Masukkan URL yang valid (contoh: https://n8n.example.com/webhook/meta-cloud-webhook)"
+                    />
+                  </div>
+                  <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
+                    *URL webhook n8n untuk menerima pesan dari Meta Cloud API (WhatsApp Business).
                   </span>
                 </div>
               )}

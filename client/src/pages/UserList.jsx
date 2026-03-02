@@ -204,18 +204,20 @@ const UserList = () => {
                   </div>
                 </th>
                 <th className="text-center pr-6">Aksi</th>
+                <th>AI Response</th>
+                <th>Conversation</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan="6" className="py-12">
+                  <td colSpan="8" className="py-12">
                     <Loader type="block" text="Sedang memuat data users..." />
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="text-center py-12 text-[var(--color-text-muted)] italic">
+                  <td colSpan="8" className="text-center py-12 text-[var(--color-text-muted)] italic">
                     Tidak ada data user yang ditemukan.
                   </td>
                 </tr>
@@ -277,9 +279,8 @@ const UserList = () => {
                             return (
                               <div className="flex flex-col gap-1">
                                 <div
-                                  className={`text-xs font-semibold ${
-                                    isExpired ? "text-red-600" : daysUntilExpiry <= 7 ? "text-yellow-600" : "text-green-600"
-                                  }`}
+                                  className={`text-xs font-semibold ${isExpired ? "text-red-600" : daysUntilExpiry <= 7 ? "text-yellow-600" : "text-green-600"
+                                    }`}
                                 >
                                   {expiryDate.toLocaleDateString("id-ID", {
                                     day: "numeric",
@@ -288,13 +289,12 @@ const UserList = () => {
                                   })}
                                 </div>
                                 <div
-                                  className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded w-fit ${
-                                    isExpired
+                                  className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded w-fit ${isExpired
                                       ? "bg-red-50 text-red-600"
                                       : daysUntilExpiry <= 7
                                         ? "bg-yellow-50 text-yellow-600"
                                         : "bg-green-50 text-green-600"
-                                  }`}
+                                    }`}
                                 >
                                   {isExpired ? (
                                     <>
@@ -343,6 +343,46 @@ const UserList = () => {
                           <FaTrash />
                         </button>
                       </div>
+                    </td>
+                    <td>
+                      {user.role === "customer" ? (
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-[var(--color-text)]">
+                            {user.usedAiResponses !== undefined ? user.usedAiResponses.toLocaleString() : '—'}
+                            <span className="text-[var(--color-text-muted)] font-normal"> / {(user.maxAiResponses || 1000).toLocaleString()}</span>
+                          </span>
+                          {user.usedAiResponses !== undefined && (
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-1">
+                              <div
+                                className={`h-1.5 rounded-full ${(user.usedAiResponses / (user.maxAiResponses || 1000)) > 0.9 ? 'bg-red-500' : (user.usedAiResponses / (user.maxAiResponses || 1000)) > 0.7 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                                style={{ width: `${Math.min((user.usedAiResponses / (user.maxAiResponses || 1000)) * 100, 100)}%` }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-[var(--color-text-muted)] italic">—</span>
+                      )}
+                    </td>
+                    <td>
+                      {user.role === "customer" ? (
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-[var(--color-text)]">
+                            {user.usedConversations !== undefined ? user.usedConversations.toLocaleString() : '—'}
+                            <span className="text-[var(--color-text-muted)] font-normal"> / {(user.maxConversations || 1000).toLocaleString()}</span>
+                          </span>
+                          {user.usedConversations !== undefined && (
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-1">
+                              <div
+                                className={`h-1.5 rounded-full ${(user.usedConversations / (user.maxConversations || 1000)) > 0.9 ? 'bg-red-500' : (user.usedConversations / (user.maxConversations || 1000)) > 0.7 ? 'bg-yellow-500' : 'bg-green-500'}`}
+                                style={{ width: `${Math.min((user.usedConversations / (user.maxConversations || 1000)) * 100, 100)}%` }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-[var(--color-text-muted)] italic">—</span>
+                      )}
                     </td>
                   </tr>
                 ))

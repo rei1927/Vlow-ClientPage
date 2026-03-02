@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import { Op } from "sequelize"; // Penting untuk Search & Filter
 import User from "../models/User.js";
+import Agent from "../models/Agent.js";
+import ConversationLog from "../models/ConversationLog.js";
 import AppError from "../utils/AppError.js";
 import sendEmail from "../utils/emailService.js";
 import { getWelcomeTemplate } from "../utils/emailTemplates.js";
@@ -9,7 +11,7 @@ import { getWelcomeTemplate } from "../utils/emailTemplates.js";
 // @route   POST /api/users
 export const createUser = async (req, res, next) => {
   try {
-    const { name, email, role, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl } = req.body;
+    const { name, email, role, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl, metaCloudWebhookUrl } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -38,6 +40,7 @@ export const createUser = async (req, res, next) => {
       maxPlatforms: parseInt(maxPlatforms) || 1,
       n8nWebhookUrl: n8nWebhookUrl || null,
       n8nSimulatorWebhookUrl: n8nSimulatorWebhookUrl || null,
+      metaCloudWebhookUrl: metaCloudWebhookUrl || null,
       subscriptionExpiry: finalExpiry,
     });
 
@@ -75,6 +78,7 @@ export const createUser = async (req, res, next) => {
         subscriptionExpiry: user.subscriptionExpiry,
         n8nWebhookUrl: user.n8nWebhookUrl,
         n8nSimulatorWebhookUrl: user.n8nSimulatorWebhookUrl,
+        metaCloudWebhookUrl: user.metaCloudWebhookUrl,
         createdAt: user.createdAt,
       },
     });
@@ -128,10 +132,61 @@ export const getAllUsers = async (req, res, next) => {
       offset: offset,
     });
 
-    // 5. Build Response Meta
+    // 5. Calculate usage stats for customer users
+    const usersWithUsage = await Promise.all(
+      rows.map(async (user) => {
+        const userData = user.toJSON();
+        if (userData.role === "customer") {
+          try {
+            const userAgents = await Agent.findAll({
+              where: { userId: userData.id },
+              attributes: ["id"],
+            });
+            const agentIds = userAgents.map((a) => a.id);
+
+            if (agentIds.length > 0) {
+              const now = new Date();
+              let startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+              if (userData.quotaResetDate) {
+                const resetDate = new Date(userData.quotaResetDate);
+                if (resetDate > startDate) startDate = resetDate;
+              }
+
+              const logs = await ConversationLog.findAll({
+                where: {
+                  agentId: { [Op.in]: agentIds },
+                  mode: "production",
+                  createdAt: { [Op.gte]: startDate },
+                },
+                attributes: ["userMessage", "aiResponse"],
+              });
+
+              let totalUserChars = 0;
+              let totalAiChars = 0;
+              logs.forEach((log) => {
+                if (log.userMessage) totalUserChars += log.userMessage.length;
+                if (log.aiResponse) totalAiChars += log.aiResponse.length;
+              });
+
+              userData.usedConversations = Math.ceil(totalUserChars / 4);
+              userData.usedAiResponses = Math.ceil(totalAiChars / 4);
+            } else {
+              userData.usedConversations = 0;
+              userData.usedAiResponses = 0;
+            }
+          } catch (e) {
+            userData.usedConversations = 0;
+            userData.usedAiResponses = 0;
+          }
+        }
+        return userData;
+      })
+    );
+
+    // 6. Build Response Meta
     res.status(200).json({
       success: true,
-      data: rows,
+      data: usersWithUsage,
       meta: {
         totalItems: count,
         totalPages: Math.ceil(count / limit),
@@ -178,7 +233,7 @@ export const getUserById = async (req, res, next) => {
 // @route   PUT /api/users/:id
 export const updateUser = async (req, res, next) => {
   try {
-    const { name, role, isActive, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl, maxConversations, maxAiResponses, resetQuota } = req.body;
+    const { name, role, isActive, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl, metaCloudWebhookUrl, maxConversations, maxAiResponses, resetQuota } = req.body;
 
     const user = await User.findByPk(req.params.id);
     if (!user) {
@@ -197,6 +252,7 @@ export const updateUser = async (req, res, next) => {
     if (maxPlatforms !== undefined) user.maxPlatforms = parseInt(maxPlatforms) || 1;
     if (n8nWebhookUrl !== undefined) user.n8nWebhookUrl = n8nWebhookUrl || null;
     if (n8nSimulatorWebhookUrl !== undefined) user.n8nSimulatorWebhookUrl = n8nSimulatorWebhookUrl || null;
+    if (metaCloudWebhookUrl !== undefined) user.metaCloudWebhookUrl = metaCloudWebhookUrl || null;
 
     // Set Max Limits for Customer
     if (role === "customer") {
@@ -245,6 +301,7 @@ export const updateUser = async (req, res, next) => {
         quotaResetDate: user.quotaResetDate,
         n8nWebhookUrl: user.n8nWebhookUrl,
         n8nSimulatorWebhookUrl: user.n8nSimulatorWebhookUrl,
+        metaCloudWebhookUrl: user.metaCloudWebhookUrl,
       },
     });
   } catch (error) {
