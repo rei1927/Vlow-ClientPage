@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # Client (Frontend) - STAGING
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.staging
+      args:
+        - VITE_API_URL=https://staging-api.vlow-ai.com
+    image: custom_vlow_client:staging
+    container_name: vlow_client_staging
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - server
+
+  # Server (Backend) - STAGING
+  server:
+    build: ./server
+    image: custom_vlow_server:staging
+    container_name: vlow_server_staging
+    restart: always
+    ports:
+      - "5001:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=staging
+      # Database (Supabase) - same as production or separate
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - DB_SSL=true
+      # MinIO (shared with production)
+      - MINIO_ENDPOINT=minio-api.dayamedialangit.co.id
+      - MINIO_PORT=443
+      - MINIO_USE_SSL=true
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY:-admin}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-rahasia123}
+      - MINIO_BUCKET=${MINIO_BUCKET:-vlow-client}
+      - MINIO_PUBLIC_URL=${MINIO_PUBLIC_URL:-https://minio.dayamedialangit.co.id}
+      # JWT
+      - JWT_SECRET=${JWT_SECRET:-rahasia_aman}
+      - FRONTEND_URL=${FRONTEND_URL:-https://staging.vlow-ai.com}
+      # WAHA Connectivity
+      - WAHA_BASE_URL=${WAHA_BASE_URL:-https://waha-plus.dayamedialangit.co.id}
+      - WAHA_API_KEY=${WAHA_API_KEY}
+      # Simulator
+      - N8N_SIMULATOR_URL=${N8N_SIMULATOR_URL}
+      # Meta Cloud API
+      - META_APP_ID=${META_APP_ID}
+      - META_APP_SECRET=${META_APP_SECRET}
+      - META_WEBHOOK_VERIFY_TOKEN=${META_WEBHOOK_VERIFY_TOKEN:-vlow_rahasia_webhook_2026}
+      # Email Configuration (Resend)
+      - SMTP_HOST=${SMTP_HOST:-smtp.resend.com}
+      - SMTP_PORT=${SMTP_PORT:-465}
+      - SMTP_EMAIL=${SMTP_EMAIL:-resend}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-re_DVhzLzW4_3Y7mDXR9KwfoA8iMhhzPgYGS}
+      - FROM_NAME=${FROM_NAME:-Vlow System Admin}
+      - FROM_EMAIL=${FROM_EMAIL:-no-reply@vlow.ai}
