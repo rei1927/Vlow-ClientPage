@@ -7,10 +7,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        52720,
-        10352
+        246256,
+        30592
       ],
-      "id": "6aef7e3b-42c1-46b3-bfa4-adcb848bf8df",
+      "id": "8cfe31d7-12aa-40cc-b15d-5651772ae4d9",
       "name": "Wait",
       "webhookId": "8f8cfbb8-3482-44a5-bd25-54086424ae9f"
     },
@@ -24,10 +24,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        51376,
-        10096
+        244912,
+        30336
       ],
-      "id": "c94bc33e-1c1c-43f1-ac3b-00f6f3ab2935",
+      "id": "a3ba847c-5d64-4f78-93c5-efe608d8da26",
       "name": "Get contact basic info",
       "credentials": {
         "wahaApi": {
@@ -48,10 +48,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        52496,
-        9904
+        246032,
+        30144
       ],
-      "id": "134a44f7-e07f-4acb-9940-af1c5f29ccae",
+      "id": "8e1b2e39-002d-44da-8803-9ee11d658a21",
       "name": "Save labels for the chat",
       "credentials": {
         "wahaApi": {
@@ -89,10 +89,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        51600,
-        10096
+        245136,
+        30336
       ],
-      "id": "69077909-c6dc-4fb6-84b5-69330d883763",
+      "id": "316b485e-344b-4edc-b599-733d7e19db16",
       "name": "CEK GRUP ATAU BUKAN"
     },
     {
@@ -133,10 +133,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        51152,
-        9904
+        244688,
+        30144
       ],
-      "id": "1419abb6-1fda-4d39-962e-43a9d3d35061",
+      "id": "815b376f-bd86-407d-8525-61529fee8904",
       "name": "CEK DARI IKLAN"
     },
     {
@@ -166,10 +166,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        51376,
-        9904
+        244912,
+        30144
       ],
-      "id": "edd81184-b5e8-477b-881c-237cc26a477f",
+      "id": "450ba05c-2a71-4823-90a9-ae93ab4950bd",
       "name": "CEK BOT"
     },
     {
@@ -200,10 +200,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        52048,
-        9904
+        245584,
+        30144
       ],
-      "id": "c7486bb3-e3f1-4d76-9ca4-86a11b9f3b76",
+      "id": "a8b1524d-1f7c-496d-80d2-3a4ce6f8f9e9",
       "name": "CEK LABEL1"
     },
     {
@@ -233,10 +233,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        51152,
-        10096
+        244688,
+        30336
       ],
-      "id": "e757210a-945f-4530-8e89-4ea8aa3499a8",
+      "id": "a4744e96-5794-4b79-a1a0-ba1b4c7e184b",
       "name": "CEK API"
     },
     {
@@ -267,10 +267,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        50928,
-        10000
+        244464,
+        30240
       ],
-      "id": "93c29802-9015-4dd6-b1e7-e83e262352d1",
+      "id": "21d21213-ee86-4ff1-9fc8-2f2783e1ad0c",
       "name": "ME or NOT"
     },
     {
@@ -301,10 +301,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        52496,
-        10096
+        246032,
+        30336
       ],
-      "id": "7c07b92e-72f4-4eb1-ad2b-e20257b56034",
+      "id": "b205535b-c109-43f3-a1ee-c30e1f22417d",
       "name": "If"
     },
     {
@@ -324,10 +324,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        54512,
-        10032
+        248048,
+        30272
       ],
-      "id": "39d63e51-8de2-4f38-8163-cff64637b525",
+      "id": "d22b79fd-7180-4c07-8685-3fdf75c3254a",
       "name": "HTTP Request"
     },
     {
@@ -347,10 +347,10 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.1,
       "position": [
-        54960,
-        9936
+        248496,
+        30176
       ],
-      "id": "7c3803d5-ce84-4734-a323-84f63ac17fc8",
+      "id": "6b91b1cd-4834-43ae-b148-1d80f9b944ac",
       "name": "Analyze an image",
       "credentials": {
         "googlePalmApi": {
@@ -371,10 +371,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        55760,
-        9936
+        249296,
+        30176
       ],
-      "id": "e7117547-c9f6-49d9-ba2d-7c38049f219d",
+      "id": "f4d58297-b617-4e01-b83c-d6a65bd17f52",
       "name": "Send a text message1",
       "credentials": {
         "wahaApi": {
@@ -391,11 +391,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        55008,
-        9856
+        248576,
+        30128
       ],
       "typeVersion": 1,
-      "id": "ecd7d868-5afd-4844-a8e4-cba40cee6d54",
+      "id": "2adeb6b3-39e3-4354-84b9-8b46f4097632",
       "name": "Sticky Note"
     },
     {
@@ -407,11 +407,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        52544,
-        9920
+        246976,
+        30448
       ],
       "typeVersion": 1,
-      "id": "1b724ec7-5dc6-475d-948d-0eef77d7a8d5",
+      "id": "89ede905-20dc-4aea-a8e6-04d175c30487",
       "name": "Sticky Note1"
     },
     {
@@ -423,11 +423,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        51216,
-        9824
+        244752,
+        30064
       ],
       "typeVersion": 1,
-      "id": "f7544cc6-6472-45ab-ba5f-1aeddb7b91d1",
+      "id": "dbb31119-dd9c-4908-ad1c-dcf65ae08ea4",
       "name": "Sticky Note2"
     },
     {
@@ -457,10 +457,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        54736,
-        10032
+        248272,
+        30272
       ],
-      "id": "d0bb71c2-f513-447e-a0f6-82642b7638b3",
+      "id": "3f615df2-31b4-4ae0-9bfd-30cd432f91ef",
       "name": "If1"
     },
     {
@@ -480,10 +480,10 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.1,
       "position": [
-        54960,
-        10176
+        248496,
+        30416
       ],
-      "id": "43b20360-cad4-44a6-891a-b43956a29eb7",
+      "id": "35a89dbb-d128-40c1-a610-0776c3bc6c77",
       "name": "Analyze audio",
       "credentials": {
         "googlePalmApi": {
@@ -503,10 +503,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        55248,
-        9936
+        248784,
+        30176
       ],
-      "id": "51fdd31a-542d-48c0-9473-366e3d124193",
+      "id": "242ef4f4-a1d6-42dd-95e9-8a2a0418020b",
       "name": "Start Typing2",
       "credentials": {
         "wahaApi": {
@@ -526,10 +526,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        55536,
-        9936
+        249072,
+        30176
       ],
-      "id": "7314255c-e3c2-4125-aee9-39b0702ab93c",
+      "id": "269315dc-b7e3-4030-886b-e7949aeaea15",
       "name": "Stop Typing2",
       "credentials": {
         "wahaApi": {
@@ -545,10 +545,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        55760,
-        10256
+        249296,
+        30496
       ],
-      "id": "f61c8a95-ed6f-42b2-9125-1e72ecc2c925",
+      "id": "f220ddb2-73ac-4486-bcd1-1f6f26490ead",
       "name": "Code in JavaScript"
     },
     {
@@ -562,10 +562,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        55184,
-        10352
+        248720,
+        30592
       ],
-      "id": "977121a2-9f87-4af0-9618-070f258f1562",
+      "id": "df10cc90-95b5-407c-bbdd-8efb1afc9fc8",
       "name": "AI Agent2"
     },
     {
@@ -575,10 +575,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        55200,
-        10576
+        248736,
+        30816
       ],
-      "id": "f70d052b-7077-43cb-a73e-7f82a7e68924",
+      "id": "b34a6c7c-6140-43c4-87ad-4832a034a103",
       "name": "Google Gemini Chat Model3",
       "credentials": {
         "googlePalmApi": {
@@ -595,26 +595,26 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        55328,
-        10576
+        248864,
+        30816
       ],
-      "id": "ead1eec4-7032-4f71-b3b1-8512b30dd304",
+      "id": "997b1f63-8987-4cb9-bd18-4e4d539a7119",
       "name": "Simple Memory1"
     },
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "/simulator-chat",
-        "options": {},
-        "responseMode": "lastNode"
+        "responseMode": "lastNode",
+        "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        52720,
-        10544
+        246256,
+        30976
       ],
-      "id": "2af733a1-8636-4ba2-95d1-56377b6e84c5",
+      "id": "6dc06d48-d698-4df5-9700-9fa744788c29",
       "name": "Webhook (Simulator Mode)",
       "webhookId": "3bcbcc00-e3c0-462d-81de-66c395f40d8a"
     },
@@ -625,10 +625,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        52944,
-        10544
+        246480,
+        30976
       ],
-      "id": "62b3383b-43ec-4e16-ae67-a464264a3345",
+      "id": "d223fc49-e4ec-4566-8964-1fb765797223",
       "name": "Set Sim Mode"
     },
     {
@@ -638,10 +638,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        52944,
-        10352
+        246480,
+        30592
       ],
-      "id": "265e1c68-a5ec-4805-b9b9-0e4979fed16d",
+      "id": "87ef69a0-2f2d-4606-a6ff-1ff9eb8066e1",
       "name": "Set Prod Mode"
     },
     {
@@ -649,10 +649,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        53168,
-        10448
+        246704,
+        30688
       ],
-      "id": "43ad1b8c-2866-4c3d-bcf9-8b6ab6676ab0",
+      "id": "c66e7a7a-83ef-4533-817c-ffd60574ea05",
       "name": "Merge Inputs"
     },
     {
@@ -711,10 +711,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        53392,
-        10448
+        246928,
+        30688
       ],
-      "id": "41d288c6-0973-4abc-8876-bac53b6e2167",
+      "id": "342a0783-bb28-402b-ba30-e0dea089debd",
       "name": "Is Production?"
     },
     {
@@ -734,23 +734,23 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        50480,
-        10768
+        244016,
+        31536
       ],
-      "id": "add86981-fafa-42e5-89bf-b44bf1218de1",
+      "id": "98968aa7-6ab0-49a8-b5b7-4eb0bf5ae79d",
       "name": "Fetch Config DB"
     },
     {
       "parameters": {
-        "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\n\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n    \n    // Tambahkan instruksi GAMBAR otomatis jika knowledge mengandung 'Attached File'\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', file tersebut akan OTOMATIS dikirim oleh sistem.\\n\";\n        finalPrompt += \"JANGAN sertakan URL minio/file di dalam response-mu. JANGAN tulis link apapun yang mengandung 'minio' atau URL file.\\n\";\n        finalPrompt += \"Cukup sebutkan bahwa file/gambar tersedia, contoh: 'Berikut detail produknya:' lalu sistem akan otomatis mengirim file-nya.\\n\";\n        finalPrompt += \"JANGAN escalate jika informasi (termasuk gambar) sudah tersedia di CONTEXT.\";\n    }\n    \n    // Parse handover_config (might be string from Postgres)\n    let hc = data.handover_config;\n    if (typeof hc === 'string') {\n        try { hc = JSON.parse(hc); } catch(e) { hc = null; }\n    }\n    \n    if (hc && hc.enabled) {\n        const rules = [];\n        rules.push(\"\\nPENTING - ATURAN ESCALATION:\");\n        rules.push(\"Kamu WAJIB menyertakan JSON {\\\"escalate\\\": true, \\\"reason\\\": \\\"<alasan>\\\"} di BARIS TERAKHIR response-mu jika salah satu kondisi berikut terpenuhi:\");\n\n        if (hc.escalationPrompt && hc.escalationPrompt.trim()) {\n            rules.push(\"\");\n            rules.push(\"KONDISI ESCALATION:\");\n            hc.escalationPrompt.trim().split('\\n').forEach(line => {\n                if (line.trim()) rules.push(\"• \" + line.trim());\n            });\n        }\n        \n        rules.push(\"\");\n        rules.push(\"PENTING: JANGAN escalate jika pertanyaan user BISA dijawab dari CONTEXT yang tersedia (termasuk gambar/file yang terlampir).\");\n        rules.push(\"\");\n        rules.push(\"FORMAT OUTPUT SAAT ESCALATION:\");\n        rules.push('Balas user dengan sopan, lalu DI BARIS TERAKHIR tulis: {\"escalate\": true, \"reason\": \"<alasan singkat>\"}');\n        rules.push(\"\");\n        rules.push(\"CONTOH OUTPUT ESCALATION:\");\n        rules.push('Mohon maaf, saya belum memiliki informasi mengenai hal tersebut. Saya akan menghubungkan Anda dengan tim kami.');\n        rules.push('{\"escalate\": true, \"reason\": \"Pertanyaan di luar knowledge base\"}');\n        rules.push(\"\");\n        rules.push(\"Jika TIDAK perlu escalation, JANGAN sertakan JSON escalate di response.\");\n        \n        finalPrompt += \"\\n\\n\" + rules.join(\"\\n\");\n    }\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n    \n    // Add file instruction for simulator mode (mirrors production path)\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', file tersebut akan OTOMATIS dikirim oleh sistem.\\n\";\n        finalPrompt += \"JANGAN sertakan URL minio/file di dalam response-mu. Cukup sebutkan bahwa file/gambar tersedia.\\n\";\n        finalPrompt += \"Jika user bertanya tentang topik yang memiliki Attached File, cukup jelaskan isinya tanpa URL.\";\n    }\n}\n\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
+        "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\n\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n    \n    // Tambahkan instruksi GAMBAR otomatis jika knowledge mengandung 'Attached File'\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', dan user MEMINTA atau MEMBUTUHKAN gambar/file tersebut, SERTAKAN URL file di response-mu dalam format markdown: [nama_file](URL).\\n\";\n        finalPrompt += \"Sistem akan OTOMATIS mengirim file tersebut sebagai attachment terpisah dan menghapus URL dari pesan teks.\\n\";\n        finalPrompt += \"Jika user TIDAK meminta gambar/file, cukup jawab dengan teks saja tanpa menyertakan URL.\\n\";\n        finalPrompt += \"JANGAN escalate jika informasi (termasuk gambar) sudah tersedia di CONTEXT.\";\n    }\n    \n    // Parse handover_config (might be string from Postgres)\n    let hc = data.handover_config;\n    if (typeof hc === 'string') {\n        try { hc = JSON.parse(hc); } catch(e) { hc = null; }\n    }\n    \n    if (hc && hc.enabled) {\n        const rules = [];\n        rules.push(\"\\nPENTING - ATURAN ESCALATION:\");\n        rules.push(\"Kamu WAJIB menyertakan JSON {\\\"escalate\\\": true, \\\"reason\\\": \\\"<alasan>\\\"} di BARIS TERAKHIR response-mu jika salah satu kondisi berikut terpenuhi:\");\n\n        if (hc.escalationPrompt && hc.escalationPrompt.trim()) {\n            rules.push(\"\");\n            rules.push(\"KONDISI ESCALATION:\");\n            hc.escalationPrompt.trim().split('\\n').forEach(line => {\n                if (line.trim()) rules.push(\"• \" + line.trim());\n            });\n        }\n        \n        rules.push(\"\");\n        rules.push(\"PENTING: JANGAN escalate jika pertanyaan user BISA dijawab dari CONTEXT yang tersedia (termasuk gambar/file yang terlampir).\");\n        rules.push(\"\");\n        rules.push(\"FORMAT OUTPUT SAAT ESCALATION:\");\n        rules.push('Balas user dengan sopan, lalu DI BARIS TERAKHIR tulis: {\"escalate\": true, \"reason\": \"<alasan singkat>\"}');\n        rules.push(\"\");\n        rules.push(\"CONTOH OUTPUT ESCALATION:\");\n        rules.push('Mohon maaf, saya belum memiliki informasi mengenai hal tersebut. Saya akan menghubungkan Anda dengan tim kami.');\n        rules.push('{\"escalate\": true, \"reason\": \"Pertanyaan di luar knowledge base\"}');\n        rules.push(\"\");\n        rules.push(\"Jika TIDAK perlu escalation, JANGAN sertakan JSON escalate di response.\");\n        \n        finalPrompt += \"\\n\\n\" + rules.join(\"\\n\");\n    }\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n    \n    // Add file instruction for simulator mode (mirrors production path)\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', dan user MEMINTA atau MEMBUTUHKAN gambar/file tersebut, SERTAKAN URL file di response-mu dalam format markdown: [nama_file](URL).\\n\";\n        finalPrompt += \"Sistem akan OTOMATIS mengirim file tersebut sebagai attachment terpisah dan menghapus URL dari pesan teks.\\n\";\n        finalPrompt += \"Jika user TIDAK meminta gambar/file, cukup jawab dengan teks saja tanpa menyertakan URL.\";\n    }\n}\n\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        53840,
-        10448
+        247376,
+        30688
       ],
-      "id": "3c8cad38-0c3c-4112-9ea0-3b803a235382",
+      "id": "726ed414-4995-4779-a8e6-2242375bd03e",
       "name": "Finalize Context"
     },
     {
@@ -809,10 +809,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        55536,
-        10352
+        249072,
+        30592
       ],
-      "id": "dc7ee983-0e77-40e3-b037-cabdaf80d8cc",
+      "id": "00eae2df-c05b-4c0a-b3f1-846d6d2c2038",
       "name": "Is Simulator?"
     },
     {
@@ -827,10 +827,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        56432,
-        10160
+        251312,
+        30608
       ],
-      "id": "5f821a38-b9bf-47bb-a410-9dea7c251004",
+      "id": "70019772-b5ae-4a35-a7a5-3cc9a57523e5",
       "name": "Save labels for the chat2",
       "credentials": {
         "wahaApi": {
@@ -850,10 +850,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        56208,
-        10160
+        251088,
+        30608
       ],
-      "id": "7fcfcfd8-39c3-472c-b2bf-4d260c561a85",
+      "id": "71bd532c-a24d-4f51-8896-314a2cab114a",
       "name": "Get contact basic info3",
       "credentials": {
         "wahaApi": {
@@ -873,10 +873,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        56208,
-        10352
+        251088,
+        30944
       ],
-      "id": "2450f3d2-fdbf-4ce6-8162-86ca6c492433",
+      "id": "5c8ff416-aeaa-4fbb-83dc-12cc030c9baf",
       "name": "Start Typing",
       "credentials": {
         "wahaApi": {
@@ -896,10 +896,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        56880,
-        10496
+        251760,
+        31088
       ],
-      "id": "5c4e44fb-22a8-413f-b97b-3cedd646ca91",
+      "id": "5044250d-a359-4446-bd5d-ac4fb0fac059",
       "name": "Stop Typing",
       "credentials": {
         "wahaApi": {
@@ -936,10 +936,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        56656,
-        10352
+        251536,
+        30944
       ],
-      "id": "daf80040-5f1b-4f0f-8986-7e40ec5f8aa1",
+      "id": "ccfdb5d5-6c31-4b24-8934-5c6c86bc447b",
       "name": "SCHEDULE"
     },
     {
@@ -949,10 +949,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        56432,
-        10352
+        251312,
+        30944
       ],
-      "id": "b4470719-9f94-414f-b2c4-679633e23cef",
+      "id": "eece34c3-9284-4c85-a801-aad8e484fcd8",
       "name": "Wait4",
       "webhookId": "3c8d1cb9-9c7f-4d0e-b199-3c159ec30a3c"
     },
@@ -969,10 +969,10 @@
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1.3,
       "position": [
-        56880,
-        10208
+        251760,
+        30784
       ],
-      "id": "98731d70-dd15-44de-9f7c-89da32b2d914",
+      "id": "636b996c-8942-4322-b1a9-24ce1c930018",
       "name": "Create an event",
       "disabled": true
     },
@@ -988,10 +988,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        57552,
-        10208
+        252880,
+        30784
       ],
-      "id": "0e3657ad-b5db-42d2-b625-1b1280c30334",
+      "id": "d7414023-79cf-467c-a2fa-c9f23b38088c",
       "name": "Send a text message8",
       "credentials": {
         "wahaApi": {
@@ -1028,10 +1028,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        57104,
-        10496
+        251984,
+        31088
       ],
-      "id": "6e6ec787-ea04-4bdd-b8a2-e6944bd78c27",
+      "id": "405a918f-9a62-4a37-8f2a-0c7d18832b16",
       "name": "HAS WELCOME IMAGE"
     },
     {
@@ -1046,10 +1046,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        57328,
-        10416
+        252656,
+        30992
       ],
-      "id": "6e353c31-9b79-450f-8129-3786b06f3de6",
+      "id": "17d6cf72-f7cd-4c35-a2fb-a5afff649bd1",
       "name": "Send welcome image1",
       "credentials": {
         "wahaApi": {
@@ -1070,10 +1070,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        57552,
-        10496
+        252880,
+        31088
       ],
-      "id": "e76756dd-adfc-4684-917e-d025627d921e",
+      "id": "8c1c3b0e-0176-43bf-afa7-aa97a4788522",
       "name": "Send a text message4",
       "credentials": {
         "wahaApi": {
@@ -1090,10 +1090,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        50704,
-        10000
+        244240,
+        30240
       ],
-      "id": "805fbf39-6127-40e2-ab38-ea34c5608f85",
+      "id": "a50e107b-6964-4cf4-8154-7fb73b3970d0",
       "name": "Edit Fields"
     },
     {
@@ -1124,10 +1124,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        54064,
-        10448
+        247600,
+        30688
       ],
-      "id": "a7f03faa-7730-4a83-a7b9-4eee61f19e8f",
+      "id": "48283606-0c6c-45f1-89bd-a343a89f40b3",
       "name": "IS ACTIVE?"
     },
     {
@@ -1158,10 +1158,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        57104,
-        10208
+        251984,
+        30784
       ],
-      "id": "5c828f15-2f8e-4caf-b719-ed0fc428923f",
+      "id": "30d17e88-f7da-48d1-8e0b-6057c554d525",
       "name": "HAS WELCOME IMAGE (BOOKING)"
     },
     {
@@ -1176,10 +1176,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        57328,
-        10128
+        252656,
+        30704
       ],
-      "id": "201134cf-02d3-48dc-b9e9-5ada355ea10f",
+      "id": "a93c3988-187a-498c-b21f-1cde28af0882",
       "name": "Send welcome image (booking)",
       "credentials": {
         "wahaApi": {
@@ -1216,10 +1216,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        58000,
-        10352
+        253328,
+        30944
       ],
-      "id": "ac7c4fb6-229d-4bae-a4a2-4504058c85ba",
+      "id": "a660b8d1-c0de-4523-8e46-8de2324fccf6",
       "name": "FOLLOWUP ENABLED?"
     },
     {
@@ -1230,10 +1230,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        58448,
-        10352
+        253776,
+        30944
       ],
-      "id": "5b391fdf-c694-48af-855c-59f049747e8f",
+      "id": "9607607f-8888-4c62-824c-82b520ed6211",
       "name": "Followup Wait",
       "webhookId": "fb0c5c98-9c47-4829-a6b5-f9137efc6b9e"
     },
@@ -1265,10 +1265,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        58672,
-        10352
+        254000,
+        30944
       ],
-      "id": "5d9927aa-b38f-4224-bf43-eeebb31745ee",
+      "id": "05243246-1bc8-481f-b62b-571df9166b75",
       "name": "FOLLOWUP HAS TEXT?"
     },
     {
@@ -1279,10 +1279,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        58224,
-        10352
+        253552,
+        30944
       ],
-      "id": "bcb2a579-5281-4d98-bbd6-7d60eb95ddb6",
+      "id": "52c3cacf-99ba-4d59-85ef-2736e96e8288",
       "name": "Prepare Followup"
     },
     {
@@ -1297,10 +1297,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        58896,
-        10352
+        254224,
+        30944
       ],
-      "id": "ffc18e8a-d955-4612-8209-d43a4ca9b841",
+      "id": "a5fe4eaf-f35b-4ab7-8c3b-f7988f234640",
       "name": "Send Followup",
       "credentials": {
         "wahaApi": {
@@ -1337,27 +1337,28 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        55984,
-        10256
+        250864,
+        30848
       ],
-      "id": "08fcaa0f-b423-4aa2-aecf-87d74f3de989",
+      "id": "04227af4-1b9a-4c10-ba9f-7d15d9e7203a",
       "name": "IF ESCALATE"
     },
     {
       "parameters": {
-        "url": "http://172.26.224.1:5000/api/analytics/log",
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/analytics/log",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"agentId\": \"{{ $('Fetch Config DB').item.json.agentId }}\",\n  \"platformId\": \"{{ $('Fetch Config DB').item.json.platformId }}\",\n  \"sessionId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}\",\n  \"chatId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.payload.from : ($('Parse Meta Payload').isExecuted ? $('Parse Meta Payload').item.json.from : '') }}\",\n  \"userMessage\": \"{{ $('Set Prod Mode').isExecuted ? $('Set Prod Mode').item.json.message : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.message : '') }}\",\n  \"aiResponse\": \"{{ $json.text_for_wa }}\",\n  \"isHandoff\": \"{{ $json.escalate || false }}\",\n  \"mode\": \"production\"\n}",
+        "jsonBody": "={\n  \"agentId\": \"{{ $('Fetch Config DB').item.json.agentId }}\",\n  \"platformId\": \"{{ $('Fetch Config DB').item.json.platformId }}\",\n  \"sessionId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}\",\n  \"chatId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.payload.from : ($('Parse Meta Payload').isExecuted ? $('Parse Meta Payload').item.json.from : '') }}\",\n  \"userMessage\": \"{{ $('Set Prod Mode').isExecuted ? $('Set Prod Mode').item.json.message : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.message : '') }}\",\n  \"aiResponse\": {{ JSON.stringify($('Code in JavaScript').item.json.text_for_wa || '') }},\n  \"isHandoff\": \"{{ $('Code in JavaScript').item.json.escalate || false }}\",\n  \"mode\": \"production\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        57776,
-        10208
+        253104,
+        30784
       ],
-      "id": "09a2559c-b4fc-477a-8c30-37f463ea299e",
+      "id": "eab04c72-2b0c-49da-a88c-be8c69022011",
       "name": "Log Conversation"
     },
     {
@@ -1366,16 +1367,16 @@
         "url": "https://api.vlow-ai.com/api/analytics/log",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"agentId\": \"{{ $('IS ACTIVE?').item.json.agent_id }}\",\n  \"sessionId\": \"{{ $('IS ACTIVE?').item.json.sessionId }}\",\n  \"chatId\": \"{{ $('IS ACTIVE?').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('IS ACTIVE?').item.json.message || \"\") }},\n  \"aiResponse\": {{ JSON.stringify($json._data.body || \"\") }},\n  \"mode\": \"production\"\n}\n",
+        "jsonBody": "={\n  \"agentId\": \"{{ $('IS ACTIVE?').item.json.agent_id }}\",\n  \"sessionId\": \"{{ $('IS ACTIVE?').item.json.sessionId }}\",\n  \"chatId\": \"{{ $('IS ACTIVE?').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('IS ACTIVE?').item.json.message || \"\") }},\n  \"aiResponse\": {{ JSON.stringify($('Code in JavaScript').item.json.text_for_wa || \"\") }},\n  \"mode\": \"production\"\n}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        57776,
-        10496
+        253104,
+        31088
       ],
-      "id": "80effd8c-6bdb-444b-b9a3-5accb8733997",
+      "id": "61c5d7be-7374-4c8f-998d-1ae718c7e992",
       "name": "Log Conversation (Alt)"
     },
     {
@@ -1383,10 +1384,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.wahaTrigger",
       "typeVersion": 202502,
       "position": [
-        50480,
-        9616
+        244016,
+        29856
       ],
-      "id": "d496867a-310c-4c32-a826-0daa68885f3b",
+      "id": "c7a72016-2b28-4675-be75-d436b9879100",
       "name": "WAHA Trigger",
       "webhookId": "20d16051-147e-4463-a36c-d98a15cf35ff"
     },
@@ -1401,10 +1402,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        53616,
-        10352
+        247152,
+        30592
       ],
-      "id": "f772d2d9-cff8-46c1-b1a2-17e078875387",
+      "id": "4640db65-3ef6-4d3d-adfe-f411ddc7722e",
       "name": "Execute a SQL query",
       "credentials": {
         "postgres": {
@@ -1424,10 +1425,10 @@
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        51824,
-        9904
+        245360,
+        30144
       ],
-      "id": "07657631-ebf4-4f39-8b01-6056245cd590",
+      "id": "272e6cef-7742-432f-bb9c-2c4ade3e6c4c",
       "name": "Get contact basic info1",
       "credentials": {
         "wahaApi": {
@@ -1439,7 +1440,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.vlow-ai.com/api/handover/activate",
+        "url": "https://api.vlow-ai.com/api/handover/activate-n8n",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"chatId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.payload.from : ($('Parse Meta Payload').isExecuted ? $('Parse Meta Payload').item.json.from : '') }}\",\n  \"sessionId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}\",\n  \"triggeredBy\": \"ai_escalate\"\n}",
@@ -1450,10 +1451,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        56656,
-        10160
+        251536,
+        30608
       ],
-      "id": "58d997b7-7da1-4772-a7f1-eea880d4b12a",
+      "id": "98e05f9e-cf10-43a3-b1ff-44f5d110ef24",
       "name": "Activate Handover",
       "onError": "continueRegularOutput"
     },
@@ -1471,10 +1472,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        54288,
-        10448
+        247824,
+        30688
       ],
-      "id": "d7a90971-0b1c-41a5-a5fa-4b0d2622d946",
+      "id": "f42cd510-2f11-46f8-87aa-7dd9e2c0cddd",
       "name": "Check Keyword",
       "onError": "continueRegularOutput"
     },
@@ -1506,10 +1507,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        54512,
-        10448
+        248048,
+        30688
       ],
-      "id": "26a5aeb8-b38b-4e10-a42e-88a2ac8b1710",
+      "id": "dac4d32a-855c-41fa-aedd-bd506c5cdc40",
       "name": "IF Keyword Match"
     },
     {
@@ -1531,10 +1532,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        54736,
-        10448
+        248272,
+        30688
       ],
-      "id": "d8676db1-463d-4ccb-aa82-813a33f5db7e",
+      "id": "4ba23bb0-38ca-42d4-8953-e39a31064bea",
       "name": "Check Handover Status",
       "onError": "continueRegularOutput"
     },
@@ -1565,10 +1566,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        54960,
-        10448
+        248496,
+        30688
       ],
-      "id": "0519588a-abb9-4727-aa1b-38f62f2a3934",
+      "id": "de035f8f-d289-4602-9165-530427b45e8c",
       "name": "IF Human Mode"
     },
     {
@@ -1580,17 +1581,17 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        54640,
-        10336
+        248176,
+        30576
       ],
       "typeVersion": 1,
-      "id": "6d422ba1-dee7-48e9-a2a8-ea4d513c3936",
+      "id": "5c9de5f8-9317-4352-ae1c-af29802ec714",
       "name": "Sticky Note Handover"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.vlow-ai.com/api/handover/activate",
+        "url": "https://api.vlow-ai.com/api/handover/activate-n8n",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"chatId\": \"{{ $(\"WAHA Trigger\").item.json.payload.to || $(\"WAHA Trigger\").item.json.payload.chatId || $(\"WAHA Trigger\").item.json.payload.from }}\",\n  \"sessionId\": \"{{ $(\"WAHA Trigger\").item.json.session }}\",\n  \"triggeredBy\": \"manual_reply\"\n}",
@@ -1601,10 +1602,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        51600,
-        9904
+        245136,
+        30144
       ],
-      "id": "71e28ca2-a939-45d8-8214-e720b6c15a40",
+      "id": "330f80b8-b600-4387-8354-734578bd0bb9",
       "name": "Auto Label Human",
       "onError": "continueRegularOutput"
     },
@@ -1627,10 +1628,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        52272,
-        9904
+        245808,
+        30144
       ],
-      "id": "7b1c9e38-0c7a-43ab-8a91-79c4c7585d82",
+      "id": "62edc23a-34ec-41f9-994a-73d78016c426",
       "name": "Fetch Handover Config",
       "onError": "continueRegularOutput"
     },
@@ -1653,10 +1654,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        51824,
-        10096
+        245360,
+        30336
       ],
-      "id": "dff77114-f43f-45e6-8344-e20ab1fa1246",
+      "id": "bbbf51f3-c028-4902-a76c-d9c53ab0bb24",
       "name": "Fetch Label Config",
       "onError": "continueRegularOutput"
     },
@@ -1667,10 +1668,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        52048,
-        10096
+        245584,
+        30336
       ],
-      "id": "2849f60b-5fc4-41e8-a2f7-f8af4ddfb013",
+      "id": "a3868770-a989-4810-98f6-c3cddf95a419",
       "name": "CEK LABEL Logic"
     },
     {
@@ -1701,10 +1702,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        52272,
-        10096
+        245808,
+        30336
       ],
-      "id": "7b0b2481-f5b6-439e-8fb5-3552ab69c468",
+      "id": "d320bd21-b6d7-4de8-a47f-b83e6acc04bb",
       "name": "CEK LABEL"
     },
     {
@@ -1714,10 +1715,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        55728,
-        10448
+        249296,
+        30688
       ],
-      "id": "5ccdb578-1471-427e-8d05-5da11f9073ae",
+      "id": "be6d9570-0b36-48ae-88c0-4918e665db39",
       "name": "Process Sim Response"
     },
     {
@@ -1746,10 +1747,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        55960,
-        10256
+        249744,
+        30784
       ],
-      "id": "if-has-image-1772015892310",
+      "id": "2b385ae4-4869-4550-93b4-7c5e7ff26aa9",
       "name": "Check If Image Exists"
     },
     {
@@ -1764,11 +1765,11 @@
           "conditions": [
             {
               "id": "e7c2e9b0-4f51-4f1b-85d8-c89b7888b64e",
-              "leftValue": "={{ $json.welcome_image_url }}",
+              "leftValue": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
               "rightValue": ".pdf",
               "operator": {
                 "type": "string",
-                "operation": "endsWith"
+                "operation": "contains"
               }
             }
           ],
@@ -1781,10 +1782,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        56100,
-        10256
+        249968,
+        30848
       ],
-      "id": "if-is-pdf-1772015892310",
+      "id": "beca1f02-c879-4055-8862-a099d3303118",
       "name": "Check If is PDF"
     },
     {
@@ -1794,16 +1795,15 @@
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
         "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
-        "caption": "",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        56160,
-        10156
+        250640,
+        30752
       ],
-      "id": "waha-send-image-1772015892310",
+      "id": "92eb9cb2-9d1b-401f-a8d5-39e126c1a4f4",
       "name": "WAHA Send Image",
       "credentials": {
         "wahaApi": {
@@ -1818,17 +1818,16 @@
         "operation": "Send File",
         "session": "={{ $('WAHA Trigger').item.json.session }}",
         "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
-        "file": "={\n  \"mimetype\": \"application/pdf\",\n  \"filename\": \"document.pdf\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
-        "caption": "",
+        "file": "={\n  \"mimetype\": \"application/pdf\",\n  \"filename\": \"{{ ($('Code in JavaScript').item.json.waha_image_url || 'document.pdf').split('/').pop().split('?')[0] || 'document.pdf' }}\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
         "requestOptions": {}
       },
       "type": "@devlikeapro/n8n-nodes-waha.WAHA",
       "typeVersion": 202502,
       "position": [
-        56160,
-        10356
+        250640,
+        30944
       ],
-      "id": "waha-send-file-1772015892310",
+      "id": "85f82a94-fd35-4f8d-9d2a-6c4c4235e29e",
       "name": "WAHA Send File",
       "credentials": {
         "wahaApi": {
@@ -1851,24 +1850,23 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        57128,
-        10416
+        252208,
+        30992
       ],
-      "id": "http-dl-1772094912991-0",
+      "id": "1e72fc77-4c6a-4a1f-92ca-f94594cb65ae",
       "name": "Download Image"
     },
     {
       "parameters": {
-        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
-        "mode": "runOnceForAllItems"
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        57328,
-        10416
+        252432,
+        30992
       ],
-      "id": "extract-b64-1772094912992-1",
+      "id": "c0472500-1a2e-4fff-b6ab-634173170937",
       "name": "To Base64"
     },
     {
@@ -1885,24 +1883,23 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        57128,
-        10128
+        252208,
+        30704
       ],
-      "id": "http-dl-1772094912995-2",
+      "id": "52a8ae0b-5072-45b8-8905-b1ce98edc286",
       "name": "Download Image (Booking)"
     },
     {
       "parameters": {
-        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
-        "mode": "runOnceForAllItems"
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        57328,
-        10128
+        252432,
+        30704
       ],
-      "id": "extract-b64-1772094912995-3",
+      "id": "384de28e-c386-4acd-aacc-9dafd6c2599a",
       "name": "To Base64 (Booking)"
     },
     {
@@ -1919,29 +1916,28 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        55960,
-        10156
+        250192,
+        30752
       ],
-      "id": "http-dl-1772094912995-4",
+      "id": "673afb25-bfc4-4cae-a928-4352f888f082",
       "name": "Download Image (Escalate)"
     },
     {
       "parameters": {
-        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
-        "mode": "runOnceForAllItems"
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        56160,
-        10156
+        250416,
+        30752
       ],
-      "id": "extract-b64-1772094912995-5",
+      "id": "4fda333c-1ea1-49db-889d-0c5dc374e28c",
       "name": "To Base64 (Escalate)"
     },
     {
       "parameters": {
-        "url": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+        "url": "={{ (() => { const imgUrl = $('Code in JavaScript').item.json.waha_image_url || ''; if (!imgUrl || !imgUrl.includes('minio.dayamedialangit.co.id')) return imgUrl; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return 'https://api.vlow-ai.com/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}",
         "options": {
           "response": {
             "response": {
@@ -1953,24 +1949,23 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        55960,
-        10356
+        250192,
+        30944
       ],
-      "id": "http-dl-1772094912995-6",
+      "id": "39d232c5-c9db-4bf4-8677-367d61364d90",
       "name": "Download File (Escalate)"
     },
     {
       "parameters": {
-        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];",
-        "mode": "runOnceForAllItems"
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        56160,
-        10356
+        250416,
+        30944
       ],
-      "id": "extract-b64-1772094912995-7",
+      "id": "8f4ec33b-3351-4b46-8c60-7083ae4c61b8",
       "name": "To Base64 (File)"
     },
     {
@@ -1982,10 +1977,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        50480,
-        9200
+        245808,
+        30784
       ],
-      "id": "meta-cloud-trigger",
+      "id": "5779d106-b7d3-40e1-9e1b-dcc474914ba4",
       "name": "Meta Cloud Webhook",
       "webhookId": "meta-cloud-combined-001"
     },
@@ -1997,10 +1992,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        50704,
-        9200
+        246032,
+        30784
       ],
-      "id": "meta-parse-payload",
+      "id": "8f1642a0-7eeb-47e6-8203-739d3559d387",
       "name": "Parse Meta Payload"
     },
     {
@@ -2031,10 +2026,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        50928,
-        9200
+        246256,
+        30784
       ],
-      "id": "meta-has-message",
+      "id": "05face4d-2c34-4a7f-b79f-317d77188a3d",
       "name": "Has Message?"
     },
     {
@@ -2044,10 +2039,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        51152,
-        9200
+        246480,
+        30784
       ],
-      "id": "meta-set-prod",
+      "id": "276199e2-de44-4c91-852a-d56dc8b29d11",
       "name": "Meta Set Prod Mode"
     },
     {
@@ -2107,10 +2102,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        55760,
-        10160
+        249520,
+        30480
       ],
-      "id": "which-platform",
+      "id": "2fc192a0-3387-4385-9859-2f77c1247164",
       "name": "Which Platform?"
     },
     {
@@ -2141,16 +2136,16 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        56208,
-        9200
+        249968,
+        30320
       ],
-      "id": "meta-if-escalate",
+      "id": "597331f7-b6ed-4fb8-906f-26a3e1b1be7f",
       "name": "Meta IF ESCALATE"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.vlow-ai.com/api/handover/activate",
+        "url": "https://api.vlow-ai.com/api/handover/activate-n8n",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"chatId\": \"{{ $('Parse Meta Payload').item.json.from }}\",\n  \"sessionId\": \"{{ $('Meta Set Prod Mode').item.json.metaSessionId }}\",\n  \"triggeredBy\": \"ai_escalate\"\n}",
@@ -2161,10 +2156,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        56432,
-        9100
+        250192,
+        30272
       ],
-      "id": "meta-activate-handover",
+      "id": "6243f471-023b-4a6b-a90d-5471e0f73814",
       "name": "Meta Activate Handover",
       "onError": "continueRegularOutput"
     },
@@ -2189,10 +2184,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        56656,
-        9200
+        250416,
+        30320
       ],
-      "id": "meta-send-text",
+      "id": "5a70c221-7ee1-48eb-8051-fd1af579b94a",
       "name": "Meta Send Text"
     },
     {
@@ -2223,10 +2218,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        56880,
-        9200
+        250640,
+        30256
       ],
-      "id": "meta-has-image",
+      "id": "1dc9b015-2a7e-4643-9d97-34285c58297d",
       "name": "Meta HAS IMAGE?"
     },
     {
@@ -2250,10 +2245,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        136816,
-        17620
+        251536,
+        30416
       ],
-      "id": "meta-send-image",
+      "id": "0ca2e7f8-7b22-46b1-aa24-68ea8cb426ea",
       "name": "Meta Send Image"
     },
     {
@@ -2262,16 +2257,16 @@
         "url": "https://api.vlow-ai.com/api/analytics/log",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"agentId\": \"{{ $('Execute a SQL query').isExecuted ? $('Execute a SQL query').first().json.agent_id : '' }}\",\n  \"sessionId\": \"{{ $('Meta Set Prod Mode').item.json.metaSessionId }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('Meta Set Prod Mode').item.json.message || '') }},\n  \"aiResponse\": {{ JSON.stringify($json.text_for_wa || $json.output || '') }},\n  \"isHandoff\": \"{{ $json.escalate || false }}\",\n  \"mode\": \"production\"\n}",
+        "jsonBody": "={\n  \"agentId\": \"{{ $('Execute a SQL query').isExecuted ? $('Execute a SQL query').first().json.agent_id : '' }}\",\n  \"sessionId\": \"{{ $('Meta Set Prod Mode').item.json.metaSessionId }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('Meta Set Prod Mode').item.json.message || '') }},\n  \"aiResponse\": {{ JSON.stringify($('Code in JavaScript').first().json.text_for_wa || $('Code in JavaScript').first().json.output || '') }},\n  \"isHandoff\": \"{{ $('Code in JavaScript').first().json.escalate || false }}\",\n  \"mode\": \"production\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        57328,
-        9200
+        251984,
+        30256
       ],
-      "id": "meta-log-conversation",
+      "id": "894547e4-9164-4579-9226-fd0dbeb9692f",
       "name": "Meta Log Conversation"
     },
     {
@@ -2302,10 +2297,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        57552,
-        9200
+        252208,
+        30256
       ],
-      "id": "meta-followup-enabled",
+      "id": "e32e8cac-af77-4c6b-899f-dfc0c58b0b09",
       "name": "Meta FOLLOWUP?"
     },
     {
@@ -2316,10 +2311,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        57776,
-        9200
+        252432,
+        30256
       ],
-      "id": "meta-prepare-followup",
+      "id": "2372d021-bc58-4ae8-a266-05ba6c1acedd",
       "name": "Meta Prepare Followup"
     },
     {
@@ -2330,10 +2325,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        58000,
-        9200
+        252656,
+        30256
       ],
-      "id": "meta-followup-wait",
+      "id": "caf850d3-bd19-4217-bd71-44cd08e8f1a2",
       "name": "Meta Followup Wait",
       "webhookId": "meta-followup-wait-combined"
     },
@@ -2358,10 +2353,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        58224,
-        9200
+        252880,
+        30256
       ],
-      "id": "meta-send-followup",
+      "id": "46b1d88d-de9a-45d5-a94b-926e883a670f",
       "name": "Meta Send Followup"
     },
     {
@@ -2373,11 +2368,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        50440,
-        9060
+        246144,
+        30240
       ],
       "typeVersion": 1,
-      "id": "note-meta-cloud",
+      "id": "32212c85-b75a-4020-9864-472f5a3211e9",
       "name": "Sticky Note Meta Cloud"
     },
     {
@@ -2389,11 +2384,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        55720,
-        10080
+        249248,
+        30832
       ],
       "typeVersion": 1,
-      "id": "note-platform-router",
+      "id": "1a57de1b-e627-4d2a-b990-74605c40b031",
       "name": "Sticky Note Router"
     },
     {
@@ -2419,10 +2414,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        56656,
-        9400
+        250640,
+        30464
       ],
-      "id": "save-ai-reply-text",
+      "id": "f209924a-fd29-47ff-8769-ce63ca6e944c",
       "name": "Save AI Reply",
       "onError": "continueRegularOutput"
     },
@@ -2449,10 +2444,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        57552,
-        9300
+        244016,
+        31312
       ],
-      "id": "save-ai-image-reply",
+      "id": "f5ce0721-188d-4d26-b0b8-be6c7aa672ff",
       "name": "Save AI Image Reply",
       "onError": "continueRegularOutput"
     },
@@ -2468,10 +2463,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        57552,
-        9300
+        251760,
+        30320
       ],
-      "id": "vlow-save-image-db",
+      "id": "da06bb94-b1d1-409a-b996-693a102d681b",
       "name": "Vlow Save Image DB"
     },
     {
@@ -2488,10 +2483,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        136144,
-        17520
+        250864,
+        30320
       ],
-      "id": "meta-dl-image-v3",
+      "id": "782c321f-bff7-4b6d-adce-2ce38f4ac375",
       "name": "Meta DL Image",
       "onError": "continueRegularOutput"
     },
@@ -2532,10 +2527,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        136368,
-        17520
+        251088,
+        30320
       ],
-      "id": "meta-upload-media-v3",
+      "id": "05faf96d-c025-4f05-b94c-b947050eeb3e",
       "name": "Meta Upload Media"
     },
     {
@@ -2565,10 +2560,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        136592,
-        17520
+        251312,
+        30320
       ],
-      "id": "meta-is-pdf-v3",
+      "id": "1198edfe-e677-497a-868d-a391bebeb4fd",
       "name": "Meta Is PDF?"
     },
     {
@@ -2592,10 +2587,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        136816,
-        17420
+        251536,
+        30224
       ],
-      "id": "meta-send-document-v3",
+      "id": "343251fe-3909-4e44-bb3b-601077af225f",
       "name": "Meta Send Document"
     },
     {
@@ -2619,10 +2614,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        56432,
-        9400
+        249744,
+        30320
       ],
-      "id": "meta-start-typing",
+      "id": "5079326f-a1c8-4695-b5f5-6d0f19679aa6",
       "name": "Meta Start Typing",
       "onError": "continueRegularOutput"
     }
@@ -3053,7 +3048,7 @@
       "main": [
         [
           {
-            "node": "Download Image",
+            "node": "Check If is PDF",
             "type": "main",
             "index": 0
           }
@@ -3402,7 +3397,7 @@
       "main": [
         [
           {
-            "node": "IF ESCALATE",
+            "node": "Send a text message4",
             "type": "main",
             "index": 0
           }
@@ -3413,7 +3408,7 @@
       "main": [
         [
           {
-            "node": "IF ESCALATE",
+            "node": "Send a text message4",
             "type": "main",
             "index": 0
           }
@@ -3538,8 +3533,7 @@
             "type": "main",
             "index": 0
           }
-        ],
-        []
+        ]
       ]
     },
     "Meta Set Prod Mode": {
@@ -3641,6 +3635,17 @@
         ]
       ]
     },
+    "Meta Send Image": {
+      "main": [
+        [
+          {
+            "node": "Vlow Save Image DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
     "Meta Log Conversation": {
       "main": [
         [
@@ -3660,8 +3665,7 @@
             "type": "main",
             "index": 0
           }
-        ],
-        []
+        ]
       ]
     },
     "Meta Prepare Followup": {
@@ -3691,17 +3695,6 @@
         [
           {
             "node": "Meta Log Conversation",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Meta Send Image": {
-      "main": [
-        [
-          {
-            "node": "Vlow Save Image DB",
             "type": "main",
             "index": 0
           }
@@ -3803,6 +3796,5 @@
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "df79904fa755120452f87c707b84f5f3a64d828f8411fb0ae2fc99bc78f2c37b"
-  },
-  "name": "Vlow AI Agent - Combined (WAHA + Meta Cloud)"
+  }
 }

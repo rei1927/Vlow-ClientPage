@@ -17,6 +17,7 @@ router.post("/release", protect, releaseHandover);
 router.get("/batch-status", protect, getBatchHandoverStatus);
 
 // n8n integration endpoints (public — called from n8n workflow)
+router.post("/activate-n8n", activateHandover); // Public route for n8n escalation
 router.get("/status/:chatId", getHandoverStatus);
 router.post("/check-keyword", checkKeyword);
 
