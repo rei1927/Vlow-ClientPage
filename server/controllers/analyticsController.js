@@ -130,6 +130,17 @@ export const logConversation = async (req, res, next) => {
       metadata,
     } = req.body;
 
+    // DEBUG: Log what we receive
+    console.log("[LOG_CONVERSATION_DEBUG] Received body:", JSON.stringify({
+      agentId,
+      sessionId,
+      chatId,
+      userMessage: userMessage ? `${userMessage.substring(0, 50)}... (${userMessage.length} chars)` : null,
+      aiResponse: aiResponse ? `${aiResponse.substring(0, 50)}... (${aiResponse.length} chars)` : null,
+      isHandoff,
+      mode,
+    }));
+
     if (!agentId || !sessionId || !chatId) {
       return res.status(400).json({ message: "agentId, sessionId, dan chatId wajib diisi" });
     }
@@ -152,6 +163,8 @@ export const logConversation = async (req, res, next) => {
       mode: mode === "simulation" ? "simulation" : "production",
       metadata: metadata || null,
     });
+
+    console.log("[LOG_CONVERSATION_DEBUG] Saved log ID:", log.id, "aiResponse saved:", log.aiResponse ? `${log.aiResponse.length} chars` : "NULL");
 
     res.status(201).json({
       success: true,
@@ -489,5 +502,47 @@ export const getAdminDashboardStats = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+// @desc    Debug: Check ConversationLog records (TEMPORARY)
+// @route   GET /api/analytics/debug-logs
+export const debugLogs = async (req, res) => {
+  try {
+    const logs = await ConversationLog.findAll({
+      order: [["createdAt", "DESC"]],
+      limit: 20,
+      attributes: ["id", "agentId", "chatId", "userMessage", "aiResponse", "mode", "createdAt"],
+    });
+
+    const summary = logs.map(log => ({
+      id: log.id,
+      agentId: log.agentId,
+      chatId: log.chatId,
+      userMessage: log.userMessage ? `${log.userMessage.substring(0, 80)}... (${log.userMessage.length} chars)` : "NULL",
+      aiResponse: log.aiResponse ? `${log.aiResponse.substring(0, 80)}... (${log.aiResponse.length} chars)` : "NULL",
+      mode: log.mode,
+      createdAt: log.createdAt,
+    }));
+
+    const totalLogs = await ConversationLog.count({ where: { mode: "production" } });
+    const logsWithAiResponse = await ConversationLog.count({ 
+      where: { 
+        mode: "production",
+        aiResponse: { [Op.ne]: null }
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalProductionLogs: totalLogs,
+        logsWithAiResponse,
+        logsWithoutAiResponse: totalLogs - logsWithAiResponse,
+      },
+      recentLogs: summary,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
