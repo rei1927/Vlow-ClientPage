@@ -20,6 +20,8 @@ const AgentBuilder = lazy(() => import("./pages/agents/AgentBuilder"));
 const ConnectedPlatforms = lazy(() => import("./pages/platforms/ConnectedPlatforms"));
 const ChatDashboard = lazy(() => import("./pages/chat/ChatDashboard"));
 
+const Profile = lazy(() => import("./pages/Profile"));
+
 const AUTH_PATHS = ["/login", "/forgot-password", "/reset-password"];
 function isAuthPath(pathname) {
   return AUTH_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
@@ -62,6 +64,7 @@ function App() {
               <Route element={<MainLayout />}>
                 {/* Semua route di dalam sini akan punya Sidebar */}
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
 
                 {/* Route User Management */}
                 <Route path="/users" element={<UserList />} />

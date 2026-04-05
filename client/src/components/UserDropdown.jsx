@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { FaSignOutAlt, FaChevronDown, FaUserShield, FaUserTie } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { FaSignOutAlt, FaChevronDown, FaUserShield, FaUserTie, FaUserCog } from "react-icons/fa";
 
 const UserDropdown = ({ user, onLogout }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -57,8 +59,19 @@ const UserDropdown = ({ user, onLogout }) => {
             </p>
           </div>
 
-          {/* Tombol Logout */}
+          {/* Menu Profil & Logout */}
           <div className="p-2">
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                navigate("/profile");
+              }}
+              className="w-full text-left px-4 py-2.5 text-sm text-[var(--color-text)] hover:bg-[var(--color-bg)] rounded-lg flex gap-2 items-center justify-start transition-colors font-medium group mb-1"
+            >
+              <FaUserCog size={14} className="group-hover:text-[var(--color-primary)] transition-colors" />
+              <span>Profil Akun</span>
+            </button>
+
             <button
               onClick={() => {
                 setIsOpen(false);

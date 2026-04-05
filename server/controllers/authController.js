@@ -49,7 +49,7 @@ export const logout = (req, res) => {
   });
 };
 
-// --- Update Password (First Login / User Profile) ---
+// --- Update Password (First Login) ---
 export const updatePassword = async (req, res, next) => {
   try {
     const { password } = req.body;
@@ -61,13 +61,32 @@ export const updatePassword = async (req, res, next) => {
     user.isFirstLogin = false; // Matikan flag first login
     await user.save();
 
-    // Opsional: Kirim token baru jika ingin memperpanjang sesi setelah ganti password
-    // sendTokenResponse(user, 200, res);
-
-    // Atau cukup response sukses saja:
     res.status(200).json({
       success: true,
       message: "Password berhasil diperbarui.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// --- Update Profile Password ---
+export const updateProfilePassword = async (req, res, next) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await User.findByPk(req.user.id);
+
+    if (!user || !(await user.matchPassword(oldPassword))) {
+      return next(new AppError("Password lama tidak sesuai.", 401));
+    }
+
+    user.password = newPassword; 
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password profil berhasil diperbarui.",
     });
   } catch (error) {
     next(error);

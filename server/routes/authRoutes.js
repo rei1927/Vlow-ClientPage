@@ -5,12 +5,14 @@ import {
   forgotPassword,
   resetPasswordFinal,
   updatePassword,
+  updateProfilePassword,
 } from "../controllers/authController.js";
 
 import {
   loginValidator,
   forgotPasswordValidator,
   resetPasswordValidator,
+  updateProfilePasswordValidator,
 } from "../validators/authValidator.js";
 
 // Import Handler Validasi Modular
@@ -43,5 +45,8 @@ router.put(
 
 // Change Password: Cek Token Login -> Validasi Password Baru -> Update DB
 router.put("/change-password", protect, resetPasswordValidator, runValidation, updatePassword);
+
+// Profile Password: Cek Token Login -> Validasi Password Lama & Baru -> Update DB
+router.put("/profile/password", protect, updateProfilePasswordValidator, runValidation, updateProfilePassword);
 
 export default router;
