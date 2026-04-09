@@ -6,6 +6,7 @@ import axiosInstance from "../../api/axiosInstance";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import QuotaOverlay from "./QuotaOverlay";
+import ImpersonateBanner from "./ImpersonateBanner";
 import ConfirmationModal from "../ConfirmationModal";
 
 const MainLayout = () => {
@@ -15,7 +16,7 @@ const MainLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { user, isLoading } = useSelector((state) => state.auth);
+  const { user, isLoading, isImpersonating } = useSelector((state) => state.auth);
 
   // Centralized usage state (shared between Header & QuotaOverlay)
   const [usage, setUsage] = useState({
@@ -28,7 +29,7 @@ const MainLayout = () => {
 
   useEffect(() => {
     const fetchUsage = async () => {
-      if (user && user.role === "customer") {
+      if (user && (user.role === "customer" || isImpersonating)) {
         setUsage((prev) => ({ ...prev, isLoading: true }));
         try {
           const res = await axiosInstance.get("/analytics/usage");
@@ -46,13 +47,12 @@ const MainLayout = () => {
           setUsage((prev) => ({ ...prev, isLoading: false }));
         }
       } else {
-        // Admin or no user — no usage data needed
         setUsage((prev) => ({ ...prev, isLoading: false }));
       }
     };
 
     fetchUsage();
-  }, [user]);
+  }, [user, isImpersonating]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -67,6 +67,9 @@ const MainLayout = () => {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] font-sans overflow-x-hidden transition-colors">
+      {/* Impersonate Banner */}
+      <ImpersonateBanner />
+
       {/* Sidebar */}
       <Sidebar
         isOpen={isSidebarOpen}
@@ -83,11 +86,12 @@ const MainLayout = () => {
 
       {/* Main Content */}
       <div
-        className="
+        className={`
           flex flex-col min-h-screen pt-14 sm:pt-16
           lg:pl-20
           transition-all duration-300 ease-in-out
-        "
+          ${isImpersonating ? "mt-10" : ""}
+        `}
       >
         {/* Page Content */}
         <main className="flex-1 px-4 pt-6 pb-21 sm:px-6 lg:px-8 overflow-y-auto bg-[var(--color-bg)]">

@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import sendEmail from "../utils/emailService.js";
 import { getPasswordResetTemplate } from "../utils/emailTemplates.js";
-import { sendTokenResponse } from "../utils/tokenUtils.js";
+import { sendTokenResponse, sendImpersonateResponse } from "../utils/tokenUtils.js";
 
 // --- Login User ---
 export const login = async (req, res, next) => {
@@ -143,6 +143,47 @@ export const resetPasswordFinal = async (req, res, next) => {
 
     // Langsung login user (Kirim Token & Cookie)
     sendTokenResponse(user, 200, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// --- Impersonate User (Admin masuk sebagai User lain) ---
+export const impersonateUser = async (req, res, next) => {
+  try {
+    const targetUser = await User.findByPk(req.params.userId);
+
+    if (!targetUser) {
+      return next(new AppError("User tidak ditemukan.", 404));
+    }
+
+    // Tidak boleh impersonate diri sendiri
+    if (targetUser.id === req.user.id) {
+      return next(new AppError("Tidak bisa impersonate diri sendiri.", 400));
+    }
+
+    // Kirim response dengan token target user + data admin asli
+    sendImpersonateResponse(targetUser, req.user, 200, res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// --- Stop Impersonating (Kembali ke akun Admin) ---
+export const stopImpersonating = async (req, res, next) => {
+  try {
+    const adminUser = await User.findByPk(req.params.adminId);
+
+    if (!adminUser) {
+      return next(new AppError("Admin user tidak ditemukan.", 404));
+    }
+
+    if (adminUser.role !== "admin") {
+      return next(new AppError("User bukan admin.", 403));
+    }
+
+    // Kirim token admin kembali (login ulang sebagai admin)
+    sendTokenResponse(adminUser, 200, res);
   } catch (error) {
     next(error);
   }

@@ -1,5 +1,6 @@
-import { useEffect, useState, useCallback } from "react"; // 1. Import useCallback
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   fetchUsers,
   createNewUser,
@@ -18,7 +19,9 @@ import {
   FaSortDown,
   FaCalendarTimes,
   FaExclamationTriangle,
+  FaKey,
 } from "react-icons/fa";
+import { impersonateUser, reset as resetAuth } from "../features/auth/authSlice";
 import toast from "react-hot-toast";
 import { updateUserSession } from "../features/auth/authSlice";
 
@@ -32,6 +35,7 @@ import UserFormModal from "../components/users/UserFormModal";
 
 const UserList = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { users, pagination, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.users,
   );
@@ -49,6 +53,7 @@ const UserList = () => {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isImpersonateModalOpen, setIsImpersonateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   // Fetch Data
@@ -137,6 +142,18 @@ const UserList = () => {
       });
   };
   const handleDelete = () => dispatch(removeUser(selectedUser.id));
+
+  const handleImpersonate = async () => {
+    try {
+      await dispatch(impersonateUser(selectedUser.id)).unwrap();
+      dispatch(resetAuth());
+      setIsImpersonateModalOpen(false);
+      setSelectedUser(null);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Gagal impersonate:", err);
+    }
+  };
 
   return (
     <div className="space-y-6 animate-[fadeIn_0.5s_ease-out]">
@@ -330,6 +347,7 @@ const UserList = () => {
                             setIsFormOpen(true);
                           }}
                           className="btn btn-sm btn-square btn-ghost text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10"
+                          title="Edit User"
                         >
                           <FaEdit />
                         </button>
@@ -339,9 +357,22 @@ const UserList = () => {
                             setIsDeleteModalOpen(true);
                           }}
                           className="btn btn-sm btn-square btn-ghost text-gray-500 hover:text-red-500 hover:bg-red-50"
+                          title="Hapus User"
                         >
                           <FaTrash />
                         </button>
+                        {user.role !== "admin" && user.id !== currentUser?.id && (
+                          <button
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setIsImpersonateModalOpen(true);
+                            }}
+                            className="btn btn-sm btn-square btn-ghost text-gray-500 hover:text-amber-600 hover:bg-amber-50"
+                            title="Login sebagai user ini"
+                          >
+                            <FaKey />
+                          </button>
+                        )}
                       </div>
                     </td>
                     <td>
@@ -417,8 +448,20 @@ const UserList = () => {
         onConfirm={handleDelete}
         title="Hapus User?"
         message={`Apakah Anda yakin ingin menghapus user "${selectedUser?.name}"? Data yang dihapus tidak dapat dikembalikan.`}
-        variant="danger" // Merah (Visual)
-        confirmText="Hapus" // Teks Tombol Khusus Delete
+        variant="danger"
+        confirmText="Hapus"
+        cancelText="Batal"
+        isLoading={isLoading}
+      />
+
+      <ConfirmationModal
+        isOpen={isImpersonateModalOpen}
+        onClose={() => setIsImpersonateModalOpen(false)}
+        onConfirm={handleImpersonate}
+        title="Login sebagai User?"
+        message={`Anda akan masuk ke dashboard sebagai "${selectedUser?.name}" (${selectedUser?.email}). Anda dapat kembali ke akun admin kapan saja.`}
+        variant="warning"
+        confirmText="Login sebagai User"
         cancelText="Batal"
         isLoading={isLoading}
       />

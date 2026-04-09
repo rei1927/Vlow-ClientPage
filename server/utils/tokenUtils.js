@@ -7,6 +7,46 @@ const generateToken = (id) => {
   });
 };
 
+// Fungsi untuk response impersonation (Admin login sebagai User lain)
+export const sendImpersonateResponse = (targetUser, adminUser, statusCode, res) => {
+  // Generate token untuk TARGET user (bukan admin)
+  const token = generateToken(targetUser.id);
+
+  const cookieOptions = {
+    expires: new Date(Date.now() + (process.env.JWT_COOKIE_EXPIRE || 30) * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === "production") {
+    cookieOptions.secure = true;
+  }
+
+  res
+    .status(statusCode)
+    .cookie("token", token, cookieOptions)
+    .json({
+      success: true,
+      token,
+      isImpersonating: true,
+      originalAdmin: {
+        id: adminUser.id,
+        name: adminUser.name,
+        email: adminUser.email,
+        role: adminUser.role,
+      },
+      user: {
+        id: targetUser.id,
+        name: targetUser.name,
+        email: targetUser.email,
+        role: targetUser.role,
+        isFirstLogin: false, // Override: jangan force change password saat impersonate
+        subscriptionExpiry: targetUser.subscriptionExpiry,
+        maxConversations: targetUser.maxConversations,
+        maxAiResponses: targetUser.maxAiResponses,
+      },
+    });
+};
+
 // Fungsi utama untuk mengirim response (Token + Cookie + JSON)
 export const sendTokenResponse = (user, statusCode, res) => {
   // 1. Buat Token
