@@ -1,15 +1,47 @@
 import BroadcastTemplate from "../models/BroadcastTemplate.js";
+import ConnectedPlatform from "../models/ConnectedPlatform.js";
 import axios from "axios";
 
 // Fungsi untuk sync template dari Meta Business Manager
 export const syncTemplates = async (req, res, next) => {
   try {
-    console.log("Syncing from Meta API...");
-    // Mock response successful
-    res.json({ message: "Templates synced successfully" });
+    const platform = await ConnectedPlatform.findOne({ 
+      where: { provider: "meta_cloud" },
+      order: [['createdAt', 'DESC']]
+    });
+
+    if (!platform || !platform.wabaId || !platform.systemUserAccessToken) {
+      return res.status(400).json({ message: "Platform Meta Cloud belum dikonfigurasi. Hubungkan WABA ID dan Token terlebih dahulu." });
+    }
+
+    const { wabaId, systemUserAccessToken } = platform;
+    
+    // Tarik data rill dari Meta
+    const response = await axios.get(`https://graph.facebook.com/v19.0/${wabaId}/message_templates`, {
+      headers: { Authorization: `Bearer ${systemUserAccessToken}` }
+    });
+
+    const metaTemplates = response.data.data || [];
+
+    // Bersihkan template lama agar tersinkronisasi bersih
+    await BroadcastTemplate.destroy({ where: {} });
+
+    const templatesToSave = metaTemplates.map(t => ({
+      name: t.name,
+      language: t.language,
+      category: t.category,
+      components: t.components,
+      status: t.status
+    }));
+
+    if (templatesToSave.length > 0) {
+      await BroadcastTemplate.bulkCreate(templatesToSave);
+    }
+
+    res.json({ message: "Templates synced successfully from Meta", count: templatesToSave.length });
   } catch (error) {
-    console.error("Error syncing templates", error);
-    next(error);
+    console.error("Error syncing templates", error.response?.data || error);
+    res.status(500).json({ message: "Internal server error during Meta sync", error: error.response?.data || error.message });
   }
 };
 
@@ -35,27 +67,41 @@ export const sendBroadcast = async (req, res, next) => {
       return res.status(404).json({ message: "Template not found" });
     }
 
-    // Logic broadcast sebenarnya menggunakan Meta Cloud API
-    /*
-    const META_TOKEN = process.env.META_ACCESS_TOKEN;
-    const PHONE_ID = process.env.META_PHONE_NUMBER_ID;
+    const platform = await ConnectedPlatform.findOne({ 
+      where: { provider: "meta_cloud" },
+      order: [['createdAt', 'DESC']]
+    });
 
-    for(const number of recipients) {
-       await axios.post(`https://graph.facebook.com/v19.0/${PHONE_ID}/messages`, {
-         messaging_product: "whatsapp",
-         to: number,
-         type: "template",
-         template: {
-           name: template.name,
-           language: { code: template.language }
-         }
-       }, {
-         headers: { Authorization: `Bearer ${META_TOKEN}` }
-       });
+    if (!platform || !platform.phoneNumberId || !platform.systemUserAccessToken) {
+      return res.status(400).json({ message: "Platform Meta Cloud belum siap. Phone Number ID atau Token tidak tersedia." });
     }
-    */
+
+    const { phoneNumberId, systemUserAccessToken } = platform;
+
+    // Loop recipients and send actual API requests to Meta
+    let successCount = 0;
     
-    res.json({ message: `Broadcast initiated to ${recipients.length} recipients successfully` });
+    // Peringatan: Untuk produksi skala besar, proses loop await axios array ini sebaiknya pakai antrian (queue)
+    for(const number of recipients) {
+       try {
+         await axios.post(`https://graph.facebook.com/v19.0/${phoneNumberId}/messages`, {
+           messaging_product: "whatsapp",
+           to: number,
+           type: "template",
+           template: {
+             name: template.name,
+             language: { code: template.language } // Kita abaikan parameter placeholder secara dinamis saat ini (bisa ditambahkan nanti)
+           }
+         }, {
+           headers: { Authorization: `Bearer ${systemUserAccessToken}` }
+         });
+         successCount++;
+       } catch (err) {
+         console.error(`Failed sending broadcast to ${number}`, err.response?.data || err.message);
+       }
+    }
+    
+    res.json({ message: `Broadcast processed. Successfully delivered to ${successCount}/${recipients.length} recipients.` });
   } catch (error) {
     console.error("Broadcast Execution Error:", error);
     next(error);

@@ -1,11 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 const RecipientsTab = () => {
   const [recipients, setRecipients] = useState("");
 
+  useEffect(() => {
+    const saved = window.localStorage.getItem("broadcast_recipients");
+    if (saved) setRecipients(saved);
+  }, []);
+
   const handleSave = () => {
-    // Nanti disimpan di state global atau DB
-    console.log("Recipients saved", recipients.split(","));
+    window.localStorage.setItem("broadcast_recipients", recipients);
+    toast.success("Daftar penerima berhasil disimpan!");
   };
 
   return (
@@ -17,7 +23,7 @@ const RecipientsTab = () => {
       
       <textarea
         className="w-full bg-[var(--input-bg)] text-white border border-white/20 rounded-lg p-3 h-40 focus:outline-none focus:border-blue-500 transition-colors"
-        placeholder="628123..., 628987..."
+        placeholder="628123456789, 628987654321&#10;Atau pakai baris baru"
         value={recipients}
         onChange={(e) => setRecipients(e.target.value)}
       ></textarea>
