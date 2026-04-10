@@ -39,7 +39,7 @@ const BroadcastDashboard = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="tab-content bg-[var(--card-bg)] p-6 rounded-lg shadow-lg border border-white/10">
+      <div className="bg-[var(--card-bg)] p-6 rounded-lg shadow-lg border border-white/10">
         {activeTab === "recipients" && <RecipientsTab />}
         {activeTab === "templates" && <TemplatesTab />}
         {activeTab === "broadcast" && <BroadcastTab />}
