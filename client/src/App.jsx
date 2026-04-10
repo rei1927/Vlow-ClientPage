@@ -19,6 +19,7 @@ const AgentList = lazy(() => import("./pages/agents/AgentList"));
 const AgentBuilder = lazy(() => import("./pages/agents/AgentBuilder"));
 const ConnectedPlatforms = lazy(() => import("./pages/platforms/ConnectedPlatforms"));
 const ChatDashboard = lazy(() => import("./pages/chat/ChatDashboard"));
+const BroadcastDashboard = lazy(() => import("./pages/broadcast/BroadcastDashboard"));
 
 const AUTH_PATHS = ["/login", "/forgot-password", "/reset-password"];
 function isAuthPath(pathname) {
@@ -72,6 +73,7 @@ function App() {
 
                 <Route path="/chat" element={<ChatDashboard />} />
                 <Route path="/platforms" element={<ConnectedPlatforms />} />
+                <Route path="/broadcast" element={<BroadcastDashboard />} />
               </Route>
             </Route>
 

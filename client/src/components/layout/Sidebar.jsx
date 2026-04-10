@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { FaHome, FaUsers, FaRobot, FaNetworkWired, FaTimes, FaSignOutAlt, FaComments } from "react-icons/fa";
+import { FaHome, FaUsers, FaRobot, FaNetworkWired, FaTimes, FaSignOutAlt, FaComments, FaBullhorn } from "react-icons/fa";
 
 const sidebarStyles = `
   /* ===== SIDEBAR BASE ===== */
@@ -130,6 +130,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
     { to: "/dashboard", icon: FaHome, label: "Dashboard", show: true },
     { to: "/users", icon: FaUsers, label: "User Management", show: user?.role === "admin" },
     { to: "/chat", icon: FaComments, label: "Live Chat", show: user?.role !== "admin" },
+    { to: "/broadcast", icon: FaBullhorn, label: "Broadcast", show: user?.role !== "admin" },
     { to: "/ai-agents", icon: FaRobot, label: "AI Agents", show: user?.role !== "admin" },
     { to: "/platforms", icon: FaNetworkWired, label: "Connected Platforms", show: user?.role !== "admin" },
   ];
