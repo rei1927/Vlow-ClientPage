@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import CreateTemplateModal from "../components/CreateTemplateModal";
 
 const TemplatesTab = () => {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     fetchTemplates();
@@ -38,6 +41,37 @@ const TemplatesTab = () => {
     }
   };
 
+  const handleCreateTemplate = async (templateData) => {
+    setCreating(true);
+    try {
+      const data = new FormData();
+      data.append("name", templateData.name);
+      data.append("category", templateData.category);
+      data.append("language", templateData.language);
+      data.append("headerType", templateData.headerType);
+      
+      if (templateData.headerText) data.append("headerText", templateData.headerText);
+      if (templateData.headerMedia) data.append("mediaFile", templateData.headerMedia);
+      
+      data.append("bodyText", templateData.bodyText);
+      if (templateData.footerText) data.append("footerText", templateData.footerText);
+
+      const res = await axios.post("/api/broadcast/templates", data, {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+
+      toast.success(res.data.message || "Template berhasil dibuat dan dikirim ke Meta untuk direview.");
+      setIsCreateModalOpen(false);
+      fetchTemplates(); // Refresh list to show the pending template
+    } catch (error) {
+      console.error("Error creating template", error);
+      toast.error(error.response?.data?.message || "Gagal membuat template.");
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -47,13 +81,21 @@ const TemplatesTab = () => {
             Sinkronkan dan lihat template pesan yang disetujui dari Meta Business Manager Anda.
           </p>
         </div>
-        <button 
-          onClick={syncMetaTemplates}
-          disabled={syncing}
-          className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium py-2 px-5 rounded-lg transition-colors flex items-center gap-2"
-        >
-          {syncing ? "Menyinkronkan..." : "Sync dari Meta"}
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setIsCreateModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-5 rounded-lg transition-colors"
+          >
+            Buat Template
+          </button>
+          <button 
+            onClick={syncMetaTemplates}
+            disabled={syncing}
+            className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-medium py-2 px-5 rounded-lg transition-colors flex items-center gap-2"
+          >
+            {syncing ? "Menyinkronkan..." : "Sync dari Meta"}
+          </button>
+        </div>
       </div>
       
       {loading ? (
@@ -83,6 +125,13 @@ const TemplatesTab = () => {
           ))}
         </div>
       )}
+
+      <CreateTemplateModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
+        onSubmit={handleCreateTemplate} 
+        submitting={creating} 
+      />
     </div>
   );
 };

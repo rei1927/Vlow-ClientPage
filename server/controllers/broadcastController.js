@@ -1,6 +1,15 @@
 import BroadcastTemplate from "../models/BroadcastTemplate.js";
 import ConnectedPlatform from "../models/ConnectedPlatform.js";
 import axios from "axios";
+import minioClient, { bucketName, getPublicFileUrl } from "../config/minio.js";
+import { v4 as uuidv4 } from "uuid";
+
+// Helper: Upload file to MinIO
+const uploadToMinio = async (file) => {
+  const fileName = `broadcast-${uuidv4()}-${file.originalname.replace(/\s/g, "-")}`;
+  await minioClient.putObject(bucketName, fileName, file.buffer);
+  return getPublicFileUrl(fileName);
+};
 
 // Fungsi untuk sync template dari Meta Business Manager
 export const syncTemplates = async (req, res, next) => {
@@ -105,5 +114,132 @@ export const sendBroadcast = async (req, res, next) => {
   } catch (error) {
     console.error("Broadcast Execution Error:", error);
     next(error);
+  }
+};
+
+export const createTemplate = async (req, res, next) => {
+  try {
+    const { name, category, language, headerType, headerText, bodyText, footerText } = req.body;
+    
+    if (!name || !bodyText) {
+      return res.status(400).json({ message: "Name dan Body Text wajib diisi" });
+    }
+
+    const platform = await ConnectedPlatform.findOne({ 
+      where: { provider: "meta_cloud" },
+      order: [['createdAt', 'DESC']]
+    });
+
+    if (!platform || !platform.wabaId || !platform.systemUserAccessToken) {
+      return res.status(400).json({ message: "Platform Meta Cloud belum dikonfigurasi. Hubungkan WABA ID dan Token terlebih dahulu." });
+    }
+
+    const { wabaId, systemUserAccessToken } = platform;
+    const appId = process.env.META_APP_ID;
+
+    let headerHandle = null;
+    let minioUrl = null;
+
+    // Handle upload media via Meta Resumable Upload API
+    if (req.file && ["IMAGE", "VIDEO", "DOCUMENT"].includes(headerType)) {
+      if (!appId) {
+        return res.status(500).json({ message: "Server misconfiguration: META_APP_ID hilang dari environment." });
+      }
+
+      // 1. Simpan di MinIO (Vlow)
+      minioUrl = await uploadToMinio(req.file);
+
+      // 2. Upload ke Meta (Resumable Uploads)
+      // Step A: Inisialisasi Sesi Upload
+      try {
+        const sessionRes = await axios.post(`https://graph.facebook.com/v19.0/${appId}/uploads`, 
+          {}, 
+          {
+            params: {
+              file_length: req.file.size,
+              file_type: req.file.mimetype,
+              access_token: systemUserAccessToken
+            }
+          }
+        );
+        
+        const uploadSessionId = sessionRes.data.id;
+
+        // Step B: Upload file buffer ke Sesi tersebut
+        const uploadRes = await axios.post(`https://graph.facebook.com/v19.0/${uploadSessionId}`,
+          req.file.buffer,
+          {
+            headers: {
+              "Authorization": `OAuth ${systemUserAccessToken}`,
+              "file_offset": "0",
+              "Content-Type": "application/octet-stream"
+            }
+          }
+        );
+
+        headerHandle = uploadRes.data.h;
+      } catch (uploadError) {
+        console.error("Meta Upload File Error:", uploadError.response?.data || uploadError.message);
+        return res.status(502).json({ 
+          message: "Gagal mengunggah file media ke Meta WhatsApp Cloud API.", 
+          details: uploadError.response?.data?.error?.message 
+        });
+      }
+    }
+
+    // Bangun komponen template mengikuti standar Meta
+    const components = [];
+    
+    // Header Component
+    if (headerType === "TEXT" && headerText) {
+      components.push({ type: "HEADER", format: "TEXT", text: headerText });
+    } else if (["IMAGE", "VIDEO", "DOCUMENT"].includes(headerType) && headerHandle) {
+      components.push({
+        type: "HEADER",
+        format: headerType,
+        example: { header_handle: [headerHandle] }
+      });
+    }
+
+    // Body Component
+    components.push({ type: "BODY", text: bodyText });
+    
+    // Footer Component
+    if (footerText) {
+      components.push({ type: "FOOTER", text: footerText });
+    }
+
+    const payload = {
+      name,
+      category: category || "MARKETING",
+      language: language || "id",
+      components
+    };
+
+    // Kirim permintaan mutasi ke WhatsApp API
+    const metaRes = await axios.post(`https://graph.facebook.com/v19.0/${wabaId}/message_templates`, payload, {
+      headers: { Authorization: `Bearer ${systemUserAccessToken}` }
+    });
+
+    // Simpan ke DB lokal kita dengan status PENDING
+    const newTemplate = await BroadcastTemplate.create({
+      name,
+      language: language || "id",
+      category: category || "MARKETING",
+      components,
+      status: "PENDING"
+    });
+
+    res.status(201).json({ 
+      message: "Template berhasil dibuat. Saat ini berstatus PENDING review dari Meta.", 
+      data: newTemplate 
+    });
+
+  } catch (error) {
+    console.error("Create template error", error.response?.data || error.message);
+    res.status(500).json({ 
+      message: "Gagal membuat template di Meta API", 
+      details: error.response?.data?.error?.message || error.message 
+    });
   }
 };

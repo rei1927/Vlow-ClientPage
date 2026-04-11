@@ -1,9 +1,12 @@
 import express from "express";
-import { getTemplates, syncTemplates, sendBroadcast } from "../controllers/broadcastController.js";
+import multer from "multer";
+import { getTemplates, syncTemplates, sendBroadcast, createTemplate } from "../controllers/broadcastController.js";
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.get("/templates", getTemplates);
+router.post("/templates", upload.single("mediaFile"), createTemplate);
 router.post("/templates/sync", syncTemplates);
 router.post("/send", sendBroadcast);
 
