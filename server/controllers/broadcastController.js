@@ -119,7 +119,7 @@ export const sendBroadcast = async (req, res, next) => {
 
 export const createTemplate = async (req, res, next) => {
   try {
-    const { name, category, language, headerType, headerText, bodyText, footerText } = req.body;
+    const { name, category, language, headerType, headerText, bodyText, footerText, buttons } = req.body;
     
     if (!name || !bodyText) {
       return res.status(400).json({ message: "Name dan Body Text wajib diisi" });
@@ -207,6 +207,28 @@ export const createTemplate = async (req, res, next) => {
     // Footer Component
     if (footerText) {
       components.push({ type: "FOOTER", text: footerText });
+    }
+
+    // Buttons Component
+    if (buttons) {
+      try {
+        const parsedButtons = JSON.parse(buttons);
+        if (Array.isArray(parsedButtons) && parsedButtons.length > 0) {
+          const buttonArray = parsedButtons.map(btn => {
+            if (btn.type === 'QUICK_REPLY' && btn.text) return { type: 'QUICK_REPLY', text: btn.text };
+            if (btn.type === 'URL' && btn.text && btn.url) return { type: 'URL', text: btn.text, url: btn.url };
+            if (btn.type === 'PHONE_NUMBER' && btn.text && btn.phone_number) return { type: 'PHONE_NUMBER', text: btn.text, phone_number: btn.phone_number };
+            if (btn.type === 'COPY_CODE' && btn.example) return { type: 'COPY_CODE', example: btn.example };
+            return null;
+          }).filter(Boolean);
+          
+          if (buttonArray.length > 0) {
+            components.push({ type: "BUTTONS", buttons: buttonArray });
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to parse buttons", err);
+      }
     }
 
     const payload = {

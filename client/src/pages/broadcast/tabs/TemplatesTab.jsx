@@ -55,6 +55,9 @@ const TemplatesTab = () => {
       
       data.append("bodyText", templateData.bodyText);
       if (templateData.footerText) data.append("footerText", templateData.footerText);
+      if (templateData.buttons && templateData.buttons.length > 0) {
+        data.append("buttons", JSON.stringify(templateData.buttons));
+      }
 
       const res = await axios.post("/api/broadcast/templates", data, {
         withCredentials: true,

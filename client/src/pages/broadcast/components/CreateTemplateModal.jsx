@@ -15,6 +15,7 @@ const CreateTemplateModal = ({ isOpen, onClose, onSubmit, submitting }) => {
   });
 
   const [previewMedia, setPreviewMedia] = useState(null);
+  const [buttons, setButtons] = useState([]);
 
   if (!isOpen) return null;
 
@@ -46,10 +47,38 @@ const CreateTemplateModal = ({ isOpen, onClose, onSubmit, submitting }) => {
     // Normalize name to Meta format (lowercase, underscores)
     const normalizedData = {
       ...formData,
-      name: formData.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
+      name: formData.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, ''),
+      buttons
     };
     
     onSubmit(normalizedData);
+  };
+
+  const handleAddButton = (e) => {
+    const type = e.target.value;
+    if (!type || buttons.length >= 10) return;
+    
+    // reset select
+    e.target.value = "";
+    
+    let newBtn = { id: Date.now(), type, text: '' };
+    if (type === 'URL') {
+      newBtn.url = '';
+    } else if (type === 'PHONE_NUMBER') {
+      newBtn.phone_number = '';
+    } else if (type === 'COPY_CODE') {
+      newBtn.example = '';
+    }
+    
+    setButtons(prev => [...prev, newBtn]);
+  };
+
+  const removeButton = (id) => {
+    setButtons(prev => prev.filter(b => b.id !== id));
+  };
+
+  const handleButtonChange = (id, field, value) => {
+    setButtons(prev => prev.map(b => b.id === id ? { ...b, [field]: value } : b));
   };
 
   const renderStep1 = () => (
@@ -191,6 +220,106 @@ const CreateTemplateModal = ({ isOpen, onClose, onSubmit, submitting }) => {
           className="w-full bg-[var(--input-bg)] text-white border border-white/20 rounded-lg p-3 focus:outline-none focus:border-blue-500"
         />
       </div>
+
+      {/* Buttons Section */}
+      <div className="p-4 border border-white/10 rounded-lg bg-black/20 mt-4">
+        <div className="flex justify-between items-center mb-4">
+          <label className="block text-sm font-medium text-white/70">Buttons (Opsional)</label>
+          <select 
+            onChange={handleAddButton}
+            className="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium py-1 px-3 rounded cursor-pointer focus:outline-none"
+            disabled={buttons.length >= 10}
+            defaultValue=""
+          >
+            <option value="" disabled>+ Add button</option>
+            <option value="QUICK_REPLY">Custom (Quick Reply)</option>
+            <option value="URL">Visit website</option>
+            <option value="PHONE_NUMBER">Call phone number</option>
+            <option value="COPY_CODE">Copy offer code</option>
+          </select>
+        </div>
+        
+        {buttons.length > 0 && (
+          <div className="space-y-3">
+            {buttons.map((btn) => (
+              <div key={btn.id} className="relative p-3 bg-black/40 border border-white/10 rounded-lg">
+                <button type="button" onClick={() => removeButton(btn.id)} className="absolute top-2 right-2 text-red-500 hover:text-red-400">
+                   <FaTimes size={12} />
+                </button>
+                
+                <div className="flex gap-4 items-start pr-4">
+                  <div className="w-1/3">
+                     <span className="text-[10px] uppercase text-white/40 block mb-1 font-bold tracking-wider">Type of Action</span>
+                     <div className="text-xs text-white/80 bg-white/5 px-2 py-2 rounded border border-white/10">
+                       {btn.type === 'QUICK_REPLY' && 'Quick Reply'}
+                       {btn.type === 'URL' && 'Visit Website'}
+                       {btn.type === 'PHONE_NUMBER' && 'Call Number'}
+                       {btn.type === 'COPY_CODE' && 'Copy Code'}
+                     </div>
+                  </div>
+                  
+                  <div className="flex-1 space-y-2">
+                    {btn.type !== 'COPY_CODE' && (
+                      <div>
+                        <span className="text-[10px] uppercase text-white/40 block mb-1 font-bold tracking-wider">Button Text (Wajib)</span>
+                        <input 
+                          type="text" 
+                          placeholder="Teks tombol (Maks 25)"
+                          maxLength={25}
+                          value={btn.text}
+                          onChange={(e) => handleButtonChange(btn.id, 'text', e.target.value)}
+                          className="w-full bg-[var(--input-bg)] text-sm text-white border border-white/20 rounded-md p-2 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                    )}
+                    
+                    {btn.type === 'URL' && (
+                      <div>
+                        <span className="text-[10px] uppercase text-white/40 block mb-1 font-bold tracking-wider">Website URL</span>
+                        <input 
+                          type="url" 
+                          placeholder="https://"
+                          value={btn.url}
+                          onChange={(e) => handleButtonChange(btn.id, 'url', e.target.value)}
+                          className="w-full bg-[var(--input-bg)] text-sm text-white border border-white/20 rounded-md p-2 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                    )}
+                    
+                    {btn.type === 'PHONE_NUMBER' && (
+                      <div>
+                        <span className="text-[10px] uppercase text-white/40 block mb-1 font-bold tracking-wider">Phone Number (+Kode Negara)</span>
+                        <input 
+                          type="text" 
+                          placeholder="+62812345678"
+                          maxLength={20}
+                          value={btn.phone_number}
+                          onChange={(e) => handleButtonChange(btn.id, 'phone_number', e.target.value)}
+                          className="w-full bg-[var(--input-bg)] text-sm text-white border border-white/20 rounded-md p-2 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                    )}
+                    
+                    {btn.type === 'COPY_CODE' && (
+                      <div>
+                        <span className="text-[10px] uppercase text-white/40 block mb-1 font-bold tracking-wider">Offer Code</span>
+                        <input 
+                          type="text" 
+                          placeholder="KODEPROMO20"
+                          maxLength={15}
+                          value={btn.example}
+                          onChange={(e) => handleButtonChange(btn.id, 'example', e.target.value)}
+                          className="w-full bg-[var(--input-bg)] text-sm text-white border border-white/20 rounded-md p-2 focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -308,7 +437,22 @@ const CreateTemplateModal = ({ isOpen, onClose, onSubmit, submitting }) => {
             </div>
           </div>
           
-          <div className="text-center text-xs text-gray-600 bg-white/80 p-2 rounded-lg backdrop-blur mx-4 border border-black/5">
+          {/* Buttons Preview */}
+          {buttons.length > 0 && (
+            <div className="mt-0 flex flex-col gap-[2px] w-full">
+              {buttons.map(btn => (
+                <div key={btn.id} className="bg-white rounded-lg py-2.5 px-3 text-center text-[#00a884] font-medium text-[13px] border border-gray-100 flex items-center justify-center shadow-sm">
+                   {btn.type === 'QUICK_REPLY' && <span className="mr-2 text-sm text-[#00a884] opacity-80">↩</span>}
+                   {btn.type === 'URL' && <span className="mr-2 text-sm text-[#00a884] opacity-80">↗</span>}
+                   {btn.type === 'PHONE_NUMBER' && <span className="mr-2 text-sm text-[#00a884] opacity-80">📞</span>}
+                   {btn.type === 'COPY_CODE' && <span className="mr-2 text-sm text-[#00a884] opacity-80">📋</span>}
+                   {btn.type === 'COPY_CODE' ? "Copy code" : (btn.text || "Tombol")}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="text-center text-xs text-gray-600 bg-white/80 p-2 rounded-lg backdrop-blur mx-4 border border-black/5 mt-4">
              Tampilan di perangkat End-User WhatsApp.
           </div>
         </div>
