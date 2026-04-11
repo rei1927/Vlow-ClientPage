@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { FaTrash } from "react-icons/fa";
 import CreateTemplateModal from "../components/CreateTemplateModal";
 
 const TemplatesTab = () => {
@@ -75,6 +76,21 @@ const TemplatesTab = () => {
     }
   };
 
+  const handleDeleteTemplate = async (templateId, templateName) => {
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus template "${templateName}" dari Meta? Tindakan ini tidak dapat dibatalkan.`)) {
+      return;
+    }
+
+    try {
+      await axios.delete(`/api/broadcast/templates/${templateId}?name=${templateName}`, { withCredentials: true });
+      toast.success(`Template ${templateName} berhasil dihapus`);
+      setTemplates(prev => prev.filter(t => t.id !== templateId));
+    } catch (error) {
+      console.error("Error deleting template", error);
+      toast.error(error.response?.data?.message || "Gagal menghapus template");
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -114,10 +130,19 @@ const TemplatesTab = () => {
           {templates.map(t => (
             <div key={t.id} className="p-4 bg-[var(--sidebar-bg)] border border-white/10 rounded-lg shadow">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-white">{t.name}</h3>
-                <span className={`text-xs px-2 py-1 rounded-full ${t.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                  {t.status}
-                </span>
+                <h3 className="font-semibold text-white truncate max-w-[70%]" title={t.name}>{t.name}</h3>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs px-2 py-1 rounded-full ${t.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                    {t.status}
+                  </span>
+                  <button 
+                    onClick={() => handleDeleteTemplate(t.id, t.name)}
+                    className="text-red-400 hover:text-red-500 transition-colors p-1"
+                    title="Hapus Template"
+                  >
+                    <FaTrash size={14} />
+                  </button>
+                </div>
               </div>
               <p className="text-xs text-white/50 mb-2">Bahasa: {t.language} | Kategori: {t.category}</p>
               <div className="text-sm text-white/80 p-3 bg-black/20 rounded max-h-32 overflow-y-auto">

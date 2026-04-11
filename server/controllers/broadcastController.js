@@ -265,3 +265,44 @@ export const createTemplate = async (req, res, next) => {
     });
   }
 };
+
+export const deleteTemplate = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.query;
+
+    if (!id || !name) {
+      return res.status(400).json({ message: "ID dan Nama template wajib disertakan." });
+    }
+
+    const platform = await ConnectedPlatform.findOne({ 
+      where: { provider: "meta_cloud" },
+      order: [['createdAt', 'DESC']]
+    });
+
+    if (!platform || !platform.wabaId || !platform.systemUserAccessToken) {
+      return res.status(400).json({ message: "Platform Meta Cloud belum dikonfigurasi." });
+    }
+
+    const { wabaId, systemUserAccessToken } = platform;
+
+    // Hapus di sisi Meta
+    try {
+      await axios.delete(`https://graph.facebook.com/v19.0/${wabaId}/message_templates`, {
+        headers: { Authorization: `Bearer ${systemUserAccessToken}` },
+        params: { name: name }
+      });
+    } catch (metaError) {
+      console.warn(`Meta template deletion warning: ${metaError.response?.data?.error?.message || metaError.message}`);
+      // Lanjut menghapus dari lokal jika memang sudah tidak ada di Meta
+    }
+
+    // Hapus dari database lokal kita
+    await BroadcastTemplate.destroy({ where: { id } });
+
+    res.json({ message: "Template berhasil dihapus." });
+  } catch (error) {
+    console.error("Delete template error", error);
+    res.status(500).json({ message: "Terjadi kesalahan sistem saat menghapus template." });
+  }
+};
