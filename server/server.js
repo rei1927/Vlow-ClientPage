@@ -21,6 +21,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import webhookRoutes from "./routes/webhookRoutes.js";
 import handoverRoutes from "./routes/handoverRoutes.js";
 import broadcastRoutes from "./routes/broadcastRoutes.js";
+import healthRoutes from "./routes/healthRoutes.js";
 import { proxyMinioImage } from "./controllers/agentController.js";
 
 // Models
@@ -79,6 +80,7 @@ app.use("/api/chats", chatRoutes);
 app.use("/api/webhooks", webhookRoutes);
 app.use("/api/handover", handoverRoutes);
 app.use("/api/broadcast", broadcastRoutes);
+app.use("/api/health", healthRoutes);
 
 // --- Error Handling Middleware ---
 // HAPUS blok app.use((err...)) yang lama (manual).
