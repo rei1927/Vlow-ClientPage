@@ -42,7 +42,7 @@ services:
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
       # WAHA Connectivity
       - WAHA_BASE_URL=${WAHA_BASE_URL:-https://waha-plus.dayamedialangit.co.id}
-      - WAHA_API_KEY=${WAHA_API_KEY}
+      - WAHA_API_KEY=${WAHA_API_KEY:-rahasia123}
       # Simulator
       - N8N_SIMULATOR_URL=${N8N_SIMULATOR_URL}
       # Meta Cloud API
