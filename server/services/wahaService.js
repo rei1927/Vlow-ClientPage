@@ -3,7 +3,7 @@ import AppError from "../utils/AppError.js";
 
 // Ambil config dari .env
 const WAHA_URL = process.env.WAHA_BASE_URL || "http://localhost:7575";
-const API_KEY = process.env.WAHA_API_KEY;
+const API_KEY = process.env.WAHA_API_KEY || "rahasia123";
 
 const HEADERS = {
   "Content-Type": "application/json",
