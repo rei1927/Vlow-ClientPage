@@ -85,3 +85,40 @@ export const checkHealth = async (req, res, next) => {
     next(error);
   }
 };
+
+// Check Webhook URL health
+export const checkWebhook = async (req, res, next) => {
+  try {
+    const { url } = req.body;
+    if (!url) {
+      return res.status(400).json({ status: "ERROR", message: "URL is required" });
+    }
+
+    try {
+      // 10 second timeout for the webhook check
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const response = await fetch(url, {
+        method: "GET",
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      // If we get any HTTP response (even 400, 404, 405, 500), it means the URL
+      // successfully resolved and the server is actively responding.
+      return res.status(200).json({ 
+        status: "OK", 
+        statusCode: response.status,
+        statusText: response.statusText 
+      });
+    } catch (err) {
+      if (err.name === 'AbortError') {
+         return res.status(500).json({ status: "TIMEOUT", message: "Connection timed out" });
+      }
+      return res.status(500).json({ status: "ERROR", message: err.message });
+    }
+  } catch (error) {
+    next(error);
+  }
+};

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaTimes, FaUser, FaEnvelope, FaUserTag, FaCalendarAlt, FaLink, FaRedo } from "react-icons/fa";
+import { FaTimes, FaUser, FaEnvelope, FaUserTag, FaCalendarAlt, FaLink, FaRedo, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 /** Validasi bahwa value adalah URL yang valid (harus http/https) */
@@ -29,6 +29,47 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
     n8nSimulatorWebhookUrl: "",
     metaCloudWebhookUrl: "",
   });
+
+  const [webhookStatus, setWebhookStatus] = useState({
+    n8nWebhookUrl: { status: 'idle' },
+    metaCloudWebhookUrl: { status: 'idle' },
+    n8nSimulatorWebhookUrl: { status: 'idle' },
+  });
+
+  const handleCheckWebhook = async (field, url) => {
+    if (!url) {
+      toast.error("URL Webhook tidak boleh kosong");
+      return;
+    }
+    if (!isValidWebhookUrl(url)) {
+      toast.error("Format URL tidak valid");
+      return;
+    }
+
+    setWebhookStatus(prev => ({ ...prev, [field]: { status: 'loading' } }));
+    
+    try {
+      // Menggunakan endpoint proxy di backend agar tidak kena issue CORS browser
+      const res = await fetch("/api/health/check-webhook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.status === "OK") {
+        setWebhookStatus(prev => ({ ...prev, [field]: { status: 'success' } }));
+        toast.success("Webhook aman dan terhubung!");
+      } else {
+        setWebhookStatus(prev => ({ ...prev, [field]: { status: 'error' } }));
+        toast.error("Gagal terhubung ke Webhook.");
+      }
+    } catch (err) {
+      setWebhookStatus(prev => ({ ...prev, [field]: { status: 'error' } }));
+      toast.error("Terjadi kesalahan sistem saat mengecek webhook.");
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -328,9 +369,26 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
               {/* n8n Webhook URL - Only for Customer */}
               {formData.role === "customer" && (
                 <div className="form-control">
-                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                    URL Webhook WAHA N8N <span className="text-red-500">*</span>
-                  </label>
+                  <div className="label flex items-center justify-between pb-1">
+                    <span className="text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                      URL Webhook WAHA N8N <span className="text-red-500">*</span>
+                    </span>
+                    <button 
+                      type="button" 
+                      onClick={() => handleCheckWebhook('n8nWebhookUrl', formData.n8nWebhookUrl)}
+                      disabled={webhookStatus.n8nWebhookUrl.status === 'loading'}
+                      className="btn btn-xs btn-outline rounded-full px-3 gap-1 hover:bg-[var(--color-primary)] hover:border-[var(--color-primary)]"
+                    >
+                      {webhookStatus.n8nWebhookUrl.status === 'loading' ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      ) : webhookStatus.n8nWebhookUrl.status === 'success' ? (
+                        <FaCheckCircle className="text-green-500" />
+                      ) : webhookStatus.n8nWebhookUrl.status === 'error' ? (
+                        <FaTimesCircle className="text-red-500" />
+                      ) : null}
+                      Cek URL
+                    </button>
+                  </div>
                   <div className="relative">
                     <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
                       <FaLink />
@@ -355,9 +413,26 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
               {/* Meta Cloud Webhook URL - Only for Customer */}
               {formData.role === "customer" && (
                 <div className="form-control">
-                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                    URL Webhook Meta Cloud <span className="text-red-500">*</span>
-                  </label>
+                  <div className="label flex items-center justify-between pb-1">
+                    <span className="text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                      URL Webhook Meta Cloud <span className="text-red-500">*</span>
+                    </span>
+                    <button 
+                      type="button" 
+                      onClick={() => handleCheckWebhook('metaCloudWebhookUrl', formData.metaCloudWebhookUrl)}
+                      disabled={webhookStatus.metaCloudWebhookUrl.status === 'loading'}
+                      className="btn btn-xs btn-outline rounded-full px-3 gap-1 hover:bg-[var(--color-primary)] hover:border-[var(--color-primary)]"
+                    >
+                      {webhookStatus.metaCloudWebhookUrl.status === 'loading' ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      ) : webhookStatus.metaCloudWebhookUrl.status === 'success' ? (
+                        <FaCheckCircle className="text-green-500" />
+                      ) : webhookStatus.metaCloudWebhookUrl.status === 'error' ? (
+                        <FaTimesCircle className="text-red-500" />
+                      ) : null}
+                      Cek URL
+                    </button>
+                  </div>
                   <div className="relative">
                     <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
                       <FaLink />
@@ -381,9 +456,26 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
               {/* n8n Simulator Webhook URL - Only for Customer */}
               {formData.role === "customer" && (
                 <div className="form-control">
-                  <label className="label text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                    URL Webhook Simulator n8n <span className="text-red-500">*</span>
-                  </label>
+                  <div className="label flex items-center justify-between pb-1">
+                    <span className="text-xs font-bold text-[var(--color-text-muted)] uppercase">
+                      URL Webhook Simulator n8n <span className="text-red-500">*</span>
+                    </span>
+                    <button 
+                      type="button" 
+                      onClick={() => handleCheckWebhook('n8nSimulatorWebhookUrl', formData.n8nSimulatorWebhookUrl)}
+                      disabled={webhookStatus.n8nSimulatorWebhookUrl.status === 'loading'}
+                      className="btn btn-xs btn-outline rounded-full px-3 gap-1 hover:bg-[var(--color-primary)] hover:border-[var(--color-primary)]"
+                    >
+                      {webhookStatus.n8nSimulatorWebhookUrl.status === 'loading' ? (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      ) : webhookStatus.n8nSimulatorWebhookUrl.status === 'success' ? (
+                        <FaCheckCircle className="text-green-500" />
+                      ) : webhookStatus.n8nSimulatorWebhookUrl.status === 'error' ? (
+                        <FaTimesCircle className="text-red-500" />
+                      ) : null}
+                      Cek URL
+                    </button>
+                  </div>
                   <div className="relative">
                     <div className="absolute z-10 inset-y-0 left-0 pl-3 flex items-center text-[var(--color-text-muted)]">
                       <FaLink />
