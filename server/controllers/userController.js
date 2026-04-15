@@ -45,7 +45,7 @@ export const createUser = async (req, res, next) => {
     });
 
     // Kirim Email Welcome
-    const loginUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/login`;
+    const loginUrl = "https://login.vlow-ai.com";
     const emailHtml = getWelcomeTemplate(name, email, tempPassword, loginUrl);
 
     let emailStatus = "Sent";
