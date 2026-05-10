@@ -21,6 +21,7 @@ const ConnectedPlatforms = lazy(() => import("./pages/platforms/ConnectedPlatfor
 const ChatDashboard = lazy(() => import("./pages/chat/ChatDashboard"));
 const BroadcastDashboard = lazy(() => import("./pages/broadcast/BroadcastDashboard"));
 const SystemHealth = lazy(() => import("./pages/SystemHealth"));
+const CRMDashboard = lazy(() => import("./pages/crm/CRMDashboard"));
 
 const AUTH_PATHS = ["/login", "/forgot-password", "/reset-password"];
 function isAuthPath(pathname) {
@@ -76,6 +77,7 @@ function App() {
                 <Route path="/platforms" element={<ConnectedPlatforms />} />
                 <Route path="/broadcast" element={<BroadcastDashboard />} />
                 <Route path="/system-status" element={<SystemHealth />} />
+                <Route path="/crm" element={<CRMDashboard />} />
               </Route>
             </Route>
 
