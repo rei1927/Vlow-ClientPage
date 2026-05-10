@@ -217,7 +217,7 @@ const CRMDashboard = () => {
                                     if (isLikelySystemId) {
                                         if (isNamePhoneFormat) {
                                             displayPhone = displayName;
-                                            displayName = "WhatsApp User";
+                                            // Keep displayName as the phone number since we don't have their real name
                                         } else {
                                             displayPhone = extractedPhone + " (Meta ID)";
                                         }
