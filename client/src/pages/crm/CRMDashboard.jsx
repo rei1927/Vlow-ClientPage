@@ -206,8 +206,22 @@ const CRMDashboard = () => {
                             <tbody className="divide-y divide-[var(--color-border)]">
                                 {filteredChats.map((chat, idx) => {
                                     const rawId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id;
-                                    const phoneNumber = String(rawId).split('@')[0];
-                                    const displayName = chat.name || phoneNumber;
+                                    let extractedPhone = String(rawId).split('@')[0];
+                                    let displayName = chat.name || extractedPhone;
+                                    
+                                    // Handle Meta Cloud API anomaly where ID is PSID and Name is Phone Number
+                                    const isLikelySystemId = /^\d{13,20}$/.test(extractedPhone);
+                                    const isNamePhoneFormat = /^[\+\d\s\-\(\)]{8,20}$/.test(displayName);
+                                    let displayPhone = extractedPhone;
+                                    
+                                    if (isLikelySystemId) {
+                                        if (isNamePhoneFormat) {
+                                            displayPhone = displayName;
+                                            displayName = "WhatsApp User";
+                                        } else {
+                                            displayPhone = extractedPhone + " (Meta ID)";
+                                        }
+                                    }
                                     
                                     return (
                                         <tr key={rawId} className="hover:bg-[var(--color-bg)] transition-colors group cursor-default">
@@ -223,7 +237,7 @@ const CRMDashboard = () => {
                                                         <span className="font-semibold text-[var(--color-text)] group-hover:text-[var(--color-primary)] transition-colors">
                                                             {displayName}
                                                         </span>
-                                                        {chat.name && chat.name !== phoneNumber && (
+                                                        {chat.name && chat.name !== displayPhone && (
                                                             <span className="hidden ml-2 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase font-bold">
                                                                 Saved Contact
                                                             </span>
@@ -236,7 +250,7 @@ const CRMDashboard = () => {
                                                     <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                                                         <FaWhatsapp className="text-[10px]" />
                                                     </span>
-                                                    {phoneNumber}
+                                                    {displayPhone}
                                                 </div>
                                             </td>
                                         </tr>
