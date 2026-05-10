@@ -22,6 +22,7 @@ import webhookRoutes from "./routes/webhookRoutes.js";
 import handoverRoutes from "./routes/handoverRoutes.js";
 import broadcastRoutes from "./routes/broadcastRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
+import crmRoutes from "./routes/crmRoutes.js";
 import { proxyMinioImage } from "./controllers/agentController.js";
 
 // Models
@@ -33,6 +34,7 @@ import ConnectedPlatform from "./models/ConnectedPlatform.js";
 import ChatHandover from "./models/ChatHandover.js";
 import MetaMessage from "./models/MetaMessage.js";
 import BroadcastTemplate from "./models/BroadcastTemplate.js";
+import CustomerProfile from "./models/CustomerProfile.js";
 import { startHandoverScheduler } from "./utils/handoverScheduler.js";
 
 dotenv.config();
@@ -81,6 +83,7 @@ app.use("/api/webhooks", webhookRoutes);
 app.use("/api/handover", handoverRoutes);
 app.use("/api/broadcast", broadcastRoutes);
 app.use("/api/health", healthRoutes);
+app.use("/api/crm", crmRoutes);
 
 // --- Error Handling Middleware ---
 // HAPUS blok app.use((err...)) yang lama (manual).

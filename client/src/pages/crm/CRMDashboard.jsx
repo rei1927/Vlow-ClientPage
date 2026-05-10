@@ -200,14 +200,15 @@ const CRMDashboard = () => {
                                 <tr>
                                     <th className="px-6 py-4 font-semibold text-[var(--color-text)] border-r border-[var(--color-border)] w-12 text-center">#</th>
                                     <th className="px-6 py-4 font-semibold text-[var(--color-text)] border-r border-[var(--color-border)]">WhatsApp Name</th>
-                                    <th className="px-6 py-4 font-semibold text-[var(--color-text)]">Phone Number</th>
+                                    <th className="px-6 py-4 font-semibold text-[var(--color-text)] border-r border-[var(--color-border)]">Phone Number</th>
+                                    <th className="px-6 py-4 font-semibold text-[var(--color-text)]">Requirements</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--color-border)]">
                                 {filteredChats.map((chat, idx) => {
                                     const rawId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id;
                                     let extractedPhone = String(rawId).split('@')[0];
-                                    let displayName = chat.name || extractedPhone;
+                                    let displayName = chat.customName || chat.name || extractedPhone;
                                     
                                     // Handle Meta Cloud API anomaly where ID is PSID and Name is Phone Number
                                     const isLikelySystemId = /^\d{13,20}$/.test(extractedPhone);
@@ -218,6 +219,7 @@ const CRMDashboard = () => {
                                         if (isNamePhoneFormat) {
                                             displayPhone = displayName;
                                             // Keep displayName as the phone number since we don't have their real name
+                                            if(chat.customName) displayName = chat.customName;
                                         } else {
                                             displayPhone = extractedPhone + " (Meta ID)";
                                         }
@@ -237,21 +239,34 @@ const CRMDashboard = () => {
                                                         <span className="font-semibold text-[var(--color-text)] group-hover:text-[var(--color-primary)] transition-colors">
                                                             {displayName}
                                                         </span>
-                                                        {chat.name && chat.name !== displayPhone && (
+                                                        {chat.customName ? (
+                                                            <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded uppercase font-bold">
+                                                                AI Extracted
+                                                            </span>
+                                                        ) : chat.name && chat.name !== displayPhone ? (
                                                             <span className="hidden ml-2 text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase font-bold">
                                                                 Saved Contact
                                                             </span>
-                                                        )}
+                                                        ) : null}
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-3 text-[var(--color-text)] font-mono">
+                                            <td className="px-6 py-3 text-[var(--color-text)] font-mono border-r border-[var(--color-border)]">
                                                 <div className="flex items-center gap-2">
                                                     <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600">
                                                         <FaWhatsapp className="text-[10px]" />
                                                     </span>
                                                     {displayPhone}
                                                 </div>
+                                            </td>
+                                            <td className="px-6 py-3 text-sm">
+                                                {chat.requirements ? (
+                                                    <div className="max-w-xs truncate text-[var(--color-text)]" title={chat.requirements}>
+                                                        {chat.requirements}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-[var(--color-text-muted)] italic text-xs">Belum ada data</span>
+                                                )}
                                             </td>
                                         </tr>
                                     );
