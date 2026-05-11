@@ -141,21 +141,26 @@ export const getChats = async (req, res, next) => {
             }));
 
             // Merge CustomerProfile data (customName and requirements)
-            const profiles = await CustomerProfile.findAll({
-                where: { platformId: platform.id },
-                raw: true,
-            });
-            const profileMap = {};
-            profiles.forEach(p => profileMap[p.chatId] = p);
+            let enrichedChats = chats;
+            try {
+                const profiles = await CustomerProfile.findAll({
+                    where: { platformId: platform.id },
+                    raw: true,
+                });
+                const profileMap = {};
+                profiles.forEach(p => profileMap[p.chatId] = p);
 
-            const enrichedChats = chats.map(chat => {
-                const profile = profileMap[chat.id];
-                if (profile) {
-                    if (profile.customName) chat.customName = profile.customName;
-                    if (profile.requirements) chat.requirements = profile.requirements;
-                }
-                return chat;
-            });
+                enrichedChats = chats.map(chat => {
+                    const profile = profileMap[chat.id];
+                    if (profile) {
+                        if (profile.customName) chat.customName = profile.customName;
+                        if (profile.requirements) chat.requirements = profile.requirements;
+                    }
+                    return chat;
+                });
+            } catch (profileErr) {
+                console.log('[CRM] CustomerProfile query failed (table may not exist yet):', profileErr.message);
+            }
 
             return res.status(200).json({
                 success: true,
@@ -166,24 +171,29 @@ export const getChats = async (req, res, next) => {
         let chats = await wahaService.getChats(platform.sessionId);
 
         // Merge CustomerProfile data for WAHA
-        const profiles = await CustomerProfile.findAll({
-            where: { platformId: platform.id },
-            raw: true,
-        });
-        const profileMap = {};
-        profiles.forEach(p => profileMap[p.chatId] = p);
+        let enrichedChats = chats;
+        try {
+            const profiles = await CustomerProfile.findAll({
+                where: { platformId: platform.id },
+                raw: true,
+            });
+            const profileMap = {};
+            profiles.forEach(p => profileMap[p.chatId] = p);
 
-        const enrichedChats = chats.map(chat => {
-            const rawId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id;
-            const phoneNumber = String(rawId).split('@')[0];
-            const profile = profileMap[phoneNumber] || profileMap[rawId]; // Check both formats
-            
-            if (profile) {
-                if (profile.customName) chat.customName = profile.customName;
-                if (profile.requirements) chat.requirements = profile.requirements;
-            }
-            return chat;
-        });
+            enrichedChats = chats.map(chat => {
+                const rawId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id;
+                const phoneNumber = String(rawId).split('@')[0];
+                const profile = profileMap[phoneNumber] || profileMap[rawId];
+                
+                if (profile) {
+                    if (profile.customName) chat.customName = profile.customName;
+                    if (profile.requirements) chat.requirements = profile.requirements;
+                }
+                return chat;
+            });
+        } catch (profileErr) {
+            console.log('[CRM] CustomerProfile query failed (table may not exist yet):', profileErr.message);
+        }
 
         res.status(200).json({
             success: true,
