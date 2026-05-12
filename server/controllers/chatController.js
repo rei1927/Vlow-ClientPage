@@ -240,7 +240,13 @@ export const getMessages = async (req, res, next) => {
             });
         }
 
-        const messages = await wahaService.getMessages(platform.sessionId, chatId, limit);
+        let messages = [];
+        try {
+            messages = await wahaService.getMessages(platform.sessionId, chatId, limit);
+        } catch (msgErr) {
+            console.warn(`[WAHA] getMessages failed for ${chatId}, returning empty array to unblock UI:`, msgErr.message);
+            messages = [];
+        }
 
         res.status(200).json({
             success: true,
