@@ -26,6 +26,7 @@ const CRMDashboard = () => {
     const [searchKeyword, setSearchKeyword] = useState("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [copiedId, setCopiedId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
     // Load platforms on mount
     useEffect(() => {
@@ -82,6 +83,19 @@ const CRMDashboard = () => {
         
         return list;
     }, [chats, searchKeyword]);
+
+    // Reset page to 1 when filter or platform changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchKeyword, selectedPlatform]);
+
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(filteredChats.length / itemsPerPage);
+
+    const paginatedChats = useMemo(() => {
+        const start = (currentPage - 1) * itemsPerPage;
+        return filteredChats.slice(start, start + itemsPerPage);
+    }, [filteredChats, currentPage]);
 
     return (
         <FeatureAccessGuard feature="crm">
@@ -210,7 +224,7 @@ const CRMDashboard = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--color-border)]">
-                                {filteredChats.map((chat, idx) => {
+                                {paginatedChats.map((chat, idx) => {
                                     const rawId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id;
                                     let extractedPhone = String(rawId).split('@')[0];
                                     let displayName = chat.customName || chat.name || extractedPhone;
@@ -235,7 +249,7 @@ const CRMDashboard = () => {
                                     return (
                                         <tr key={rawId} className="hover:bg-[var(--color-bg)] transition-colors group cursor-default">
                                             <td className="px-6 py-3 text-center text-[var(--color-text-muted)] border-r border-[var(--color-border)]">
-                                                {idx + 1}
+                                                {(currentPage - 1) * itemsPerPage + idx + 1}
                                             </td>
                                             <td className="px-6 py-3 border-r border-[var(--color-border)]">
                                                 <div className="flex items-center gap-3">
@@ -301,13 +315,43 @@ const CRMDashboard = () => {
                 )}
             </div>
             
-            {/* Table Footer / Pagination Placeholder */}
+            {/* Table Footer / Pagination Controls */}
             {filteredChats.length > 0 && (
-                <div className="p-4 border-t border-[var(--color-border)] bg-[var(--color-surface)] flex justify-between items-center text-sm text-[var(--color-text-muted)]">
-                    <span>Menampilkan <strong>{filteredChats.length}</strong> kontak WhatsApp</span>
-                    <div className="flex gap-1">
-                        {/* Pagination can be implemented here if backend supports it */}
-                    </div>
+                <div className="p-4 border-t border-[var(--color-border)] bg-[var(--color-surface)] flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-[var(--color-text-muted)]">
+                    <span>
+                        Menampilkan <strong>{((currentPage - 1) * itemsPerPage) + 1}</strong> - <strong>{Math.min(currentPage * itemsPerPage, filteredChats.length)}</strong> dari <strong>{filteredChats.length}</strong> kontak WhatsApp
+                    </span>
+                    {totalPages > 1 && (
+                        <div className="flex items-center gap-1 bg-[var(--color-bg)] p-1 rounded-xl border border-[var(--color-border)]">
+                            <button
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                                className="px-3 py-1 rounded-lg text-xs font-semibold hover:bg-[var(--color-surface)] text-[var(--color-text)] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                            >
+                                Prev
+                            </button>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                <button
+                                    key={page}
+                                    onClick={() => setCurrentPage(page)}
+                                    className={`w-7 h-7 rounded-lg text-xs font-bold transition-colors flex items-center justify-center ${
+                                        currentPage === page
+                                            ? "bg-[var(--color-primary)] text-white shadow-sm"
+                                            : "hover:bg-[var(--color-surface)] text-[var(--color-text)]"
+                                    }`}
+                                >
+                                    {page}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                                className="px-3 py-1 rounded-lg text-xs font-semibold hover:bg-[var(--color-surface)] text-[var(--color-text)] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
