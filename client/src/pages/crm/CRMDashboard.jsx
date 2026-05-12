@@ -7,7 +7,9 @@ import {
     FaUserCircle,
     FaChevronDown,
     FaFileExport,
-    FaFilter
+    FaFilter,
+    FaCopy,
+    FaCheck
 } from "react-icons/fa";
 import { getPlatforms } from "../../features/platforms/platformSlice";
 import axiosInstance from "../../api/axiosInstance";
@@ -23,6 +25,7 @@ const CRMDashboard = () => {
     const [isFetchingChats, setIsFetchingChats] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState("");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [copiedId, setCopiedId] = useState(null);
 
     // Load platforms on mount
     useEffect(() => {
@@ -218,10 +221,12 @@ const CRMDashboard = () => {
                                     let displayPhone = extractedPhone;
                                     
                                     if (isLikelySystemId) {
-                                        if (isNamePhoneFormat) {
+                                        const origNameIsPhone = chat.name && /^[\+\d\s\-\(\)]{8,20}$/.test(chat.name);
+                                        if (origNameIsPhone) {
+                                            displayPhone = chat.name;
+                                        } else if (isNamePhoneFormat) {
                                             displayPhone = displayName;
-                                            // Keep displayName as the phone number since we don't have their real name
-                                            if(chat.customName) displayName = chat.customName;
+                                            if (chat.customName) displayName = chat.customName;
                                         } else {
                                             displayPhone = extractedPhone + " (Meta ID)";
                                         }
@@ -255,10 +260,27 @@ const CRMDashboard = () => {
                                             </td>
                                             <td className="px-6 py-3 text-[var(--color-text)] font-mono border-r border-[var(--color-border)]">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                                    <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0">
                                                         <FaWhatsapp className="text-[10px]" />
                                                     </span>
-                                                    {displayPhone}
+                                                    <span className="truncate">{displayPhone}</span>
+                                                    <button
+                                                        onClick={() => {
+                                                            const cleanNumber = displayPhone.replace(" (Meta ID)", "");
+                                                            navigator.clipboard.writeText(cleanNumber);
+                                                            setCopiedId(rawId);
+                                                            toast.success("Nomor telepon disalin!");
+                                                            setTimeout(() => setCopiedId(null), 2000);
+                                                        }}
+                                                        className="text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors p-1 rounded hover:bg-[var(--color-bg)] flex-shrink-0"
+                                                        title="Salin Nomor Telepon"
+                                                    >
+                                                        {copiedId === rawId ? (
+                                                            <FaCheck className="text-green-500 text-xs" />
+                                                        ) : (
+                                                            <FaCopy className="text-xs" />
+                                                        )}
+                                                    </button>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-3 text-sm">
