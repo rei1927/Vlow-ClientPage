@@ -43,6 +43,7 @@ export const sendImpersonateResponse = (targetUser, adminUser, statusCode, res) 
         subscriptionExpiry: targetUser.subscriptionExpiry,
         maxConversations: targetUser.maxConversations,
         maxAiResponses: targetUser.maxAiResponses,
+        features: targetUser.features,
       },
     });
 };
@@ -79,6 +80,7 @@ export const sendTokenResponse = (user, statusCode, res) => {
         subscriptionExpiry: user.subscriptionExpiry,
         maxConversations: user.maxConversations,
         maxAiResponses: user.maxAiResponses,
+        features: user.features,
         // Don't send n8nWebhookUrl to customer - security measure
         ...(user.role === "admin" ? { n8nWebhookUrl: user.n8nWebhookUrl } : {}),
       },

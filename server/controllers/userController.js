@@ -11,7 +11,7 @@ import { getWelcomeTemplate } from "../utils/emailTemplates.js";
 // @route   POST /api/users
 export const createUser = async (req, res, next) => {
   try {
-    const { name, email, role, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl, metaCloudWebhookUrl } = req.body;
+    const { name, email, role, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl, metaCloudWebhookUrl, features } = req.body;
 
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
@@ -42,6 +42,7 @@ export const createUser = async (req, res, next) => {
       n8nSimulatorWebhookUrl: n8nSimulatorWebhookUrl || null,
       metaCloudWebhookUrl: metaCloudWebhookUrl || null,
       subscriptionExpiry: finalExpiry,
+      features: features || { chatbot: true, crm: true, broadcast: true },
     });
 
     // Kirim Email Welcome
@@ -79,6 +80,7 @@ export const createUser = async (req, res, next) => {
         n8nWebhookUrl: user.n8nWebhookUrl,
         n8nSimulatorWebhookUrl: user.n8nSimulatorWebhookUrl,
         metaCloudWebhookUrl: user.metaCloudWebhookUrl,
+        features: user.features,
         createdAt: user.createdAt,
       },
     });
@@ -233,7 +235,7 @@ export const getUserById = async (req, res, next) => {
 // @route   PUT /api/users/:id
 export const updateUser = async (req, res, next) => {
   try {
-    const { name, role, isActive, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl, metaCloudWebhookUrl, maxConversations, maxAiResponses, resetQuota } = req.body;
+    const { name, role, isActive, subscriptionExpiry, maxPlatforms, n8nWebhookUrl, n8nSimulatorWebhookUrl, metaCloudWebhookUrl, maxConversations, maxAiResponses, resetQuota, features } = req.body;
 
     const user = await User.findByPk(req.params.id);
     if (!user) {
@@ -253,6 +255,7 @@ export const updateUser = async (req, res, next) => {
     if (n8nWebhookUrl !== undefined) user.n8nWebhookUrl = n8nWebhookUrl || null;
     if (n8nSimulatorWebhookUrl !== undefined) user.n8nSimulatorWebhookUrl = n8nSimulatorWebhookUrl || null;
     if (metaCloudWebhookUrl !== undefined) user.metaCloudWebhookUrl = metaCloudWebhookUrl || null;
+    if (features !== undefined) user.features = features;
 
     // Set Max Limits for Customer
     if (role === "customer") {
@@ -302,6 +305,7 @@ export const updateUser = async (req, res, next) => {
         n8nWebhookUrl: user.n8nWebhookUrl,
         n8nSimulatorWebhookUrl: user.n8nSimulatorWebhookUrl,
         metaCloudWebhookUrl: user.metaCloudWebhookUrl,
+        features: user.features,
       },
     });
   } catch (error) {

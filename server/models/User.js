@@ -70,6 +70,12 @@ const User = sequelize.define(
       allowNull: true,
       comment: "Catatan kapan terakhir kali kuota (Conversation & AI Response) di-reset oleh Admin",
     },
+    features: {
+      type: DataTypes.JSON,
+      allowNull: false,
+      defaultValue: { chatbot: true, crm: true, broadcast: true },
+      comment: "Pengaturan akses fitur yang dimiliki oleh user (chatbot, crm, broadcast)",
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,

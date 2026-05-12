@@ -12,6 +12,7 @@ import {
 import { getPlatforms } from "../../features/platforms/platformSlice";
 import axiosInstance from "../../api/axiosInstance";
 import toast from "react-hot-toast";
+import FeatureAccessGuard from "../../components/common/FeatureAccessGuard";
 
 const CRMDashboard = () => {
     const dispatch = useDispatch();
@@ -80,6 +81,7 @@ const CRMDashboard = () => {
     }, [chats, searchKeyword]);
 
     return (
+        <FeatureAccessGuard feature="crm">
         <div className="h-[calc(100vh-100px)] flex flex-col bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] overflow-hidden shadow-sm animate-fade-in">
             {/* Header Section */}
             <div className="p-4 border-b border-[var(--color-border)] flex flex-col sm:flex-row justify-between items-center gap-4 bg-[var(--color-surface)] z-10">
@@ -287,6 +289,7 @@ const CRMDashboard = () => {
                 </div>
             )}
         </div>
+        </FeatureAccessGuard>
     );
 };
 

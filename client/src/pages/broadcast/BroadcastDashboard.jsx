@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import RecipientsTab from "./tabs/RecipientsTab";
 import TemplatesTab from "./tabs/TemplatesTab";
 import BroadcastTab from "./tabs/BroadcastTab";
+import FeatureAccessGuard from "../../components/common/FeatureAccessGuard";
 
 const BroadcastDashboard = () => {
   const [activeTab, setActiveTab] = useState("recipients");
 
   return (
+    <FeatureAccessGuard feature="broadcast">
     <div className="p-6 text-white min-h-screen">
       <h1 className="text-2xl font-bold mb-6">WhatsApp Broadcast (Meta Cloud API)</h1>
       
@@ -45,6 +47,7 @@ const BroadcastDashboard = () => {
         {activeTab === "broadcast" && <BroadcastTab />}
       </div>
     </div>
+    </FeatureAccessGuard>
   );
 };
 

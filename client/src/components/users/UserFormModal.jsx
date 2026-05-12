@@ -28,6 +28,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
     n8nWebhookUrl: "",
     n8nSimulatorWebhookUrl: "",
     metaCloudWebhookUrl: "",
+    features: { chatbot: true, crm: true, broadcast: true },
   });
 
   const [webhookStatus, setWebhookStatus] = useState({
@@ -88,6 +89,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
           n8nWebhookUrl: initialData.n8nWebhookUrl || "",
           n8nSimulatorWebhookUrl: initialData.n8nSimulatorWebhookUrl || "",
           metaCloudWebhookUrl: initialData.metaCloudWebhookUrl || "",
+          features: initialData.features || { chatbot: true, crm: true, broadcast: true },
         });
       } else {
         setFormData({
@@ -102,6 +104,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
           n8nWebhookUrl: "",
           n8nSimulatorWebhookUrl: "",
           metaCloudWebhookUrl: "",
+          features: { chatbot: true, crm: true, broadcast: true },
         });
       }
     }
@@ -496,6 +499,75 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
                   </span>
                 </div>
               )}
+
+              {/* Pengaturan Hak Akses Fitur */}
+              <div className="border border-[var(--color-border)] rounded-xl p-4 bg-[var(--color-surface)] space-y-3">
+                <label className="label text-xs font-bold text-[var(--color-text)] uppercase tracking-wider pb-0">
+                  Pengaturan Hak Akses Fitur
+                </label>
+                <p className="text-[10px] text-[var(--color-text-muted)] mt-0">
+                  Centang kapabilitas menu fitur yang diizinkan untuk digunakan oleh akun ini.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                  {/* Chatbot */}
+                  <label className="flex items-center gap-3 p-2.5 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bg)] transition-colors cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      className="checkbox checkbox-sm checkbox-primary rounded"
+                      checked={formData.features?.chatbot !== false}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          features: {
+                            ...formData.features,
+                            chatbot: e.target.checked,
+                          },
+                        })
+                      }
+                    />
+                    <span className="text-xs font-bold text-[var(--color-text)]">Chatbot AI</span>
+                  </label>
+
+                  {/* CRM */}
+                  <label className="flex items-center gap-3 p-2.5 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bg)] transition-colors cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      className="checkbox checkbox-sm checkbox-primary rounded"
+                      checked={formData.features?.crm !== false}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          features: {
+                            ...formData.features,
+                            crm: e.target.checked,
+                          },
+                        })
+                      }
+                    />
+                    <span className="text-xs font-bold text-[var(--color-text)]">CRM Kontak</span>
+                  </label>
+
+                  {/* Broadcast */}
+                  <label className="flex items-center gap-3 p-2.5 rounded-lg border border-[var(--color-border)] hover:bg-[var(--color-bg)] transition-colors cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      className="checkbox checkbox-sm checkbox-primary rounded"
+                      checked={formData.features?.broadcast !== false}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          features: {
+                            ...formData.features,
+                            broadcast: e.target.checked,
+                          },
+                        })
+                      }
+                    />
+                    <span className="text-xs font-bold text-[var(--color-text)]">Broadcast WA</span>
+                  </label>
+                </div>
+              </div>
             </fieldset>
 
             {/* Actions */}

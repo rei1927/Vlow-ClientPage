@@ -14,6 +14,7 @@ import AgentListLoading from "../../components/agents/AgentListLoading";
 import Loader from "../../components/Loader";
 import ConfirmationModal from "../../components/ConfirmationModal";
 import SubscriptionWarning from "../../components/common/SubscriptionWarning";
+import FeatureAccessGuard from "../../components/common/FeatureAccessGuard";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -154,7 +155,8 @@ const AgentList = () => {
   })();
 
   return (
-    <div className="space-y-3 animate-[fadeIn_0.5s_ease-out]">
+    <FeatureAccessGuard feature="chatbot">
+      <div className="space-y-3 animate-[fadeIn_0.5s_ease-out]">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 pb-2 border-b border-[var(--color-border)]">
         <div>
           <h1 className="text-lg sm:text-xl font-bold text-[var(--color-text)]">My AI Agents</h1>
@@ -272,6 +274,7 @@ const AgentList = () => {
         cancelText="Batal"
       />
     </div>
+    </FeatureAccessGuard>
   );
 };
 
