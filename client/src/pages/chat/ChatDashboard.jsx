@@ -201,14 +201,40 @@ const ChatDashboard = () => {
             });
             if (res.data?.success) {
                 const fetchedMsgs = Array.isArray(res.data.data) ? res.data.data : (Array.isArray(res.data.data?.docs) ? res.data.data.docs : []);
-                setMessages([...fetchedMsgs].reverse()); // Asumsi WAHA return newest first, kita butuh oldest first untuk UI chat
+                
+                // Fallback: If WAHA returns 0 history but sidebar knows a message exists, inject it!
+                // We only do this if our current screen is completely empty to avoid overwriting live chat.
+                if (fetchedMsgs.length === 0 && activeChat?.lastMessage && messages.length === 0) {
+                    setMessages([{
+                        id: `fallback-${Date.now()}`,
+                        fromMe: false,
+                        body: activeChat.lastMessage?.body || activeChat.lastMessage?.text || activeChat.lastMessage?.message?.conversation || "(Pesan tidak dapat dimuat penuh)",
+                        timestamp: activeChat.timestamp || Math.floor(Date.now() / 1000),
+                        type: "text",
+                        status: "received"
+                    }]);
+                } else if (fetchedMsgs.length > 0) {
+                    setMessages([...fetchedMsgs].reverse()); // Asumsi WAHA return newest first, kita butuh oldest first untuk UI chat
+                } else {
+                    // Benar-benar chat baru yang kosong
+                    if (messages.length === 0) setMessages([]);
+                }
             }
         } catch (error) {
             console.error("Error fetching messages:", error);
             const isTimeout = error.code === 'ECONNABORTED' || error.message?.toLowerCase().includes('timeout');
-            if (isTimeout && messages.length === 0) {
-                setMessages([]);
-            } else if (!isTimeout) {
+            
+            // Fallback: If engine crashes on this chat (e.g. @lid) but sidebar has a message, inject it!
+            if (messages.length === 0 && activeChat?.lastMessage) {
+                setMessages([{
+                    id: `fallback-err-${Date.now()}`,
+                    fromMe: false,
+                    body: activeChat.lastMessage?.body || activeChat.lastMessage?.text || activeChat.lastMessage?.message?.conversation || "(Pesan history diblokir oleh Meta)",
+                    timestamp: activeChat.timestamp || Math.floor(Date.now() / 1000),
+                    type: "text",
+                    status: "received"
+                }]);
+            } else if (!isTimeout && showLoading) {
                 toast.error(error.response?.data?.message || "Gagal memuat isi pesan");
             }
         } finally {
