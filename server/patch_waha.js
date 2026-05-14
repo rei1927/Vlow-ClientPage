@@ -1,44 +1,15 @@
 const fs = require('fs');
-const { execSync } = require('child_process');
 
-console.log("🚀 Memulai proses patching WAHA Plus...");
+const filePath = process.argv[2] || "/tmp/WebjsClientCore.js";
+console.log(`🚀 Membaca file dari: ${filePath}`);
 
-// 1. Dapatkan nama container WAHA
-let wahaContainer = "";
 try {
-    const psOutput = execSync("docker ps --format '{{.Names}}' | grep waha").toString().trim();
-    if (psOutput) {
-        wahaContainer = psOutput.split('\n')[0]; // Ambil yang pertama jika ada banyak
-        console.log(`✅ Container WAHA ditemukan: ${wahaContainer}`);
-    } else {
-        console.error("❌ Container WAHA tidak ditemukan! Pastikan WAHA sedang berjalan.");
-        process.exit(1);
-    }
-} catch (e) {
-    console.error("❌ Gagal mencari container WAHA:", e.message);
-    process.exit(1);
-}
+    let code = fs.readFileSync(filePath, 'utf8');
 
-// 2. Extract file WebjsClientCore.js
-const filePath = "/tmp/WebjsClientCore_Patch.js";
-try {
-    console.log(`📥 Mengekstrak WebjsClientCore.js dari ${wahaContainer}...`);
-    execSync(`docker cp ${wahaContainer}:/app/dist/core/engines/webjs/WebjsClientCore.js ${filePath}`);
-    console.log("✅ File berhasil diekstrak ke /tmp");
-} catch (e) {
-    console.error("❌ Gagal mengekstrak file:", e.message);
-    process.exit(1);
-}
+    const messageMatch = code.match(/new\s+([a-zA-Z0-9_]+\.Message|Message)\s*\(\s*this\s*,\s*m\s*\)/);
+    const messageClass = messageMatch ? messageMatch[1] : 'structures_1.Message';
 
-// 3. Baca dan Patch File
-let code = fs.readFileSync(filePath, 'utf8');
-
-// Cari tahu nama variabel import untuk Message (bisa structures_1.Message, dll)
-const messageMatch = code.match(/new\s+([a-zA-Z0-9_]+\.Message|Message)\s*\(\s*this\s*,\s*m\s*\)/);
-const messageClass = messageMatch ? messageMatch[1] : 'structures_1.Message';
-
-// Definisikan fungsi getMessages yang baru (versi 2026.4.3)
-const newGetMessages = `
+    const newGetMessages = `
     async getMessages(chatId, filter, pagination) {
         const messages = await this.pupPage.evaluate(async (chatId, filter, pagination) => {
             pagination.limit ||= Infinity;
@@ -140,29 +111,17 @@ const newGetMessages = `
     }
 `;
 
-// Cari deklarasi fungsi lama menggunakan Regex
-const oldFuncRegex = /async\s+getMessages\s*\(\s*chatId\s*,\s*filter\s*,\s*pagination\s*\)\s*\{[\s\S]*?return\s+messages\.map\s*\(\s*\(\s*m\s*\)\s*=>\s*new\s+(?:[a-zA-Z0-9_]+\.)?Message\s*\(\s*this\s*,\s*m\s*\)\s*\)\s*;\s*\}/;
+    const oldFuncRegex = /async\s+getMessages\s*\(\s*chatId\s*,\s*filter\s*,\s*pagination\s*\)\s*\{[\s\S]*?return\s+messages\.map\s*\(\s*\(\s*m\s*\)\s*=>\s*new\s+(?:[a-zA-Z0-9_]+\.)?Message\s*\(\s*this\s*,\s*m\s*\)\s*\)\s*;\s*\}/;
 
-if (!oldFuncRegex.test(code)) {
-    console.error("❌ Gagal menemukan fungsi getMessages lama di dalam file. Patching dibatalkan agar aman.");
-    process.exit(1);
-}
+    if (!oldFuncRegex.test(code)) {
+        console.error("❌ Gagal menemukan fungsi getMessages lama di dalam file.");
+        process.exit(1);
+    }
 
-// Replace kodenya
-code = code.replace(oldFuncRegex, newGetMessages.trim());
-
-// Simpan kembali
-fs.writeFileSync(filePath, code);
-console.log("✅ File berhasil di-patch dengan fungsi terbaru!");
-
-// 4. Masukkan kembali ke container dan restart
-try {
-    console.log(`📤 Mengirim file kembali ke ${wahaContainer}...`);
-    execSync(`docker cp ${filePath} ${wahaContainer}:/app/dist/core/engines/webjs/WebjsClientCore.js`);
-    console.log(`🔄 Merestart container ${wahaContainer}... (Ini mungkin memakan waktu beberapa detik)`);
-    execSync(`docker restart ${wahaContainer}`);
-    console.log("🎉 BERHASIL! WAHA Plus Anda sudah kebal terhadap bug Meta ID.");
+    code = code.replace(oldFuncRegex, newGetMessages.trim());
+    fs.writeFileSync(filePath, code);
+    console.log("✅ File berhasil di-patch dengan fungsi terbaru!");
 } catch (e) {
-    console.error("❌ Gagal mengunggah file kembali:", e.message);
+    console.error("❌ Terjadi kesalahan:", e.message);
     process.exit(1);
 }
