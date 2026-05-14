@@ -259,7 +259,7 @@ export const getMessages = async (sessionId, chatId, limit = 50) => {
         limit: limit,
       },
       headers: HEADERS,
-      timeout: 15000,
+      timeout: 5000,
     });
     return response.data;
   } catch (error) {

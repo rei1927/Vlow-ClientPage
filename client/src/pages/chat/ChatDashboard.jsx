@@ -196,7 +196,8 @@ const ChatDashboard = () => {
         try {
             const safeChatId = typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id;
             const res = await axiosInstance.get(`/chats/${selectedPlatform.id}/${safeChatId}/messages`, {
-                params: { limit: 50 }
+                params: { limit: 50 },
+                timeout: 8000
             });
             if (res.data?.success) {
                 const fetchedMsgs = Array.isArray(res.data.data) ? res.data.data : (Array.isArray(res.data.data?.docs) ? res.data.data.docs : []);
@@ -204,7 +205,12 @@ const ChatDashboard = () => {
             }
         } catch (error) {
             console.error("Error fetching messages:", error);
-            toast.error(error.response?.data?.message || "Gagal memuat isi pesan");
+            const isTimeout = error.code === 'ECONNABORTED' || error.message?.toLowerCase().includes('timeout');
+            if (isTimeout && messages.length === 0) {
+                setMessages([]);
+            } else if (!isTimeout) {
+                toast.error(error.response?.data?.message || "Gagal memuat isi pesan");
+            }
         } finally {
             if (showLoading) setIsFetchingMessages(false);
         }
