@@ -168,6 +168,28 @@ export const receiveMetaWebhook = async (req, res) => {
 // =============================================
 // WAHA WEBHOOK PROXY — Intercept sebelum ke n8n
 // =============================================
+
+// Helper: Teruskan payload WAHA ke n8n user
+const forwardToN8n = async (payload, sessionId) => {
+    try {
+        const platform = await ConnectedPlatform.findOne({
+            where: { sessionId, provider: "waha" },
+            include: [{ model: User, attributes: ["n8nWebhookUrl"] }],
+        });
+
+        const n8nUrl = platform?.User?.n8nWebhookUrl;
+        if (!n8nUrl) return;
+
+        await axios.post(n8nUrl, payload, {
+            headers: { "Content-Type": "application/json" },
+            timeout: 10000,
+        });
+        console.log(`✅ [WAHA Proxy] Forwarded to n8n: ${n8nUrl}`);
+    } catch (err) {
+        console.error(`[WAHA Proxy] Forward to n8n failed:`, err?.response?.data || err.message);
+    }
+};
+
 // Semua pesan WAHA melewati backend dulu.
 // Jika chat berlabel Human (handover aktif) → pesan DIBLOKIR, AI diam.
 // Jika chat dalam mode AI → pesan diteruskan ke n8n untuk diproses AI.
@@ -180,13 +202,17 @@ export const receiveWahaWebhook = async (req, res) => {
         // Langsung balas 200 OK ke WAHA agar tidak retry
         res.status(200).send("OK");
 
-        // Hanya proses event pesan masuk (bukan pesan keluar dari bot)
-        if (event !== "message" || !payload.payload) return;
+        // Jika BUKAN event pesan masuk, langsung teruskan ke n8n
+        if (!event.startsWith("message") || !payload.payload) {
+            return forwardToN8n(payload, sessionId);
+        }
 
         const msgPayload = payload.payload;
 
-        // Abaikan pesan dari diri sendiri (bot)
-        if (msgPayload.fromMe) return;
+        // Abaikan pesan dari diri sendiri (bot), tapi tetap teruskan ke n8n (mungkin n8n butuh)
+        if (msgPayload.fromMe) {
+            return forwardToN8n(payload, sessionId);
+        }
 
         const chatId = msgPayload.from;
         const messageBody = msgPayload.body || "";
