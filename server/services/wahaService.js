@@ -287,3 +287,21 @@ export const sendTextMessage = async (sessionId, chatId, text) => {
     throw new AppError(`Gagal mengirim pesan: ${rawError}`, 502);
   }
 };
+
+export const createLabel = async (sessionId, name, color = 1) => {
+  try {
+    const payload = {
+      name: name,
+      color: color,
+    };
+    const response = await axios.post(`${WAHA_URL}/api/${sessionId}/labels`, payload, {
+      headers: HEADERS,
+      timeout: 10000,
+    });
+    return response.data;
+  } catch (error) {
+    const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
+    console.error("WAHA Create Label Error:", rawError);
+    throw new AppError(`Gagal membuat label: ${rawError}`, 502);
+  }
+};

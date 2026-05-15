@@ -570,3 +570,57 @@ export const registerPhone = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get labels for a specific platform
+// @route   GET /api/platforms/:id/labels
+// @access  Private
+export const getPlatformLabels = async (req, res, next) => {
+  try {
+    const platform = await ConnectedPlatform.findOne({
+      where: { id: req.params.id, userId: req.user.id },
+    });
+
+    if (!platform) {
+      return next(new AppError("Platform tidak ditemukan.", 404));
+    }
+
+    if (platform.provider === "waha") {
+      const labels = await wahaService.getLabels(platform.sessionId);
+      res.status(200).json({ success: true, data: labels || [] });
+    } else {
+      // Untuk meta_cloud (saat ini belum didukung via API resmi, bisa di-mock)
+      res.status(200).json({ success: true, data: [] });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Create a new label for a specific platform
+// @route   POST /api/platforms/:id/labels
+// @access  Private
+export const createPlatformLabel = async (req, res, next) => {
+  try {
+    const { name, color } = req.body;
+    if (!name) {
+      return next(new AppError("Nama label wajib diisi.", 400));
+    }
+
+    const platform = await ConnectedPlatform.findOne({
+      where: { id: req.params.id, userId: req.user.id },
+    });
+
+    if (!platform) {
+      return next(new AppError("Platform tidak ditemukan.", 404));
+    }
+
+    if (platform.provider === "waha") {
+      const newLabel = await wahaService.createLabel(platform.sessionId, name, color || 1);
+      res.status(201).json({ success: true, data: newLabel });
+    } else {
+      return next(new AppError("Pembuatan label hanya didukung untuk WAHA (Unofficial).", 400));
+    }
+  } catch (error) {
+    next(error);
+  }
+};

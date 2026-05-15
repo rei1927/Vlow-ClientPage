@@ -447,7 +447,7 @@ const AgentBuilder = () => {
                   <FollowupTab config={followupConfig} setConfig={setFollowupConfig} />
                 )}
                 {activeTab === "handover" && (
-                  <HandoverTab config={handoverConfig} setConfig={setHandoverConfig} />
+                  <HandoverTab config={handoverConfig} setConfig={setHandoverConfig} platformId={formData.whatsappNumber} />
                 )}
                 {activeTab === "evaluation" && <EvaluationTab agentId={id} />}
               </>

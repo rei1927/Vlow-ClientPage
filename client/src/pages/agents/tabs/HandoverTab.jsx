@@ -1,9 +1,53 @@
-import { useState } from "react";
-import { FaToggleOff, FaTimes, FaPlus, FaBrain } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaToggleOff, FaTimes, FaPlus, FaBrain, FaSpinner } from "react-icons/fa";
 import { FiShield, FiClock, FiTag, FiMessageSquare, FiAlertTriangle } from "react-icons/fi";
+import platformService from "../../../features/platforms/platformService";
+import toast from "react-hot-toast";
 
-const HandoverTab = ({ config, setConfig }) => {
+const HandoverTab = ({ config, setConfig, platformId }) => {
     const [keywordInput, setKeywordInput] = useState("");
+    const [labels, setLabels] = useState([]);
+    const [isLoadingLabels, setIsLoadingLabels] = useState(false);
+    const [isCreatingLabel, setIsCreatingLabel] = useState(false);
+
+    useEffect(() => {
+        if (platformId && config.enabled) {
+            fetchLabels();
+        }
+    }, [platformId, config.enabled]);
+
+    const fetchLabels = async () => {
+        setIsLoadingLabels(true);
+        try {
+            const res = await platformService.getPlatformLabels(platformId);
+            if (res.success) {
+                setLabels(res.data || []);
+            }
+        } catch (error) {
+            console.error("Gagal menarik label:", error);
+        } finally {
+            setIsLoadingLabels(false);
+        }
+    };
+
+    const handleCreateLabel = async (targetField) => {
+        const name = window.prompt("Masukkan nama label baru:");
+        if (!name || !name.trim()) return;
+
+        setIsCreatingLabel(true);
+        try {
+            const res = await platformService.createPlatformLabel({ id: platformId, name: name.trim(), color: 1 });
+            if (res.success && res.data) {
+                toast.success("Label berhasil dibuat!");
+                setLabels(prev => [...prev, res.data]);
+                handleChange(targetField, res.data.id);
+            }
+        } catch (error) {
+            toast.error(error?.response?.data?.message || "Gagal membuat label");
+        } finally {
+            setIsCreatingLabel(false);
+        }
+    };
 
     const handleChange = (field, value) => {
         setConfig((prev) => ({ ...prev, [field]: value }));
@@ -186,32 +230,80 @@ const HandoverTab = ({ config, setConfig }) => {
 
                         {/* Label AI */}
                         <div className="bg-[var(--color-surface)] p-5 rounded-2xl shadow-sm border border-[var(--color-border)]">
-                            <h4 className="font-bold text-[var(--color-text)] mb-3 flex items-center gap-2 text-sm">
-                                🤖 Label AI
+                            <h4 className="font-bold text-[var(--color-text)] mb-3 flex items-center justify-between text-sm">
+                                <span className="flex items-center gap-2">🤖 Label AI</span>
                             </h4>
-                            <input
-                                type="text"
-                                className="input input-bordered input-sm w-full bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
-                                placeholder="Label ID"
-                                value={config.aiLabelId || ""}
-                                onChange={(e) => handleChange("aiLabelId", e.target.value || null)}
-                            />
-                            <span className="text-[10px] text-[var(--color-text-muted)] mt-1 block">ID label dari WA Business</span>
+                            
+                            {!platformId ? (
+                                <div className="text-xs text-orange-500 bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg border border-orange-200">
+                                    Simpan agent dan hubungkan WhatsApp untuk menarik label.
+                                </div>
+                            ) : isLoadingLabels ? (
+                                <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)] p-2">
+                                    <FaSpinner className="animate-spin" /> Menarik label dari WhatsApp...
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <select
+                                        className="select select-bordered select-sm w-full bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
+                                        value={config.aiLabelId || ""}
+                                        onChange={(e) => handleChange("aiLabelId", e.target.value || null)}
+                                    >
+                                        <option value="">-- Pilih Label --</option>
+                                        {labels.map((lbl) => (
+                                            <option key={lbl.id} value={lbl.id}>{lbl.name}</option>
+                                        ))}
+                                    </select>
+                                    <button 
+                                        type="button"
+                                        onClick={() => handleCreateLabel("aiLabelId")}
+                                        disabled={isCreatingLabel}
+                                        className="btn btn-xs btn-outline btn-block text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-border)]"
+                                    >
+                                        <FaPlus size={10} /> Buat Label Baru
+                                    </button>
+                                </div>
+                            )}
+                            <span className="text-[10px] text-[var(--color-text-muted)] mt-2 block">Diterapkan saat AI mengambil alih.</span>
                         </div>
 
                         {/* Label Human */}
                         <div className="bg-[var(--color-surface)] p-5 rounded-2xl shadow-sm border border-[var(--color-border)]">
-                            <h4 className="font-bold text-[var(--color-text)] mb-3 flex items-center gap-2 text-sm">
-                                👤 Label Human
+                            <h4 className="font-bold text-[var(--color-text)] mb-3 flex items-center justify-between text-sm">
+                                <span className="flex items-center gap-2">👤 Label Human</span>
                             </h4>
-                            <input
-                                type="text"
-                                className="input input-bordered input-sm w-full bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
-                                placeholder="Label ID"
-                                value={config.handoverLabelId || ""}
-                                onChange={(e) => handleChange("handoverLabelId", e.target.value || null)}
-                            />
-                            <span className="text-[10px] text-[var(--color-text-muted)] mt-1 block">ID label dari WA Business</span>
+                            
+                            {!platformId ? (
+                                <div className="text-xs text-orange-500 bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg border border-orange-200">
+                                    Simpan agent dan hubungkan WhatsApp untuk menarik label.
+                                </div>
+                            ) : isLoadingLabels ? (
+                                <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)] p-2">
+                                    <FaSpinner className="animate-spin" /> Menarik label dari WhatsApp...
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <select
+                                        className="select select-bordered select-sm w-full bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
+                                        value={config.handoverLabelId || ""}
+                                        onChange={(e) => handleChange("handoverLabelId", e.target.value || null)}
+                                    >
+                                        <option value="">-- Pilih Label --</option>
+                                        {labels.map((lbl) => (
+                                            <option key={lbl.id} value={lbl.id}>{lbl.name}</option>
+                                        ))}
+                                    </select>
+                                    <button 
+                                        type="button"
+                                        onClick={() => handleCreateLabel("handoverLabelId")}
+                                        disabled={isCreatingLabel}
+                                        className="btn btn-xs btn-outline btn-block text-[var(--color-text-muted)] border-[var(--color-border)] hover:bg-[var(--color-border)]"
+                                    >
+                                        <FaPlus size={10} /> Buat Label Baru
+                                    </button>
+                                </div>
+                            )}
+                            <span className="text-[10px] text-[var(--color-text-muted)] mt-2 block">Diterapkan saat Manusia mengambil alih.</span>
                         </div>
                     </div>
                 </div>

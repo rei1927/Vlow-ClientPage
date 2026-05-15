@@ -51,6 +51,18 @@ const getPlatformStatus = async (id) => {
   return response.data;
 };
 
+// Get Labels
+const getPlatformLabels = async (id) => {
+  const response = await axiosInstance.get(`${API_URL}/${id}/labels`);
+  return response.data;
+};
+
+// Create Label
+const createPlatformLabel = async ({ id, name, color }) => {
+  const response = await axiosInstance.post(`${API_URL}/${id}/labels`, { name, color });
+  return response.data;
+};
+
 const platformService = {
   getPlatforms,
   createPlatform,
@@ -58,6 +70,8 @@ const platformService = {
   deletePlatform,
   getPlatformQR,
   getPlatformStatus,
+  getPlatformLabels,
+  createPlatformLabel
 };
 
 export default platformService;
