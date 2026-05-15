@@ -56,6 +56,8 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD:-re_DVhzLzW4_3Y7mDXR9KwfoA8iMhhzPgYGS}
       - FROM_NAME=${FROM_NAME:-Vlow System Admin}
       - FROM_EMAIL=${FROM_EMAIL:-no-reply@vlow.ai}
+      # WAHA Webhook Proxy (WAHA reaches backend via public Nginx proxy)
+      - WAHA_WEBHOOK_PROXY_URL=${WAHA_WEBHOOK_PROXY_URL}
     depends_on:
       - minio
 

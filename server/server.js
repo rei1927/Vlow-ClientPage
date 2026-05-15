@@ -165,13 +165,35 @@ const startServer = async () => {
     // Start handover auto-release scheduler
     startHandoverScheduler();
 
+    // Migrate existing WAHA sessions to use webhook proxy
+    try {
+      const { updateSessionWebhook } = await import("./services/wahaService.js");
+      const backendBaseUrl = process.env.WAHA_WEBHOOK_PROXY_URL || process.env.FRONTEND_URL?.replace(/\/$/, '');
+      if (backendBaseUrl) {
+        const proxyUrl = `${backendBaseUrl}/api/webhooks/waha`;
+        const wahaPlatforms = await ConnectedPlatform.findAll({
+          where: { provider: "waha", status: "WORKING" },
+        });
+        for (const p of wahaPlatforms) {
+          await updateSessionWebhook(p.sessionId, proxyUrl);
+        }
+        if (wahaPlatforms.length > 0) {
+          logger.info(`[Migration] Updated ${wahaPlatforms.length} WAHA session(s) webhook → proxy`);
+        }
+      }
+    } catch (e) {
+      logger.warn(`[Migration] WAHA webhook migration skipped: ${e.message}`);
+    }
+
     app.listen(PORT, () => {
       logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
     });
   } catch (error) {
+    console.error("FULL ERROR STARTING SERVER:", error);
     logger.error(`Error starting server: ${error.message}`);
     process.exit(1);
   }
+
 };
 
 startServer();

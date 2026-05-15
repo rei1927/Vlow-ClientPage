@@ -1,4 +1,6 @@
 import ConnectedPlatform from "../models/ConnectedPlatform.js";
+import ChatHandover from "../models/ChatHandover.js";
+import Agent from "../models/Agent.js";
 import MetaMessage from "../models/MetaMessage.js";
 import User from "../models/User.js";
 import axios from "axios";
@@ -160,6 +162,144 @@ export const receiveMetaWebhook = async (req, res) => {
         }
     } catch (error) {
         console.error("Meta Webhook Processing Error:", error);
+    }
+};
+
+// =============================================
+// WAHA WEBHOOK PROXY — Intercept sebelum ke n8n
+// =============================================
+// Semua pesan WAHA melewati backend dulu.
+// Jika chat berlabel Human (handover aktif) → pesan DIBLOKIR, AI diam.
+// Jika chat dalam mode AI → pesan diteruskan ke n8n untuk diproses AI.
+export const receiveWahaWebhook = async (req, res) => {
+    try {
+        const payload = req.body;
+        const event = payload.event;
+        const sessionId = payload.session;
+
+        // Langsung balas 200 OK ke WAHA agar tidak retry
+        res.status(200).send("OK");
+
+        // Hanya proses event pesan masuk (bukan pesan keluar dari bot)
+        if (event !== "message" || !payload.payload) return;
+
+        const msgPayload = payload.payload;
+
+        // Abaikan pesan dari diri sendiri (bot)
+        if (msgPayload.fromMe) return;
+
+        const chatId = msgPayload.from;
+        const messageBody = msgPayload.body || "";
+
+        console.log(`📨 [WAHA Proxy] Pesan masuk dari ${chatId} di sesi ${sessionId}: "${messageBody.substring(0, 50)}..."`);
+
+        // 1. Cari platform dan agent
+        const platform = await ConnectedPlatform.findOne({
+            where: { sessionId, provider: "waha" },
+            include: [
+                { model: Agent },
+                { model: User, attributes: ["n8nWebhookUrl"] },
+            ],
+        });
+
+        if (!platform) {
+            console.error(`[WAHA Proxy] ⚠️ Platform tidak ditemukan untuk sesi: ${sessionId}`);
+            return;
+        }
+
+        const n8nUrl = platform.User?.n8nWebhookUrl;
+        if (!n8nUrl) {
+            console.error(`[WAHA Proxy] ⚠️ n8n Webhook URL belum diset untuk user platform ${platform.id}`);
+            return;
+        }
+
+        const handoverConfig = platform.Agent?.handoverConfig || {};
+
+        // 2. CEK KEYWORD TRIGGER (sebelum cek handover)
+        if (handoverConfig.enabled && Array.isArray(handoverConfig.keywords) && handoverConfig.keywords.length > 0) {
+            const lowerMessage = messageBody.toLowerCase();
+            const matchedKeyword = handoverConfig.keywords.find((kw) =>
+                lowerMessage.includes(kw.toLowerCase())
+            );
+
+            if (matchedKeyword) {
+                console.log(`🔑 [WAHA Proxy] Keyword "${matchedKeyword}" terdeteksi! Mengaktifkan handover untuk ${chatId}`);
+
+                const autoReleaseMinutes = handoverConfig.autoReleaseMinutes || 30;
+                const { handoverLabelId, aiLabelId } = handoverConfig;
+
+                // Upsert handover record
+                const [handover, created] = await ChatHandover.findOrCreate({
+                    where: { chatId, sessionId },
+                    defaults: {
+                        platformId: platform.id,
+                        agentId: platform.Agent?.id || null,
+                        status: "human",
+                        triggeredBy: "auto_keyword",
+                        triggerKeyword: matchedKeyword,
+                        activatedAt: new Date(),
+                        autoReleaseAt: new Date(Date.now() + autoReleaseMinutes * 60 * 1000),
+                        releasedAt: null,
+                    },
+                });
+
+                if (!created) {
+                    handover.status = "human";
+                    handover.triggeredBy = "auto_keyword";
+                    handover.triggerKeyword = matchedKeyword;
+                    handover.activatedAt = new Date();
+                    handover.autoReleaseAt = new Date(Date.now() + autoReleaseMinutes * 60 * 1000);
+                    handover.releasedAt = null;
+                    await handover.save();
+                }
+
+                // Swap labels di WhatsApp
+                try {
+                    const { updateChatLabels } = await import("../services/wahaService.js");
+                    if (handoverLabelId) await updateChatLabels(sessionId, chatId, String(handoverLabelId), "add");
+                    if (aiLabelId) await updateChatLabels(sessionId, chatId, String(aiLabelId), "remove");
+                } catch (e) {
+                    console.error("[WAHA Proxy] Label swap error:", e.message);
+                }
+
+                // Kirim pesan handover ke customer
+                if (handoverConfig.responseMessage) {
+                    try {
+                        const { sendTextMessage } = await import("../services/wahaService.js");
+                        await sendTextMessage(sessionId, chatId, handoverConfig.responseMessage);
+                    } catch (e) {
+                        console.error("[WAHA Proxy] Gagal kirim pesan handover:", e.message);
+                    }
+                }
+
+                // BLOKIR — jangan teruskan ke n8n
+                console.log(`🚫 [WAHA Proxy] Pesan DIBLOKIR (keyword handover aktif). AI tidak akan membalas.`);
+                return;
+            }
+        }
+
+        // 3. CEK STATUS HANDOVER
+        const handover = await ChatHandover.findOne({
+            where: { chatId, sessionId, status: "human" },
+        });
+
+        if (handover) {
+            console.log(`🚫 [WAHA Proxy] Pesan dari ${chatId} DIBLOKIR — chat sedang dalam mode HUMAN (handover aktif).`);
+            return; // BLOKIR — AI diam
+        }
+
+        // 4. MODE AI — Teruskan ke n8n
+        console.log(`✅ [WAHA Proxy] Chat ${chatId} dalam mode AI. Meneruskan ke n8n: ${n8nUrl}`);
+        try {
+            await axios.post(n8nUrl, payload, {
+                headers: { "Content-Type": "application/json" },
+                timeout: 10000,
+            });
+        } catch (err) {
+            console.error(`[WAHA Proxy] Gagal meneruskan ke n8n:`, err?.response?.data || err.message);
+        }
+    } catch (error) {
+        console.error("[WAHA Proxy] Error:", error.message);
     }
 };
 

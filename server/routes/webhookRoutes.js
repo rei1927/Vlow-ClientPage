@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyMetaWebhook, receiveMetaWebhook, receiveN8nWebhook, receiveN8nOutgoingMessage } from "../controllers/webhookController.js";
+import { verifyMetaWebhook, receiveMetaWebhook, receiveN8nWebhook, receiveN8nOutgoingMessage, receiveWahaWebhook } from "../controllers/webhookController.js";
 
 const router = express.Router();
 
@@ -8,6 +8,9 @@ router.get("/meta", verifyMetaWebhook);
 
 // Digunakan oleh Meta untuk mengirim payload JSON pesan masuk WhatsApp
 router.post("/meta", receiveMetaWebhook);
+
+// WAHA Webhook Proxy — intercept pesan WAHA, cek handover, lalu teruskan ke n8n
+router.post("/waha", receiveWahaWebhook);
 
 // Digunakan oleh n8n untuk mengirim parameter/objek
 router.post("/n8n", receiveN8nWebhook);

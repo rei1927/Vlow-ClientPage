@@ -45,20 +45,26 @@ const isRecoverableStartError = async (sessionId, error) => {
   return false;
 };
 
-// Start Session & Inject Webhook URL
+// Start Session & Inject Webhook URL (via Backend Proxy)
 export const startWahaSession = async (sessionId, webhookUrl) => {
   try {
     // 1. Cek apakah session sudah ada
     const existingSession = await getWahaSession(sessionId);
 
     if (!existingSession) {
-      // 2. Payload Config untuk WAHA
+      // 2. Proxy URL: Semua pesan WAHA melewati backend dulu untuk cek handover
+      // Backend akan meneruskan ke n8n hanya jika chat dalam mode AI
+      const backendBaseUrl = process.env.WAHA_WEBHOOK_PROXY_URL || process.env.FRONTEND_URL?.replace(/\/$/, '');
+      const proxyUrl = backendBaseUrl ? `${backendBaseUrl}/api/webhooks/waha` : webhookUrl;
+
+      console.log(`[WAHA] Session ${sessionId} webhook proxy: ${proxyUrl}`);
+
       const payload = {
         name: sessionId,
         config: {
-          webhooks: webhookUrl ? [
+          webhooks: proxyUrl ? [
             {
-              url: webhookUrl, // <--- INI KUNCINYA (Dikirim ke n8n User)
+              url: proxyUrl, // <--- PROXY: Backend intercept dulu, baru forward ke n8n
               events: [
                 "message.any",
                 "label.deleted",
@@ -85,6 +91,34 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
     const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
     console.error("WAHA Service Error:", rawError);
     throw new AppError(`Gagal menghubungkan ke WAHA: ${rawError}`, 400);
+  }
+};
+
+// Update webhook URL untuk session yang sudah ada
+export const updateSessionWebhook = async (sessionId, newWebhookUrl) => {
+  try {
+    const payload = {
+      config: {
+        webhooks: [
+          {
+            url: newWebhookUrl,
+            events: [
+              "message.any",
+              "label.deleted",
+              "label.chat.added",
+              "label.chat.deleted"
+            ],
+          },
+        ],
+      },
+    };
+
+    await axios.put(`${WAHA_URL}/api/sessions/${sessionId}`, payload, { headers: HEADERS });
+    console.log(`[WAHA] Webhook updated for session ${sessionId} → ${newWebhookUrl}`);
+  } catch (error) {
+    const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
+    console.error(`[WAHA] Failed to update webhook for ${sessionId}:`, rawError);
+    // Non-fatal: don't throw, just log
   }
 };
 
