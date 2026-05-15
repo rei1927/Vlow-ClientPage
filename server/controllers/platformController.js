@@ -577,7 +577,7 @@ export const registerPhone = async (req, res, next) => {
 export const getPlatformLabels = async (req, res, next) => {
   try {
     const platform = await ConnectedPlatform.findOne({
-      where: { id: req.params.id, userId: req.user.id },
+      where: { agentId: req.params.id, userId: req.user.id },
     });
 
     if (!platform) {
@@ -607,7 +607,7 @@ export const createPlatformLabel = async (req, res, next) => {
     }
 
     const platform = await ConnectedPlatform.findOne({
-      where: { id: req.params.id, userId: req.user.id },
+      where: { agentId: req.params.id, userId: req.user.id },
     });
 
     if (!platform) {
