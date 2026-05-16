@@ -168,11 +168,21 @@ const startServer = async () => {
     // Migrate existing WAHA sessions to use webhook proxy
     try {
       const { updateSessionWebhook } = await import("./services/wahaService.js");
-      // Gunakan internal Docker network vlow_server agar WAHA bisa mengirim webhook tanpa masalah DNS/Cloudflare
-      const backendBaseUrl = process.env.WAHA_WEBHOOK_PROXY_URL || "http://vlow_server:5000";
+      
+      let internalIp = "172.17.0.1";
+      try {
+        const dns = await import("dns/promises");
+        const res = await dns.lookup("vlow_server");
+        if (res && res.address) internalIp = res.address;
+      } catch (e) {
+        console.warn("DNS lookup failed, fallback to", internalIp);
+      }
+
+      const backendBaseUrl = process.env.WAHA_WEBHOOK_PROXY_URL || `http://${internalIp}:5000`;
       
       if (backendBaseUrl) {
-        const proxyUrl = `${backendBaseUrl}/api/webhooks/waha`;
+        let proxyUrl = `${backendBaseUrl}/api/webhooks/waha`;
+        if (proxyUrl.includes("vlow_server")) proxyUrl = proxyUrl.replace("vlow_server", internalIp);
         const wahaPlatforms = await ConnectedPlatform.findAll({
           where: { provider: "waha", status: "WORKING" },
         });
