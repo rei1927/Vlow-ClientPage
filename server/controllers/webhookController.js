@@ -4,6 +4,7 @@ import Agent from "../models/Agent.js";
 import MetaMessage from "../models/MetaMessage.js";
 import User from "../models/User.js";
 import axios from "axios";
+import { emitNewMessage, emitChatListUpdate } from "../socket.js";
 
 // Digunakan oleh Meta untuk Veryfikasi URL Webhook
 export const verifyMetaWebhook = (req, res) => {
@@ -127,6 +128,17 @@ export const receiveMetaWebhook = async (req, res) => {
                                             status: "received",
                                         }
                                     });
+
+                                    // Emit real-time event to connected dashboard clients
+                                    emitNewMessage(platform.id, msg.from, {
+                                        id: msg.id,
+                                        fromMe: false,
+                                        body: body,
+                                        type: msg.type || "text",
+                                        timestamp: parseInt(msg.timestamp) || Math.floor(Date.now() / 1000),
+                                        status: "received",
+                                        contactName: contact.profile?.name || null,
+                                    });
                                 } catch (dbErr) {
                                     console.error("[Webhook] DB save error:", dbErr.message);
                                 }
@@ -219,7 +231,8 @@ export const receiveWahaWebhook = async (req, res) => {
 
         console.log(`📨 [WAHA Proxy] Pesan masuk dari ${chatId} di sesi ${sessionId}: "${messageBody.substring(0, 50)}..."`);
 
-        // 1. Cari platform dan agent
+        // Emit real-time event to dashboard clients
+        // Find platform to get platformId for the socket room
         const platform = await ConnectedPlatform.findOne({
             where: { sessionId, provider: "waha" },
             include: [
@@ -232,6 +245,16 @@ export const receiveWahaWebhook = async (req, res) => {
             console.error(`[WAHA Proxy] ⚠️ Platform tidak ditemukan untuk sesi: ${sessionId}`);
             return;
         }
+
+        // Emit new message to connected dashboard clients immediately
+        emitNewMessage(platform.id, chatId, {
+            id: msgPayload.id?._serialized || msgPayload.id || `waha-${Date.now()}`,
+            fromMe: false,
+            body: messageBody,
+            type: msgPayload.type || "text",
+            timestamp: msgPayload.timestamp || Math.floor(Date.now() / 1000),
+            status: "received",
+        });
 
         const n8nUrl = platform.User?.n8nWebhookUrl;
         if (!n8nUrl) {
@@ -386,6 +409,16 @@ export const receiveN8nOutgoingMessage = async (req, res) => {
             platformId: platform.id,
             waMessageId: waMessageId || `n8n_${Date.now()}`,
             chatId: chatId,
+            fromMe: true,
+            body: body,
+            type: type || "text",
+            timestamp: Math.floor(Date.now() / 1000),
+            status: "sent",
+        });
+
+        // Emit real-time event so dashboard shows AI reply instantly
+        emitNewMessage(platform.id, chatId, {
+            id: waMessageId || `n8n_${Date.now()}`,
             fromMe: true,
             body: body,
             type: type || "text",

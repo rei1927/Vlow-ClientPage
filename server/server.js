@@ -1,4 +1,5 @@
 import express from "express"; // Restart server trigger
+import { createServer } from "http";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
@@ -7,6 +8,7 @@ import cookieParser from "cookie-parser";
 import sequelize from "./config/database.js";
 import logger from "./utils/logger.js";
 import { initMinio } from "./config/minio.js";
+import { initSocket } from "./socket.js";
 
 // Import Middleware Error Handler kita yang sudah canggih
 import errorHandler from "./middlewares/errorMiddleware.js";
@@ -40,6 +42,10 @@ import { startHandoverScheduler } from "./utils/handoverScheduler.js";
 dotenv.config();
 
 const app = express();
+const httpServer = createServer(app);
+
+// Initialize Socket.io
+const io = initSocket(httpServer);
 
 // --- Server Start & DB Connect ---
 const PORT = process.env.PORT || 5000;
@@ -197,8 +203,9 @@ const startServer = async () => {
       logger.warn(`[Migration] WAHA webhook migration skipped: ${e.message}`);
     }
 
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+      logger.info(`Socket.io ready for real-time connections`);
     });
   } catch (error) {
     console.error("FULL ERROR STARTING SERVER:", error);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     FaSearch,
@@ -15,6 +15,7 @@ import {
 import { FiShield } from "react-icons/fi";
 import { getPlatforms } from "../../features/platforms/platformSlice";
 import axiosInstance from "../../api/axiosInstance";
+import { getSocket } from "../../api/socket";
 import toast from "react-hot-toast";
 
 const ChatDashboard = () => {
@@ -83,17 +84,114 @@ const ChatDashboard = () => {
         }
     }, [activeChat, selectedPlatform]);
 
-    // Background Long-Polling for "Real-time" feel (every 10 seconds)
+    // Background Long-Polling as FALLBACK only (every 30 seconds instead of 10)
     useEffect(() => {
         let pollInterval;
         if (activeChat && selectedPlatform) {
             pollInterval = setInterval(() => {
-                fetchChats(false); // Update sidebar silently
-                fetchMessages(false); // Update chat window silently
-            }, 10000); // 10 seconds
+                fetchChats(false); // Update sidebar silently as safety net
+            }, 30000); // 30 seconds fallback
         }
         return () => {
             if (pollInterval) clearInterval(pollInterval);
+        };
+    }, [activeChat, selectedPlatform]);
+
+    // Socket.io Real-time Connection
+    useEffect(() => {
+        if (!selectedPlatform) return;
+
+        const socket = getSocket();
+
+        // Join platform room to receive chat list updates
+        socket.emit("join:platform", selectedPlatform.id);
+
+        // Listen for new messages (updates sidebar)
+        const handleChatUpdated = (data) => {
+            setChats(prev => {
+                const updated = prev.map(chat => {
+                    const chatIdStr = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id;
+                    if (chatIdStr === data.chatId) {
+                        return {
+                            ...chat,
+                            lastMessage: data.lastMessage,
+                            timestamp: data.timestamp,
+                            unreadCount: (chat.unreadCount || 0) + 1,
+                        };
+                    }
+                    return chat;
+                });
+                // Sort by latest timestamp
+                return updated.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            });
+        };
+
+        // Listen for chat list refresh (new chat appeared)
+        const handleChatListRefresh = () => {
+            fetchChats(false);
+        };
+
+        // Listen for handover changes
+        const handleHandoverChanged = (data) => {
+            setChatHandoverMap(prev => {
+                const updated = { ...prev };
+                if (data.status === 'human') {
+                    updated[data.chatId] = 'human';
+                } else {
+                    delete updated[data.chatId];
+                }
+                return updated;
+            });
+        };
+
+        socket.on("chat:updated", handleChatUpdated);
+        socket.on("chatlist:refresh", handleChatListRefresh);
+        socket.on("handover:changed", handleHandoverChanged);
+
+        return () => {
+            socket.off("chat:updated", handleChatUpdated);
+            socket.off("chatlist:refresh", handleChatListRefresh);
+            socket.off("handover:changed", handleHandoverChanged);
+            socket.emit("leave:platform", selectedPlatform.id);
+        };
+    }, [selectedPlatform]);
+
+    // Socket.io: Listen for new messages in active chat
+    useEffect(() => {
+        if (!activeChat || !selectedPlatform) return;
+
+        const socket = getSocket();
+        const safeChatId = typeof activeChat.id === 'object' ? (activeChat.id._serialized || activeChat.id.id) : activeChat.id;
+
+        // Join specific chat room
+        socket.emit("join:chat", { platformId: selectedPlatform.id, chatId: safeChatId });
+
+        const handleNewMessage = (data) => {
+            if (data.chatId === safeChatId && data.platformId === selectedPlatform.id) {
+                setMessages(prev => {
+                    // Avoid duplicates
+                    const exists = prev.some(m => {
+                        const mId = typeof m.id === 'object' ? (m.id._serialized || m.id.id) : m.id;
+                        const newId = typeof data.message.id === 'object' ? (data.message.id._serialized || data.message.id.id) : data.message.id;
+                        return mId === newId;
+                    });
+                    if (exists) return prev;
+
+                    // Remove temp messages if this is our own sent message
+                    let filtered = prev;
+                    if (data.message.fromMe) {
+                        filtered = prev.filter(m => !String(m.id).startsWith('temp-'));
+                    }
+                    return [...filtered, data.message];
+                });
+            }
+        };
+
+        socket.on("message:new", handleNewMessage);
+
+        return () => {
+            socket.off("message:new", handleNewMessage);
+            socket.emit("leave:chat", { platformId: selectedPlatform.id, chatId: safeChatId });
         };
     }, [activeChat, selectedPlatform]);
 
@@ -359,13 +457,6 @@ const ChatDashboard = () => {
 
     const wahaChats = React.useMemo(() => {
         let list = chats || [];
-
-        // --- DEBUG LOGS MULAI ---
-        if (list.length > 0 && isBusiness) {
-            console.log("DEBUG: list[0] labels prop:", list[0].labels);
-            console.log("DEBUG: master labels[0]:", labels[0]);
-        }
-        // --- DEBUG LOGS SELESAI ---
 
         // Map labels from WAHA API (Syncing WAHA label.items into chat objects)
         if (isBusiness && labels.length > 0 && list.length > 0) {

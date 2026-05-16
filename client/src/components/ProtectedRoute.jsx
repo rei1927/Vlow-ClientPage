@@ -1,11 +1,24 @@
+import { useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { connectSocket, disconnectSocket } from "../api/socket";
 
 const ProtectedRoute = () => {
   const { user } = useSelector((state) => state.auth);
 
+  // Connect socket when authenticated
+  useEffect(() => {
+    if (user) {
+      connectSocket();
+    }
+    return () => {
+      // Disconnect only if user logs out (handled by auth slice)
+    };
+  }, [user]);
+
   // Jika tidak ada user (state kosong), tendang ke Login
   if (!user) {
+    disconnectSocket();
     return <Navigate to="/login" replace />;
   }
 

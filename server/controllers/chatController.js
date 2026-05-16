@@ -7,6 +7,7 @@ import CustomerProfile from "../models/CustomerProfile.js";
 import AppError from "../utils/AppError.js";
 import * as wahaService from "../services/wahaService.js";
 import * as metaService from "../services/metaService.js";
+import { emitNewMessage } from "../socket.js";
 
 // Helper: swap WA labels for dashboard reply
 const swapLabelsForDashboard = async (sessionId, chatId, handoverConfig) => {
@@ -288,8 +289,28 @@ export const sendMessage = async (req, res, next) => {
                 timestamp: Math.floor(Date.now() / 1000),
                 status: "sent",
             });
+
+            // Emit real-time event for dashboard
+            emitNewMessage(platform.id, chatId, {
+                id: waMessageId || `dash-${Date.now()}`,
+                fromMe: true,
+                body: text,
+                type: "text",
+                timestamp: Math.floor(Date.now() / 1000),
+                status: "sent",
+            });
         } else {
             result = await wahaService.sendTextMessage(platform.sessionId, chatId, text);
+
+            // Emit real-time event for dashboard (WAHA)
+            emitNewMessage(platform.id, chatId, {
+                id: result?.id?._serialized || result?.id || `dash-${Date.now()}`,
+                fromMe: true,
+                body: text,
+                type: "text",
+                timestamp: Math.floor(Date.now() / 1000),
+                status: "sent",
+            });
         }
 
         // Auto-activate handover + label when admin sends from dashboard

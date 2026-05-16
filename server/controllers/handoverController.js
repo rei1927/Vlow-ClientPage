@@ -5,6 +5,7 @@ import AppError from "../utils/AppError.js";
 import * as wahaService from "../services/wahaService.js";
 import * as metaService from "../services/metaService.js";
 import { Op } from "sequelize";
+import { emitHandoverChange } from "../socket.js";
 
 // Helper: swap WA labels for handover
 const swapLabels = async (sessionId, chatId, handoverConfig, newStatus) => {
@@ -90,6 +91,9 @@ export const activateHandover = async (req, res, next) => {
             await swapLabels(sessionId, chatId, handoverConfig, "human");
         }
 
+        // Emit real-time handover change to dashboard
+        emitHandoverChange(platform.id, chatId, "human");
+
         // If there's a response message and triggered by keyword/ai, send it
         if (
             handoverConfig.responseMessage &&
@@ -154,6 +158,11 @@ export const releaseHandover = async (req, res, next) => {
         // Swap labels back (WAHA only)
         if (platform?.Agent && platform.provider !== "meta_cloud") {
             await swapLabels(sessionId, chatId, platform.Agent.handoverConfig, "ai");
+        }
+
+        // Emit real-time handover change to dashboard
+        if (platform) {
+            emitHandoverChange(platform.id, chatId, "ai");
         }
 
         res.status(200).json({
