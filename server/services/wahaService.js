@@ -54,7 +54,7 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
     if (!existingSession) {
       // 2. Proxy URL: Semua pesan WAHA melewati backend dulu untuk cek handover
       // Backend akan meneruskan ke n8n hanya jika chat dalam mode AI
-      const backendBaseUrl = process.env.WAHA_WEBHOOK_PROXY_URL || process.env.FRONTEND_URL?.replace(/\/$/, '');
+      const backendBaseUrl = process.env.WAHA_WEBHOOK_PROXY_URL || "http://vlow_server:5000";
       const proxyUrl = backendBaseUrl ? `${backendBaseUrl}/api/webhooks/waha` : webhookUrl;
 
       console.log(`[WAHA] Session ${sessionId} webhook proxy: ${proxyUrl}`);
@@ -97,6 +97,10 @@ export const startWahaSession = async (sessionId, webhookUrl) => {
 // Update webhook URL untuk session yang sudah ada
 export const updateSessionWebhook = async (sessionId, newWebhookUrl) => {
   try {
+    // Gunakan internal network vlow_server jika tidak ada proxy URL eksplisit, ini mencegah masalah Cloudflare/DNS
+    const backendBaseUrl = process.env.WAHA_WEBHOOK_PROXY_URL || "http://vlow_server:5000";
+    const proxyUrl = newWebhookUrl || `${backendBaseUrl}/api/webhooks/waha`;
+
     const payload = {
       config: {
         webhooks: [

@@ -168,7 +168,9 @@ const startServer = async () => {
     // Migrate existing WAHA sessions to use webhook proxy
     try {
       const { updateSessionWebhook } = await import("./services/wahaService.js");
-      const backendBaseUrl = process.env.WAHA_WEBHOOK_PROXY_URL || process.env.FRONTEND_URL?.replace(/\/$/, '');
+      // Gunakan internal Docker network vlow_server agar WAHA bisa mengirim webhook tanpa masalah DNS/Cloudflare
+      const backendBaseUrl = process.env.WAHA_WEBHOOK_PROXY_URL || "http://vlow_server:5000";
+      
       if (backendBaseUrl) {
         const proxyUrl = `${backendBaseUrl}/api/webhooks/waha`;
         const wahaPlatforms = await ConnectedPlatform.findAll({
