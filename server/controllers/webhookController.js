@@ -209,17 +209,7 @@ export const receiveWahaWebhook = async (req, res) => {
 
         const msgPayload = payload.payload;
 
-        // Abaikan pesan dari diri sendiri (bot), tapi tetap teruskan ke n8n (mungkin n8n butuh)
-        if (msgPayload.fromMe) {
-            return forwardToN8n(payload, sessionId);
-        }
-
-        const chatId = msgPayload.from;
-        const messageBody = msgPayload.body || "";
-
-        console.log(`📨 [WAHA Proxy] Pesan masuk dari ${chatId} di sesi ${sessionId}: "${messageBody.substring(0, 50)}..."`);
-
-        // 1. Cari platform dan agent
+        // 1. Cari platform dan agent (Harus di awal agar bisa ambil konfigurasi handover)
         const platform = await ConnectedPlatform.findOne({
             where: { sessionId, provider: "waha" },
             include: [
@@ -230,18 +220,70 @@ export const receiveWahaWebhook = async (req, res) => {
 
         if (!platform) {
             console.error(`[WAHA Proxy] ⚠️ Platform tidak ditemukan untuk sesi: ${sessionId}`);
-            return;
+            return res.status(200).send("OK");
         }
 
         const n8nUrl = platform.User?.n8nWebhookUrl;
         if (!n8nUrl) {
             console.error(`[WAHA Proxy] ⚠️ n8n Webhook URL belum diset untuk user platform ${platform.id}`);
-            return;
+            return res.status(200).send("OK");
         }
 
         const handoverConfig = platform.Agent?.handoverConfig || {};
+        const chatId = msgPayload.from;
+        const messageBody = msgPayload.body || "";
 
-        // 2. CEK KEYWORD TRIGGER (sebelum cek handover)
+        // 2. CEK PESAN DARI DIRI SENDIRI (HP / API)
+        if (msgPayload.fromMe) {
+            const messageId = typeof msgPayload.id === 'string' ? msgPayload.id : (msgPayload.id?.id || "");
+            // Deteksi apakah pesan ini dari API (bot) atau murni dari HP (manusia).
+            // Baileys (engine WAHA) biasanya menggunakan ID berawalan BAE5 atau 3EB0 untuk pesan API.
+            const isApiMessage = messageId.startsWith("BAE5") || messageId.startsWith("3EB0") || messageId.startsWith("WAHA");
+
+            if (!isApiMessage && handoverConfig.enabled) {
+                console.log(`📱 [WAHA Proxy] Pesan dari HP owner terdeteksi (${chatId}). Mengaktifkan Handover (Take Over).`);
+                const autoReleaseMinutes = handoverConfig.autoReleaseMinutes || 30;
+                const { handoverLabelId, aiLabelId } = handoverConfig;
+
+                const [handover, created] = await ChatHandover.findOrCreate({
+                    where: { chatId, sessionId },
+                    defaults: {
+                        platformId: platform.id,
+                        agentId: platform.Agent?.id || null,
+                        status: "human",
+                        triggeredBy: "owner_reply",
+                        activatedAt: new Date(),
+                        autoReleaseAt: new Date(Date.now() + autoReleaseMinutes * 60 * 1000),
+                        releasedAt: null,
+                    },
+                });
+
+                if (!created) {
+                    handover.status = "human";
+                    handover.triggeredBy = "owner_reply";
+                    handover.activatedAt = new Date();
+                    handover.autoReleaseAt = new Date(Date.now() + autoReleaseMinutes * 60 * 1000);
+                    handover.releasedAt = null;
+                    await handover.save();
+                }
+
+                // Swap labels di WhatsApp
+                try {
+                    const { updateChatLabels } = await import("../services/wahaService.js");
+                    if (handoverLabelId) await updateChatLabels(sessionId, chatId, String(handoverLabelId), "add");
+                    if (aiLabelId) await updateChatLabels(sessionId, chatId, String(aiLabelId), "remove");
+                } catch (e) {
+                    console.error("[WAHA Proxy] Label swap error from phone reply:", e.message);
+                }
+            }
+
+            // Tetap teruskan ke n8n (mungkin n8n butuh mencatat log)
+            return forwardToN8n(payload, sessionId);
+        }
+
+        console.log(`📨 [WAHA Proxy] Pesan masuk dari ${chatId} di sesi ${sessionId}: "${messageBody.substring(0, 50)}..."`);
+
+        // 3. CEK KEYWORD TRIGGER (sebelum cek handover)
         if (handoverConfig.enabled && Array.isArray(handoverConfig.keywords) && handoverConfig.keywords.length > 0) {
             const lowerMessage = messageBody.toLowerCase();
             const matchedKeyword = handoverConfig.keywords.find((kw) =>
