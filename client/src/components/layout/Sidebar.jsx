@@ -1,6 +1,7 @@
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { FaHome, FaUsers, FaRobot, FaNetworkWired, FaTimes, FaSignOutAlt, FaComments, FaBullhorn, FaHeartbeat, FaAddressBook } from "react-icons/fa";
+import { FaHome, FaUsers, FaRobot, FaNetworkWired, FaTimes, FaSignOutAlt, FaComments, FaBullhorn, FaHeartbeat, FaAddressBook, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const sidebarStyles = `
   /* ===== SIDEBAR BASE ===== */
@@ -116,6 +117,7 @@ const sidebarStyles = `
 const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
+  const [broadcastOpen, setBroadcastOpen] = useState(false);
 
   const isActive = (path) =>
     location.pathname === path
@@ -132,7 +134,16 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
     { to: "/system-status", icon: FaHeartbeat, label: "System Status", show: user?.role === "admin" },
     { to: "/chat", icon: FaComments, label: "Live Chat", show: user?.role !== "admin" },
     { to: "/crm", icon: FaAddressBook, label: "CRM", show: user?.role !== "admin" },
-    { to: "/broadcast", icon: FaBullhorn, label: "Broadcast", show: user?.role !== "admin" },
+    { 
+      to: "/broadcast", 
+      icon: FaBullhorn, 
+      label: "Broadcast", 
+      show: user?.role !== "admin",
+      subItems: [
+        { to: "/broadcast/meta", label: "Official (Meta)" },
+        { to: "/broadcast/unofficial", label: "Unofficial (WAHA)" }
+      ]
+    },
     { to: "/ai-agents", icon: FaRobot, label: "AI Agents", show: user?.role !== "admin" },
     { to: "/platforms", icon: FaNetworkWired, label: "Connected Platforms", show: user?.role !== "admin" },
   ];
@@ -175,6 +186,36 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
           <nav className="flex flex-col gap-1 px-3 py-2">
             {menuItems.filter(m => m.show).map((item) => {
               const Icon = item.icon;
+              if (item.subItems) {
+                const isSubActive = item.subItems.some(sub => location.pathname === sub.to || location.pathname.startsWith(sub.to + "/"));
+                return (
+                  <div key={item.label} className="flex flex-col">
+                    <button
+                      onClick={() => setBroadcastOpen(!broadcastOpen)}
+                      className={`sb-link flex items-center h-11 w-full rounded-xl font-medium transition-colors ${isSubActive && !broadcastOpen ? "bg-white/10 text-white shadow-sm" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+                    >
+                      <Icon className="w-5 h-5 flex-shrink-0" />
+                      <span className="sb-label flex-1 flex items-center justify-between pr-4">
+                        <span>{item.label}</span>
+                        {broadcastOpen ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
+                      </span>
+                    </button>
+                    <div className={`sb-label flex flex-col gap-1 overflow-hidden transition-all duration-300 ${broadcastOpen ? "mt-1 pl-[44px] max-h-40" : "max-h-0"}`}>
+                      {item.subItems.map(sub => (
+                        <Link
+                          key={sub.to}
+                          to={sub.to}
+                          onClick={handleMenuClick}
+                          className={`flex items-center h-9 rounded-xl text-sm font-medium transition-colors ${isActive(sub.to)} px-3`}
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
               return (
                 <Link
                   key={item.to}

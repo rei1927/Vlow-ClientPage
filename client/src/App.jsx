@@ -20,6 +20,7 @@ const AgentBuilder = lazy(() => import("./pages/agents/AgentBuilder"));
 const ConnectedPlatforms = lazy(() => import("./pages/platforms/ConnectedPlatforms"));
 const ChatDashboard = lazy(() => import("./pages/chat/ChatDashboard"));
 const BroadcastDashboard = lazy(() => import("./pages/broadcast/BroadcastDashboard"));
+const UnofficialBroadcast = lazy(() => import("./pages/broadcast/UnofficialBroadcast"));
 const SystemHealth = lazy(() => import("./pages/SystemHealth"));
 const CRMDashboard = lazy(() => import("./pages/crm/CRMDashboard"));
 
@@ -75,7 +76,9 @@ function App() {
 
                 <Route path="/chat" element={<ChatDashboard />} />
                 <Route path="/platforms" element={<ConnectedPlatforms />} />
-                <Route path="/broadcast" element={<BroadcastDashboard />} />
+                <Route path="/broadcast" element={<Navigate to="/broadcast/meta" replace />} />
+                <Route path="/broadcast/meta" element={<BroadcastDashboard />} />
+                <Route path="/broadcast/unofficial" element={<UnofficialBroadcast />} />
                 <Route path="/system-status" element={<SystemHealth />} />
                 <Route path="/crm" element={<CRMDashboard />} />
               </Route>
