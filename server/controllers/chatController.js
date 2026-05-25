@@ -257,10 +257,10 @@ export const getMessages = async (req, res, next) => {
 export const sendMessage = async (req, res, next) => {
     try {
         const { platformId, chatId } = req.params;
-        const { text } = req.body;
+        const { text, image } = req.body;
 
-        if (!text || text.trim() === "") {
-            return next(new AppError("Pesan tidak boleh kosong", 400));
+        if ((!text || text.trim() === "") && !image) {
+            return next(new AppError("Pesan atau gambar tidak boleh kosong", 400));
         }
 
         const platform = await getValidPlatform(platformId, req.user.id);
@@ -283,13 +283,17 @@ export const sendMessage = async (req, res, next) => {
                 waMessageId,
                 chatId,
                 fromMe: true,
-                body: text,
-                type: "text",
+                body: text || "[Image]",
+                type: image ? "image" : "text",
                 timestamp: Math.floor(Date.now() / 1000),
                 status: "sent",
             });
         } else {
-            result = await wahaService.sendTextMessage(platform.sessionId, chatId, text);
+            if (image) {
+                result = await wahaService.sendImageMessage(platform.sessionId, chatId, image, text);
+            } else {
+                result = await wahaService.sendTextMessage(platform.sessionId, chatId, text);
+            }
         }
 
         // Auto-activate handover + label when admin sends from dashboard

@@ -343,6 +343,43 @@ export const sendTextMessage = async (sessionId, chatId, text) => {
   }
 };
 
+export const sendImageMessage = async (sessionId, chatId, imageBase64, caption) => {
+  try {
+    // Determine mimetype and base64 data
+    const matches = imageBase64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    let mimetype = 'image/jpeg';
+    let data = imageBase64;
+    
+    if (matches && matches.length === 3) {
+      mimetype = matches[1];
+      data = matches[2];
+    } else {
+      // If no prefix, assume it's just raw base64
+      data = imageBase64;
+    }
+
+    const payload = {
+      session: sessionId,
+      chatId: chatId,
+      file: {
+        mimetype: mimetype,
+        filename: "broadcast_image.jpg",
+        data: data
+      },
+      caption: caption || "",
+    };
+    const response = await axios.post(`${WAHA_URL}/api/sendImage`, payload, {
+      headers: HEADERS,
+      timeout: 30000,
+    });
+    return response.data;
+  } catch (error) {
+    const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
+    console.error("WAHA Send Image Error:", rawError);
+    throw new AppError(`Gagal mengirim gambar: ${rawError}`, 502);
+  }
+};
+
 export const createLabel = async (sessionId, name, color = 1) => {
   try {
     const payload = {

@@ -9,6 +9,8 @@ const UnofficialBroadcast = () => {
   const [selectedPlatform, setSelectedPlatform] = useState("");
   const [targetNumbers, setTargetNumbers] = useState("");
   const [messageText, setMessageText] = useState("");
+  const [imageBase64, setImageBase64] = useState("");
+  const [imageName, setImageName] = useState("");
   const [minDelay, setMinDelay] = useState(3);
   const [maxDelay, setMaxDelay] = useState(7);
 
@@ -65,6 +67,27 @@ const UnofficialBroadcast = () => {
     reader.readAsText(file);
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 5 * 1024 * 1024) {
+      return toast.error("Ukuran gambar maksimal 5MB");
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImageBase64(event.target.result);
+      setImageName(file.name);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setImageBase64("");
+    setImageName("");
+  };
+
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const addLog = (msg, type = "info") => {
@@ -74,7 +97,7 @@ const UnofficialBroadcast = () => {
   const startBroadcast = async () => {
     const numbers = parseNumbers(targetNumbers);
     if (numbers.length === 0) return toast.error("Daftar nomor target kosong atau tidak valid");
-    if (!messageText) return toast.error("Pesan tidak boleh kosong");
+    if (!messageText && !imageBase64) return toast.error("Pesan atau gambar tidak boleh kosong");
     if (!selectedPlatform) return toast.error("Pilih akun pengirim (Device WA)");
 
     setStatus("RUNNING");
@@ -105,6 +128,7 @@ const UnofficialBroadcast = () => {
         addLog(`Mengirim ke ${numbers[i]}...`, "info");
         await axiosInstance.post(`/chats/${selectedPlatform}/${target}/messages`, {
           text: messageText,
+          image: imageBase64 || undefined
         });
         currentSuccess++;
         addLog(`Berhasil mengirim ke ${numbers[i]}`, "success");
@@ -196,6 +220,27 @@ const UnofficialBroadcast = () => {
                     placeholder="Tulis pesan broadcast Anda di sini..."
                     className="w-full h-40 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-3 text-sm focus:border-blue-500 outline-none resize-none"
                   ></textarea>
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-sm font-medium">Sisipkan Gambar (Opsional)</label>
+                    {imageBase64 && (
+                      <button onClick={removeImage} className="text-xs text-red-500 hover:underline">Hapus Gambar</button>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <label className={`cursor-pointer w-full flex flex-col items-center justify-center h-24 border-2 border-dashed ${imageBase64 ? 'border-green-500 bg-green-500/10' : 'border-[var(--color-border)] hover:bg-[var(--color-bg)]'} rounded-xl transition-colors`}>
+                      <FaUpload className={`mb-2 ${imageBase64 ? 'text-green-500' : 'text-[var(--color-text-muted)]'}`} />
+                      <span className="text-sm font-medium text-[var(--color-text-muted)]">
+                        {imageBase64 ? imageName : "Klik untuk upload gambar"}
+                      </span>
+                      <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={status === "RUNNING" || status === "PAUSED"} />
+                    </label>
+                    {imageBase64 && (
+                      <img src={imageBase64} alt="Preview" className="h-24 w-24 object-cover rounded-xl border border-[var(--color-border)]" />
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
