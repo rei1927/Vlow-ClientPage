@@ -97,6 +97,78 @@ const CRMDashboard = () => {
         return filteredChats.slice(start, start + itemsPerPage);
     }, [filteredChats, currentPage]);
 
+    const handleExport = () => {
+        if (!filteredChats || filteredChats.length === 0) {
+            toast.error("Tidak ada data untuk dieksport");
+            return;
+        }
+
+        // Prepare CSV Headers
+        const headers = ["WhatsApp Name", "Phone Number", "Requirements", "Terakhir Aktif"];
+        
+        // Prepare CSV Rows
+        const rows = filteredChats.map(chat => {
+            const rawId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id;
+            let extractedPhone = String(rawId).split('@')[0];
+            let displayName = chat.customName || chat.name || extractedPhone;
+            
+            // Re-apply same logic for Meta IDs to match table display
+            const isLikelySystemId = /^\d{13,20}$/.test(extractedPhone);
+            const isNamePhoneFormat = /^[\+\d\s\-\(\)]{8,20}$/.test(displayName);
+            let displayPhone = extractedPhone;
+            
+            if (isLikelySystemId) {
+                const origNameIsPhone = chat.name && /^[\+\d\s\-\(\)]{8,20}$/.test(chat.name);
+                if (origNameIsPhone) {
+                    displayPhone = chat.name;
+                } else if (isNamePhoneFormat) {
+                    displayPhone = displayName;
+                    if (chat.customName) displayName = chat.customName;
+                } else {
+                    displayPhone = extractedPhone + " (Meta ID)";
+                }
+            }
+
+            let lastActive = "-";
+            if (chat.timestamp) {
+                const numTs = Number(chat.timestamp);
+                const date = new Date(numTs < 10000000000 ? numTs * 1000 : numTs);
+                lastActive = date.toLocaleString("id-ID", {
+                    day: '2-digit', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            }
+
+            const requirements = chat.requirements || "Belum ada data";
+
+            // Escape quotes and handle commas in CSV
+            const escapeCSV = (str) => `"${String(str).replace(/"/g, '""')}"`;
+
+            return [
+                escapeCSV(displayName),
+                escapeCSV(displayPhone),
+                escapeCSV(requirements),
+                escapeCSV(lastActive)
+            ].join(",");
+        });
+
+        // Combine headers and rows
+        const csvContent = [headers.join(","), ...rows].join("\n");
+        
+        // Add BOM for Excel UTF-8 support
+        const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `CRM_Kontak_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        toast.success("Berhasil mengeksport data ke CSV!");
+    };
+
     return (
         <FeatureAccessGuard feature="crm">
         <div className="h-[calc(100vh-100px)] flex flex-col bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] overflow-hidden shadow-sm animate-fade-in">
@@ -183,7 +255,7 @@ const CRMDashboard = () => {
                         <FaFilter className="text-[var(--color-text-muted)]" />
                         <span>Filter</span>
                     </button>
-                    <button className="flex items-center gap-2 px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text)] hover:bg-[var(--color-bg)] transition-colors">
+                    <button onClick={handleExport} className="flex items-center gap-2 px-3 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text)] hover:bg-[var(--color-bg)] transition-colors">
                         <FaFileExport className="text-[var(--color-text-muted)]" />
                         <span>Export</span>
                     </button>
