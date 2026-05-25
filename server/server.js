@@ -146,6 +146,19 @@ const startServer = async () => {
         await sequelize.query('SET statement_timeout = 60000;'); // 60 seconds
         await sequelize.sync({ alter: true });
         logger.info("Database Models Synced.");
+        
+        // --- INJECT TEST LOG ---
+        try {
+          const { logInfo } = await import("./utils/systemLogger.js");
+          await logInfo("SYSTEM", "Backend Server berhasil dimulai dan sinkronisasi database selesai.", { 
+            environment: process.env.NODE_ENV,
+            port: PORT
+          });
+        } catch (e) {
+          // Ignore
+        }
+        // -----------------------
+
         synced = true;
         break;
       } catch (syncErr) {
