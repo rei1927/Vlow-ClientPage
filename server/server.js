@@ -23,6 +23,7 @@ import handoverRoutes from "./routes/handoverRoutes.js";
 import broadcastRoutes from "./routes/broadcastRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import crmRoutes from "./routes/crmRoutes.js";
+import logRoutes from "./routes/logRoutes.js";
 import { proxyMinioImage } from "./controllers/agentController.js";
 
 // Models
@@ -35,6 +36,7 @@ import ChatHandover from "./models/ChatHandover.js";
 import MetaMessage from "./models/MetaMessage.js";
 import BroadcastTemplate from "./models/BroadcastTemplate.js";
 import CustomerProfile from "./models/CustomerProfile.js";
+import SystemLog from "./models/SystemLog.js"; // New model
 import { startHandoverScheduler } from "./utils/handoverScheduler.js";
 
 dotenv.config();
@@ -84,6 +86,7 @@ app.use("/api/handover", handoverRoutes);
 app.use("/api/broadcast", broadcastRoutes);
 app.use("/api/health", healthRoutes);
 app.use("/api/crm", crmRoutes);
+app.use("/api/logs", logRoutes);
 
 // --- Error Handling Middleware ---
 // HAPUS blok app.use((err...)) yang lama (manual).
@@ -164,6 +167,29 @@ const startServer = async () => {
 
     // Start handover auto-release scheduler
     startHandoverScheduler();
+
+    // Start auto-delete for system logs (older than 14 days)
+    setInterval(async () => {
+      try {
+        const { Op } = await import('sequelize');
+        const fourteenDaysAgo = new Date();
+        fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+        
+        const deletedRows = await SystemLog.destroy({
+          where: {
+            createdAt: {
+              [Op.lt]: fourteenDaysAgo
+            }
+          }
+        });
+        
+        if (deletedRows > 0) {
+          logger.info(`[SystemLogger] Auto-deleted ${deletedRows} old logs (>14 days).`);
+        }
+      } catch (err) {
+        logger.error(`[SystemLogger] Failed to auto-delete old logs: ${err.message}`);
+      }
+    }, 24 * 60 * 60 * 1000); // Run every 24 hours
 
     // Migrate existing WAHA sessions to use webhook proxy
     try {
