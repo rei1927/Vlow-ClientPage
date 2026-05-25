@@ -190,7 +190,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
                       className={`sb-link flex items-center h-11 w-full rounded-xl font-medium transition-colors ${isSubActive && !broadcastOpen ? "bg-white/10 text-white shadow-sm" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
                     >
                       <Icon className="w-5 h-5 flex-shrink-0" />
-                      <span className="sb-label flex items-center justify-between pr-4">
+                      <span className="sb-label flex items-center justify-between">
                         <span>{item.label}</span>
                         {broadcastOpen ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
                       </span>
