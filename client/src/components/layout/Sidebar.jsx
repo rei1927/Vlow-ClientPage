@@ -177,11 +177,6 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
             </button>
           </div>
 
-          {/* Section Title */}
-          <div className="sb-section text-[10px] font-bold text-white/30 uppercase tracking-widest whitespace-nowrap">
-            Main Menu
-          </div>
-
           {/* Menu Items */}
           <nav className="flex flex-col gap-1 px-3 py-2">
             {menuItems.filter(m => m.show).map((item) => {
@@ -195,7 +190,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
                       className={`sb-link flex items-center h-11 w-full rounded-xl font-medium transition-colors ${isSubActive && !broadcastOpen ? "bg-white/10 text-white shadow-sm" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
                     >
                       <Icon className="w-5 h-5 flex-shrink-0" />
-                      <span className="sb-label flex-1 flex items-center justify-between pr-4">
+                      <span className="sb-label flex items-center justify-between pr-4">
                         <span>{item.label}</span>
                         {broadcastOpen ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
                       </span>
