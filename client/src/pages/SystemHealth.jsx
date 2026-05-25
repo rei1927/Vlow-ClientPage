@@ -430,11 +430,11 @@ const SystemHealth = () => {
                           {new Date(log.createdAt).toLocaleString("id-ID")}
                         </td>
                         <td className="py-3 px-6">
-                          <span className={\`inline-flex px-2 py-1 rounded-md text-[10px] font-bold tracking-wider \${
+                          <span className={`inline-flex px-2 py-1 rounded-md text-[10px] font-bold tracking-wider ${
                             log.level === 'ERROR' ? 'bg-red-500/10 text-red-500' :
                             log.level === 'WARNING' ? 'bg-yellow-500/10 text-yellow-500' :
                             'bg-blue-500/10 text-blue-500'
-                          }\`}>
+                          }`}>
                             {log.level}
                           </span>
                         </td>
