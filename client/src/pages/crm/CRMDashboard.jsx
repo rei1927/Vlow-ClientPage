@@ -220,7 +220,8 @@ const CRMDashboard = () => {
                                     <th className="px-6 py-4 font-semibold text-[var(--color-text)] border-r border-[var(--color-border)] w-12 text-center">#</th>
                                     <th className="px-6 py-4 font-semibold text-[var(--color-text)] border-r border-[var(--color-border)]">WhatsApp Name</th>
                                     <th className="px-6 py-4 font-semibold text-[var(--color-text)] border-r border-[var(--color-border)]">Phone Number</th>
-                                    <th className="px-6 py-4 font-semibold text-[var(--color-text)]">Requirements</th>
+                                    <th className="px-6 py-4 font-semibold text-[var(--color-text)] border-r border-[var(--color-border)]">Requirements</th>
+                                    <th className="px-6 py-4 font-semibold text-[var(--color-text)]">Terakhir Aktif</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--color-border)]">
@@ -297,7 +298,7 @@ const CRMDashboard = () => {
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-3 text-sm">
+                                            <td className="px-6 py-3 text-sm border-r border-[var(--color-border)]">
                                                 {chat.requirements ? (
                                                     <div className="max-w-xs truncate text-[var(--color-text)]" title={chat.requirements}>
                                                         {chat.requirements}
@@ -305,6 +306,17 @@ const CRMDashboard = () => {
                                                 ) : (
                                                     <span className="text-[var(--color-text-muted)] italic text-xs">Belum ada data</span>
                                                 )}
+                                            </td>
+                                            <td className="px-6 py-3 text-sm text-[var(--color-text-muted)]">
+                                                {(() => {
+                                                    if (!chat.timestamp) return "-";
+                                                    const numTs = Number(chat.timestamp);
+                                                    const date = new Date(numTs < 10000000000 ? numTs * 1000 : numTs);
+                                                    return date.toLocaleString("id-ID", {
+                                                        day: '2-digit', month: 'short', year: 'numeric',
+                                                        hour: '2-digit', minute: '2-digit'
+                                                    });
+                                                })()}
                                             </td>
                                         </tr>
                                     );
