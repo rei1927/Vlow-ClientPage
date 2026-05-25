@@ -71,6 +71,8 @@ const AgentBuilder = () => {
     delay: 15,
     unit: "minutes",
     prompt: "",
+    isAdvancedFollowup: false,
+    targetLabels: [],
   });
   const [handoffConfig, setHandoffConfig] = useState(getDefaultHandoffConfig());
   const [handoverConfig, setHandoverConfig] = useState({
@@ -168,7 +170,7 @@ const AgentBuilder = () => {
         setHandoverConfig(currentAgent.handoverConfig);
       }
     } else {
-      setFollowupConfig({ isEnabled: false, delay: 15, unit: "minutes", prompt: "" });
+      setFollowupConfig({ isEnabled: false, delay: 15, unit: "minutes", prompt: "", isAdvancedFollowup: false, targetLabels: [] });
       setHandoffConfig(getDefaultHandoffConfig());
       setHandoverConfig({
         enabled: false,
@@ -444,7 +446,7 @@ const AgentBuilder = () => {
                 </div>
 
                 {activeTab === "followups" && (
-                  <FollowupTab config={followupConfig} setConfig={setFollowupConfig} />
+                  <FollowupTab config={followupConfig} setConfig={setFollowupConfig} platformId={id} />
                 )}
                 {activeTab === "handover" && (
                   <HandoverTab config={handoverConfig} setConfig={setHandoverConfig} platformId={id} />
