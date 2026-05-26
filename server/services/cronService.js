@@ -34,11 +34,8 @@ async function checkAndSendFollowups() {
         // 1. Get all agents that have followup enabled
         const agents = await Agent.findAll();
         for (const agent of agents) {
-            let config = agent.followupConfig;
-            if (typeof config === 'string') {
-                try { config = JSON.parse(config); } catch(e) { config = {}; }
-            }
-            if (!config || !config.enabled) continue;
+            let config = typeof agent.followupConfig === 'string' ? JSON.parse(agent.followupConfig) : agent.followupConfig;
+            if (!config || !config.isEnabled) continue;
 
             // 2. Find active platforms for this agent
             const platforms = await ConnectedPlatform.findAll({ where: { agentId: agent.id, status: 'WORKING' } });
@@ -133,7 +130,7 @@ async function checkAndSendFollowups() {
                 }
 
                 // Prepare message
-                let messageToSend = config.followupPrompt || "Halo kak, apakah ada yang bisa kami bantu lagi?";
+                let messageToSend = config.prompt || "Halo kak, apakah ada yang bisa kami bantu lagi?";
 
                 if (config.isAdvancedFollowup && process.env.GEMINI_API_KEY) {
                     try {
