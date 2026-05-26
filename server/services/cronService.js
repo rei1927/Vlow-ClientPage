@@ -8,6 +8,20 @@ import { sendTextMessage } from './wahaService.js';
 import { sendCloudMessage } from './metaService.js';
 import axios from 'axios';
 
+const stripHtml = (html) => {
+    if (!html) return "";
+    let text = html.replace(/<br\s*\/?>/gi, '\n');
+    text = text.replace(/<\/p>/gi, '\n\n');
+    text = text.replace(/<[^>]*>?/gm, '');
+    text = text.replace(/&nbsp;/g, ' ');
+    text = text.replace(/&amp;/g, '&');
+    text = text.replace(/&lt;/g, '<');
+    text = text.replace(/&gt;/g, '>');
+    text = text.replace(/&quot;/g, '"');
+    text = text.replace(/&#39;/g, "'");
+    return text.trim();
+};
+
 const WAHA_URL = process.env.WAHA_BASE_URL || "http://localhost:7575";
 const HEADERS = {
   "Content-Type": "application/json",
@@ -54,8 +68,8 @@ async function checkAndSendFollowups() {
             const query = `
                 WITH RankedLogs AS (
                     SELECT 
-                        id, "chatId", "sessionId", "userMessage", "aiResponse", "createdAt", "metadata",
-                        ROW_NUMBER() OVER(PARTITION BY "chatId", "sessionId" ORDER BY "createdAt" DESC) as rn
+                        id, "chatId", "sessionId", "userMessage", "aiResponse", "createdAt", "metadata", "platformId",
+                        ROW_NUMBER() OVER(PARTITION BY "chatId" ORDER BY "createdAt" DESC) as rn
                     FROM "ConversationLogs"
                     WHERE "agentId" = :agentId
                 )
@@ -131,6 +145,7 @@ async function checkAndSendFollowups() {
 
                 // Prepare message
                 let messageToSend = config.prompt || "Halo kak, apakah ada yang bisa kami bantu lagi?";
+                messageToSend = stripHtml(messageToSend);
 
                 if (config.isAdvancedFollowup && process.env.GEMINI_API_KEY) {
                     try {
