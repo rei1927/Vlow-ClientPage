@@ -46,6 +46,9 @@ async function checkAndSendFollowups() {
 
             const delayMinutes = config.delay || 15;
             const targetLabels = config.targetLabels || []; // array of string IDs
+            const maxCount = config.maxCount || 1;
+            const maxPeriod = config.maxPeriod || 24;
+            const maxPeriodUnit = config.maxPeriodUnit || 'hours';
 
             // 3. Find chats that might need followup
             // We find the LATEST message for each chat
@@ -70,9 +73,33 @@ async function checkAndSendFollowups() {
             });
 
             for (const log of latestLogs) {
-                // If the latest message is ALREADY a followup, skip!
-                if (log.metadata && log.metadata.isFollowup) {
-                    continue;
+                // 4. Check how many followups sent in the specified period AFTER the last user message
+                const followupCountQuery = `
+                    WITH LastUserMsg AS (
+                        SELECT "createdAt" 
+                        FROM "ConversationLogs" 
+                        WHERE "chatId" = :chatId 
+                        AND "sessionId" = :sessionId
+                        AND "userMessage" IS NOT NULL
+                        ORDER BY "createdAt" DESC 
+                        LIMIT 1
+                    )
+                    SELECT COUNT(*) as count 
+                    FROM "ConversationLogs" 
+                    WHERE "chatId" = :chatId 
+                    AND "sessionId" = :sessionId
+                    AND "agentId" = :agentId
+                    AND metadata->>'isFollowup' = 'true'
+                    AND "createdAt" >= NOW() - INTERVAL '${maxPeriod} ${maxPeriodUnit}'
+                    AND "createdAt" >= COALESCE((SELECT "createdAt" FROM LastUserMsg), '1970-01-01'::timestamp)
+                `;
+                const [followupRes] = await Agent.sequelize.query(followupCountQuery, {
+                    replacements: { chatId: log.chatId, sessionId: log.sessionId, agentId: agent.id },
+                    type: Sequelize.QueryTypes.SELECT
+                });
+
+                if (parseInt(followupRes.count) >= maxCount) {
+                    continue; // Skip! Reached max follow-up limit for this period or cycle.
                 }
 
                 const platform = platforms.find(p => p.sessionId === log.sessionId);

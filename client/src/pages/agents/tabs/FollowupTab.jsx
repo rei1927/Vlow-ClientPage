@@ -114,6 +114,44 @@ const FollowupTab = ({ config, setConfig, platformId }) => {
                 </label>
               </div>
 
+              <div className="form-control w-full mt-4">
+                <label className="label">
+                  <span className="label-text font-medium text-[var(--color-text-muted)] flex items-center gap-2">
+                    Maksimal Follow-up
+                  </span>
+                </label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="number"
+                      min="1"
+                      className="input input-bordered w-20 bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
+                      value={config.maxCount || 1}
+                      onChange={(e) => handleChange("maxCount", parseInt(e.target.value) || 1)}
+                    />
+                    <span className="text-sm text-[var(--color-text-muted)] whitespace-nowrap">kali dalam</span>
+                  </div>
+                  <div className="join flex-1">
+                    <input
+                      type="number"
+                      min="1"
+                      className="input input-bordered join-item w-full bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
+                      value={config.maxPeriod || 24}
+                      onChange={(e) => handleChange("maxPeriod", parseInt(e.target.value) || 24)}
+                    />
+                    <select
+                      className="select select-bordered join-item bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary)]"
+                      value={config.maxPeriodUnit || "hours"}
+                      onChange={(e) => handleChange("maxPeriodUnit", e.target.value)}
+                    >
+                      <option value="minutes">Menit</option>
+                      <option value="hours">Jam</option>
+                      <option value="days">Hari</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
               <div className="mt-6 bg-[var(--color-surface)] p-4 rounded-xl border border-[var(--color-border)] text-sm text-[var(--color-text)]">
                 <div className="flex items-start gap-2">
                   <FaLightbulb className="mt-1 text-[var(--color-primary)] shrink-0" />
