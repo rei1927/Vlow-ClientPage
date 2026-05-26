@@ -41,7 +41,7 @@ async function checkAndSendFollowups() {
             if (!config || !config.enabled) continue;
 
             // 2. Find active platforms for this agent
-            const platforms = await ConnectedPlatform.findAll({ where: { agentId: agent.id, status: 'connected' } });
+            const platforms = await ConnectedPlatform.findAll({ where: { agentId: agent.id, status: 'WORKING' } });
             if (platforms.length === 0) continue;
 
             const delayMinutes = config.delay || 15;
