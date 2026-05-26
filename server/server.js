@@ -38,6 +38,7 @@ import BroadcastTemplate from "./models/BroadcastTemplate.js";
 import CustomerProfile from "./models/CustomerProfile.js";
 import SystemLog from "./models/SystemLog.js"; // New model
 import { startHandoverScheduler } from "./utils/handoverScheduler.js";
+import { initCron } from "./services/cronService.js";
 
 dotenv.config();
 
@@ -180,6 +181,7 @@ const startServer = async () => {
 
     // Start handover auto-release scheduler
     startHandoverScheduler();
+    initCron();
 
     // Start auto-delete for system logs (older than 14 days)
     setInterval(async () => {
