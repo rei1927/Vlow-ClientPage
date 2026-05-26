@@ -102,12 +102,17 @@ async function checkAndSendFollowups() {
                     continue; // Skip! Reached max follow-up limit for this period or cycle.
                 }
 
-                const platform = platforms.find(p => p.sessionId === log.sessionId);
+                // Find platform for this log
+                let platform = platforms.find(p => p.id === log.platformId || p.sessionId === log.sessionId);
+                if (!platform && platforms.length > 0) {
+                    // Fallback for wrong sessionId from N8N
+                    platform = platforms.find(p => p.platform === (log.chatId.includes('@') ? 'waha' : 'meta_cloud')) || platforms[0];
+                }
                 if (!platform) continue;
 
-                // Check labels if it's WAHA
+                // 5. Check labels if WAHA
                 if (platform.platform === 'waha' && targetLabels.length > 0) {
-                    const chatLabels = await getChatLabels(log.sessionId, log.chatId);
+                    const chatLabels = await getChatLabels(platform.sessionId, log.chatId);
                     const hasLabel = targetLabels.some(targetId => {
                         return chatLabels.some(chatLbl => {
                             const chatLblId = typeof chatLbl === 'object' ? String(chatLbl.id) : String(chatLbl);
@@ -150,8 +155,9 @@ async function checkAndSendFollowups() {
                 try {
                     const provider = platform.provider || platform.platform;
                     console.log(`[CRON] Sending followup to ${log.chatId} on ${provider}`);
+                    // 6. Send Followup via N8N Webhook or WAHA Directly
                     if (provider === 'waha') {
-                        await sendTextMessage(log.sessionId, log.chatId, messageToSend);
+                        await sendTextMessage(platform.sessionId, log.chatId, messageToSend);
                     } else if (provider === 'meta_cloud' || provider === 'meta') {
                         await sendCloudMessage(platform.phoneNumberId, platform.systemUserAccessToken, log.chatId, messageToSend);
                     }
