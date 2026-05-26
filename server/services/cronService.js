@@ -71,6 +71,7 @@ async function checkAndSendFollowups() {
                 replacements: { agentId: agent.id },
                 type: Sequelize.QueryTypes.SELECT
             });
+            console.log(`[CRON-DEBUG] Agent ${agent.id} latestLogs count: ${latestLogs.length}`);
 
             for (const log of latestLogs) {
                 // 4. Check how many followups sent in the specified period AFTER the last user message
@@ -99,6 +100,7 @@ async function checkAndSendFollowups() {
                 });
 
                 if (parseInt(followupRes.count) >= maxCount) {
+                    console.log(`[CRON-DEBUG] Skipped ${log.chatId}: followupRes count ${followupRes.count} >= ${maxCount}`);
                     continue; // Skip! Reached max follow-up limit for this period or cycle.
                 }
 
@@ -108,18 +110,26 @@ async function checkAndSendFollowups() {
                     // Fallback for wrong sessionId from N8N
                     platform = platforms.find(p => p.platform === (log.chatId.includes('@') ? 'waha' : 'meta_cloud')) || platforms[0];
                 }
-                if (!platform) continue;
+                if (!platform) {
+                    console.log(`[CRON-DEBUG] Skipped ${log.chatId}: No platform found`);
+                    continue;
+                }
 
                 // 5. Check labels if WAHA
                 if (platform.platform === 'waha' && targetLabels.length > 0) {
                     const chatLabels = await getChatLabels(platform.sessionId, log.chatId);
+                    console.log(`[CRON-DEBUG] Chat ${log.chatId} labels from WAHA:`, JSON.stringify(chatLabels));
+                    console.log(`[CRON-DEBUG] Chat ${log.chatId} targetLabels:`, JSON.stringify(targetLabels));
                     const hasLabel = targetLabels.some(targetId => {
                         return chatLabels.some(chatLbl => {
                             const chatLblId = typeof chatLbl === 'object' ? String(chatLbl.id) : String(chatLbl);
                             return chatLblId === String(targetId.value || targetId);
                         });
                     });
-                    if (!hasLabel) continue; // Skip this chat, doesn't match target label
+                    if (!hasLabel) {
+                        console.log(`[CRON-DEBUG] Skipped ${log.chatId}: Label mismatch`);
+                        continue; // Skip this chat, doesn't match target label
+                    }
                 }
 
                 // Prepare message
