@@ -60,6 +60,32 @@ services:
       - WAHA_WEBHOOK_PROXY_URL=${WAHA_WEBHOOK_PROXY_URL}
     depends_on:
       - minio
+      - postgres
+
+  # Database (PostgreSQL Local)
+  postgres:
+    image: postgres:15-alpine
+    container_name: vlow_postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=vlow
+      - POSTGRES_PASSWORD=vlow_secret
+      - POSTGRES_DB=vlow_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Database Migrator (Temporary service to copy Supabase -> Local)
+  db_migrator:
+    image: postgres:15-alpine
+    container_name: vlow_db_migrator
+    depends_on:
+      - postgres
+    environment:
+      - PGPASSWORD=${DB_PASS}
+    command: >
+      sh -c "echo 'Starting Migration from Supabase to Local...' && pg_dump -h ${DB_HOST} -p 5432 -U ${DB_USER} -d ${DB_NAME} -F p --clean --if-exists | PGPASSWORD=vlow_secret psql -h postgres -p 5432 -U vlow -d vlow_db && echo 'MIGRATION_COMPLETE' || echo 'MIGRATION_FAILED'"
 
   # MinIO (Object Storage)
   minio:
@@ -78,3 +104,4 @@ services:
 
 volumes:
   minio_data:
+  postgres_data:
