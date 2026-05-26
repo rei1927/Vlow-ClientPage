@@ -74,7 +74,7 @@ services:
       - POSTGRES_PASSWORD=vlow_secret
       - POSTGRES_DB=vlow_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_17:/var/lib/postgresql/data
 
   # Database Migrator (Temporary service to copy Supabase -> Local)
   db_migrator:
@@ -105,3 +105,4 @@ services:
 volumes:
   minio_data:
   postgres_data:
+  postgres_data_17:
