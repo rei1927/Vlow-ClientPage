@@ -105,7 +105,7 @@ async function checkAndSendFollowups() {
                 let platform = platforms.find(p => p.id === log.platformId || p.sessionId === log.sessionId);
                 if (!platform && platforms.length > 0) {
                     // Fallback for wrong sessionId from N8N
-                    platform = platforms.find(p => p.platform === (log.chatId.includes('@') ? 'waha' : 'meta_cloud')) || platforms[0];
+                    platform = platforms.find(p => p.provider === (log.chatId.includes('@') ? 'waha' : 'meta_cloud')) || platforms[0];
                 }
                 if (!platform) {
                     console.log(`[CRON-DEBUG] Skipped ${log.chatId}: No platform found`);
@@ -113,7 +113,7 @@ async function checkAndSendFollowups() {
                 }
 
                 // 5. Check labels if WAHA
-                if (platform.platform === 'waha' && targetLabels.length > 0) {
+                if (platform.provider === 'waha' && targetLabels.length > 0) {
                     const chatLabels = await getChatLabels(platform.sessionId, log.chatId);
                     console.log(`[CRON-DEBUG] Chat ${log.chatId} labels from WAHA:`, JSON.stringify(chatLabels));
                     console.log(`[CRON-DEBUG] Chat ${log.chatId} targetLabels:`, JSON.stringify(targetLabels));
