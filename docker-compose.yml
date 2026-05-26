@@ -28,7 +28,7 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASS=${DB_PASS}
       - DB_NAME=${DB_NAME}
-      - DB_SSL=true
+      - DB_SSL=${DB_SSL:-true}
       # MinIO (External Network)
       - MINIO_ENDPOINT=minio-api.dayamedialangit.co.id
       - MINIO_PORT=443
