@@ -5,7 +5,7 @@ import Agent from '../models/Agent.js';
 import ConnectedPlatform from '../models/ConnectedPlatform.js';
 import ConversationLog from '../models/ConversationLog.js';
 import { sendTextMessage } from './wahaService.js';
-import { sendTextMessage as sendMetaMessage } from './metaService.js';
+import { sendCloudMessage } from './metaService.js';
 import axios from 'axios';
 
 const WAHA_URL = process.env.WAHA_BASE_URL || "http://localhost:7575";
@@ -148,11 +148,12 @@ async function checkAndSendFollowups() {
 
                 // Send the message
                 try {
-                    console.log(`[CRON] Sending followup to ${log.chatId} on ${platform.platform}`);
-                    if (platform.platform === 'waha') {
+                    const provider = platform.provider || platform.platform;
+                    console.log(`[CRON] Sending followup to ${log.chatId} on ${provider}`);
+                    if (provider === 'waha') {
                         await sendTextMessage(log.sessionId, log.chatId, messageToSend);
-                    } else if (platform.platform === 'meta') {
-                        await sendMetaMessage(log.sessionId, log.chatId, messageToSend);
+                    } else if (provider === 'meta_cloud' || provider === 'meta') {
+                        await sendCloudMessage(platform.phoneNumberId, platform.systemUserAccessToken, log.chatId, messageToSend);
                     }
 
                     // Log it so we don't send again!
