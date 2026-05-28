@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaClock, FaToggleOff, FaLightbulb, FaSpinner, FaBrain, FaPlus } from "react-icons/fa";
+import { FaClock, FaToggleOff, FaLightbulb, FaSpinner, FaBrain, FaPlus, FaSync } from "react-icons/fa";
 import { FiActivity, FiMessageSquare, FiTag } from "react-icons/fi";
 import RichTextEditor from "../../../components/common/RichTextEditor";
 import platformService from "../../../features/platforms/platformService";
@@ -188,20 +188,30 @@ const FollowupTab = ({ config, setConfig, platformId }) => {
                     <FiTag className="text-blue-500" /> Target Label
                   </h4>
                   {platformId && !isLoadingLabels && (
-                    <button
-                      type="button"
-                      onClick={handleCreateLabel}
-                      disabled={isCreatingLabel}
-                      className="btn btn-xs btn-outline btn-success gap-1"
-                      title="Buat label baru (tersinkron ke HP)"
-                    >
-                      {isCreatingLabel ? (
-                        <FaSpinner className="animate-spin" size={12} />
-                      ) : (
-                        <FaPlus size={10} />
-                      )}
-                      {isCreatingLabel ? "Membuat..." : "Tambah Label"}
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={fetchLabels}
+                        className="btn btn-xs btn-outline border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white hover:border-blue-500"
+                        title="Sinkronkan label dari WhatsApp"
+                      >
+                        <FaSync size={12} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleCreateLabel}
+                        disabled={isCreatingLabel}
+                        className="btn btn-xs btn-outline btn-success gap-1"
+                        title="Buat label baru (tersinkron ke HP)"
+                      >
+                        {isCreatingLabel ? (
+                          <FaSpinner className="animate-spin" size={12} />
+                        ) : (
+                          <FaPlus size={10} />
+                        )}
+                        {isCreatingLabel ? "Membuat..." : "Tambah Label"}
+                      </button>
+                    </div>
                   )}
                 </div>
                 {!platformId ? (
