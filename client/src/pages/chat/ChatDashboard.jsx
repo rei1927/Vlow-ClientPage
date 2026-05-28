@@ -354,6 +354,39 @@ const ChatDashboard = () => {
         }
     };
 
+    const formatSidebarTime = (timestamp) => {
+        if (!timestamp) return "";
+        try {
+            let date;
+            if (typeof timestamp === 'string' && timestamp.includes('T')) {
+                date = new Date(timestamp);
+            } else {
+                const numTs = Number(timestamp);
+                date = new Date(numTs > 9999999999 ? numTs : numTs * 1000);
+            }
+            if (isNaN(date.getTime())) return "";
+
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            const diffTime = today - targetDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) {
+                return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace(':', '.');
+            } else if (diffDays === 1) {
+                return "Kemarin";
+            } else if (diffDays > 1 && diffDays < 7) {
+                return date.toLocaleDateString('id-ID', { weekday: 'long' });
+            } else {
+                return date.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            }
+        } catch (e) {
+            return "";
+        }
+    };
+
     // Toggle Dropdown State
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -552,7 +585,7 @@ const ChatDashboard = () => {
                                                     </span>
                                                 );
                                             })()}
-                                            <span className="text-xs text-[var(--color-text-muted)]">{formatTime(chat.timestamp)}</span>
+                                            <span className="text-xs text-[var(--color-text-muted)]">{formatSidebarTime(chat.timestamp)}</span>
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center mb-1">
