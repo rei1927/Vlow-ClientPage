@@ -624,3 +624,34 @@ export const createPlatformLabel = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Refresh labels by restarting WAHA session to force re-sync
+// @route   POST /api/platforms/:id/labels/refresh
+// @access  Private
+export const refreshPlatformLabels = async (req, res, next) => {
+  try {
+    const platform = await ConnectedPlatform.findOne({
+      where: { agentId: req.params.id, userId: req.user.id },
+    });
+
+    if (!platform) {
+      return next(new AppError("Platform tidak ditemukan.", 404));
+    }
+
+    if (platform.provider !== "waha") {
+      return next(new AppError("Refresh label hanya didukung untuk WAHA.", 400));
+    }
+
+    // Restart session to force WAHA to re-sync all data from WhatsApp
+    await wahaService.restartWahaSession(platform.sessionId);
+
+    // Wait for WAHA to fully reconnect and sync labels
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    // Now fetch the refreshed labels
+    const labels = await wahaService.getLabels(platform.sessionId);
+    res.json({ success: true, data: labels || [] });
+  } catch (error) {
+    next(error);
+  }
+};

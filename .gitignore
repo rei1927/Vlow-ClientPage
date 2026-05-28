@@ -54,3 +54,22 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Secret files
+deploy_proxmox.exp
+fix_proxy_env.js
+update_stack7_envs.js
+redeploy_stack7.js
+upload_dist.js
+client/dist.tar
+*.exp
+check_*.js
+test_*.js
+patch_*.js
+explore_*.js
+eval_*.js
+strip_*.js
+remove_*.js
+inspect_*.js
+run_portainer_api.js
+n8n_*.json
+ai_agent_persona.md

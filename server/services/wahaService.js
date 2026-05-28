@@ -397,3 +397,18 @@ export const createLabel = async (sessionId, name, color = 1) => {
     throw new AppError(`Gagal membuat label: ${rawError}`, 502);
   }
 };
+
+export const restartWahaSession = async (sessionId) => {
+  try {
+    await axios.post(`${WAHA_URL}/api/sessions/${sessionId}/restart`, {}, {
+      headers: HEADERS,
+      timeout: 15000,
+    });
+    console.log(`[WAHA] Session ${sessionId} restarted for label sync.`);
+    return true;
+  } catch (error) {
+    const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
+    console.error("WAHA Restart Session Error:", rawError);
+    throw new AppError(`Gagal restart sesi WAHA: ${rawError}`, 502);
+  }
+};

@@ -12,7 +12,8 @@ import {
   diagnoseWebhook,
   registerPhone,
   getPlatformLabels,
-  createPlatformLabel
+  createPlatformLabel,
+  refreshPlatformLabels
 } from "../controllers/platformController.js";
 
 const router = express.Router();
@@ -31,6 +32,7 @@ router.get("/:id/status", getPlatformStatus);
 
 // Labels
 router.route("/:id/labels").get(getPlatformLabels).post(createPlatformLabel);
+router.post("/:id/labels/refresh", refreshPlatformLabels);
 
 // Subscribe existing meta_cloud platform to webhook
 router.post("/:id/subscribe-webhook", subscribeWebhook);

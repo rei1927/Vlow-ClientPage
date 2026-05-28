@@ -63,6 +63,12 @@ const createPlatformLabel = async ({ id, name, color }) => {
   return response.data;
 };
 
+// Refresh Labels (restart WAHA session to force sync)
+const refreshPlatformLabels = async (id) => {
+  const response = await axiosInstance.post(`${API_URL}/${id}/labels/refresh`);
+  return response.data;
+};
+
 const platformService = {
   getPlatforms,
   createPlatform,
@@ -71,7 +77,8 @@ const platformService = {
   getPlatformQR,
   getPlatformStatus,
   getPlatformLabels,
-  createPlatformLabel
+  createPlatformLabel,
+  refreshPlatformLabels
 };
 
 export default platformService;

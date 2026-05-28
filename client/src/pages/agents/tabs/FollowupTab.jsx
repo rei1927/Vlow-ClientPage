@@ -32,12 +32,13 @@ const FollowupTab = ({ config, setConfig, platformId }) => {
   const handleRefreshLabels = async () => {
     setIsRefreshing(true);
     try {
-      const res = await platformService.getPlatformLabels(platformId);
+      const res = await platformService.refreshPlatformLabels(platformId);
       if (res.success) {
         setLabels(res.data || []);
       }
     } catch (error) {
       console.error("Gagal refresh label:", error);
+      alert("Gagal refresh label. Pastikan sesi WhatsApp aktif.");
     } finally {
       setIsRefreshing(false);
     }
