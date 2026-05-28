@@ -7,6 +7,7 @@ import platformService from "../../../features/platforms/platformService";
 const FollowupTab = ({ config, setConfig, platformId }) => {
   const [labels, setLabels] = useState([]);
   const [isLoadingLabels, setIsLoadingLabels] = useState(false);
+  const [isCreatingLabel, setIsCreatingLabel] = useState(false);
 
   useEffect(() => {
     if (platformId && config.isEnabled) {
@@ -26,6 +27,26 @@ const FollowupTab = ({ config, setConfig, platformId }) => {
     } finally {
       setIsLoadingLabels(false);
     }
+  };
+
+  const handleCreateLabel = async () => {
+      const name = window.prompt("Masukkan nama label baru (akan langsung ditambahkan ke WA):");
+      if (!name || !name.trim()) return;
+
+      setIsCreatingLabel(true);
+      try {
+          const res = await platformService.createPlatformLabel({ id: platformId, name: name.trim(), color: 1 });
+          if (res.success && res.data) {
+              setLabels(prev => [...prev, res.data]);
+              const currentLabels = config.targetLabels || [];
+              handleChange("targetLabels", [...currentLabels, res.data.id]);
+          }
+      } catch (error) {
+          console.error("Gagal membuat label", error);
+          alert(error?.response?.data?.message || "Gagal membuat label");
+      } finally {
+          setIsCreatingLabel(false);
+      }
   };
 
   const handleChange = (field, value) => {
@@ -163,9 +184,21 @@ const FollowupTab = ({ config, setConfig, platformId }) => {
               </div>
               
               <div className="mt-6">
-                <h4 className="font-bold text-[var(--color-text)] mb-3 flex items-center gap-2 text-sm">
-                  <FiTag className="text-blue-500" /> Target Label
-                </h4>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="font-bold text-[var(--color-text)] flex items-center gap-2 text-sm">
+                    <FiTag className="text-blue-500" /> Target Label
+                  </h4>
+                  {platformId && !isLoadingLabels && (
+                    <button
+                      type="button"
+                      onClick={handleCreateLabel}
+                      disabled={isCreatingLabel}
+                      className="btn btn-xs btn-outline btn-primary"
+                    >
+                      {isCreatingLabel ? <FaSpinner className="animate-spin" /> : "+ Buat Label Baru"}
+                    </button>
+                  )}
+                </div>
                 {!platformId ? (
                   <div className="text-xs text-orange-500 bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg border border-orange-200">
                     Simpan agent dan hubungkan WhatsApp untuk menarik label.
