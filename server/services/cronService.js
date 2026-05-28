@@ -87,15 +87,6 @@ async function checkAndSendFollowups() {
             for (const log of latestLogs) {
                 // 4. Check how many followups sent in the specified period AFTER the last user message
                 const followupCountQuery = `
-                    WITH LastUserMsg AS (
-                        SELECT "createdAt" 
-                        FROM "ConversationLogs" 
-                        WHERE "chatId" = :chatId 
-                        AND "sessionId" = :sessionId
-                        AND "userMessage" IS NOT NULL
-                        ORDER BY "createdAt" DESC 
-                        LIMIT 1
-                    )
                     SELECT COUNT(*) as count 
                     FROM "ConversationLogs" 
                     WHERE "chatId" = :chatId 
@@ -103,7 +94,6 @@ async function checkAndSendFollowups() {
                     AND "agentId" = :agentId
                     AND metadata->>'isFollowup' = 'true'
                     AND "createdAt" >= NOW() - INTERVAL '${maxPeriod} ${maxPeriodUnit}'
-                    AND "createdAt" >= COALESCE((SELECT "createdAt" FROM LastUserMsg), '1970-01-01'::timestamp)
                 `;
                 const [followupRes] = await Agent.sequelize.query(followupCountQuery, {
                     replacements: { chatId: log.chatId, sessionId: log.sessionId, agentId: agent.id },
