@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import { FaClock, FaToggleOff, FaLightbulb, FaSpinner, FaBrain } from "react-icons/fa";
-import { FiActivity, FiMessageSquare, FiTag, FiRefreshCw } from "react-icons/fi";
+import { FaClock, FaToggleOff, FaLightbulb, FaSpinner, FaBrain, FaPlus } from "react-icons/fa";
+import { FiActivity, FiMessageSquare, FiTag } from "react-icons/fi";
 import RichTextEditor from "../../../components/common/RichTextEditor";
 import platformService from "../../../features/platforms/platformService";
+import toast from "react-hot-toast";
 
 const FollowupTab = ({ config, setConfig, platformId }) => {
   const [labels, setLabels] = useState([]);
   const [isLoadingLabels, setIsLoadingLabels] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isCreatingLabel, setIsCreatingLabel] = useState(false);
 
   useEffect(() => {
     if (platformId && config.isEnabled) {
@@ -29,18 +30,21 @@ const FollowupTab = ({ config, setConfig, platformId }) => {
     }
   };
 
-  const handleRefreshLabels = async () => {
-    setIsRefreshing(true);
+  const handleCreateLabel = async () => {
+    const name = window.prompt("Masukkan nama label baru:");
+    if (!name || !name.trim()) return;
+
+    setIsCreatingLabel(true);
     try {
-      const res = await platformService.refreshPlatformLabels(platformId);
-      if (res.success) {
-        setLabels(res.data || []);
+      const res = await platformService.createPlatformLabel({ id: platformId, name: name.trim(), color: 1 });
+      if (res.success && res.data) {
+        toast.success("Label berhasil dibuat! Label akan tersinkron ke HP Anda.");
+        setLabels(prev => [...prev, res.data]);
       }
     } catch (error) {
-      console.error("Gagal refresh label:", error);
-      alert("Gagal refresh label. Pastikan sesi WhatsApp aktif.");
+      toast.error(error?.response?.data?.message || "Gagal membuat label");
     } finally {
-      setIsRefreshing(false);
+      setIsCreatingLabel(false);
     }
   };
 
@@ -186,13 +190,17 @@ const FollowupTab = ({ config, setConfig, platformId }) => {
                   {platformId && !isLoadingLabels && (
                     <button
                       type="button"
-                      onClick={handleRefreshLabels}
-                      disabled={isRefreshing}
-                      className="btn btn-xs btn-outline btn-info gap-1"
-                      title="Refresh label dari WhatsApp"
+                      onClick={handleCreateLabel}
+                      disabled={isCreatingLabel}
+                      className="btn btn-xs btn-outline btn-success gap-1"
+                      title="Buat label baru (tersinkron ke HP)"
                     >
-                      <FiRefreshCw className={`${isRefreshing ? "animate-spin" : ""}`} size={12} />
-                      {isRefreshing ? "Memuat..." : "Refresh Label"}
+                      {isCreatingLabel ? (
+                        <FaSpinner className="animate-spin" size={12} />
+                      ) : (
+                        <FaPlus size={10} />
+                      )}
+                      {isCreatingLabel ? "Membuat..." : "Tambah Label"}
                     </button>
                   )}
                 </div>
