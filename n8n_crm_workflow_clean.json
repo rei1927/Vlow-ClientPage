@@ -1,0 +1,3535 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "amount": "=5"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        20928,
+        4016
+      ],
+      "id": "e0ed6711-fb6d-4c6f-beac-f188b74165ab",
+      "name": "Wait",
+      "webhookId": "8f8cfbb8-3482-44a5-bd25-54086424ae9f"
+    },
+    {
+      "parameters": {
+        "resource": "Contacts",
+        "operation": "Get",
+        "contactId": "={{ $json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        19584,
+        3760
+      ],
+      "id": "444e4f86-af33-4bb4-8e45-882d9c35f599",
+      "name": "Get contact basic info",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Labels",
+        "operation": "Put Chat Labels",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.to }}",
+        "labels": "=[\n  {\n    \"id\": \"{{ $json.handoverConfig.handoverLabelId || \\\"1\\\" }}\"\n  }\n]",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        20704,
+        3568
+      ],
+      "id": "09b10e7c-783b-4a36-bc2a-3c6323dc86de",
+      "name": "Save labels for the chat",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ceaa9ef7-9a60-4e05-9a4d-c03690169bdd",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "@g.us",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        19808,
+        3760
+      ],
+      "id": "c82627cb-349f-4f94-a6ab-80f87d5d0015",
+      "name": "CEK GRUP ATAU BUKAN"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6b4e5201-9682-42a8-b2fc-82d441634226",
+              "leftValue": "={{ $('WAHA Trigger').item.json.payload._data.ctwaContext }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c16986c2-0998-4e19-bf5e-bca7870a27fc",
+              "leftValue": "={{ $('WAHA Trigger').item.json.payload._data.ctwaContext.automatedGreetingMessageShown }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        19360,
+        3568
+      ],
+      "id": "e1017733-d76e-4c93-90a5-f76358964165",
+      "name": "CEK DARI IKLAN"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4b9e27ad-2689-448b-b88c-bc4495a8e9e1",
+              "leftValue": "={{ $json.payload.source }}",
+              "rightValue": "api",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        19584,
+        3568
+      ],
+      "id": "633d8d8e-e043-492d-8077-79947979c6fa",
+      "name": "CEK BOT"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "05cc99f6-392c-4c5a-99bc-dbd26c90d582",
+              "leftValue": "={{ $json.labels }}",
+              "rightValue": "=1",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        20256,
+        3568
+      ],
+      "id": "352515d5-394f-48af-9b2c-7a4c4869dee1",
+      "name": "CEK LABEL1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "942f2fae-299e-47d8-9896-5d115f8545cc",
+              "leftValue": "={{ $json.payload.source }}",
+              "rightValue": "api",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        19360,
+        3760
+      ],
+      "id": "16f3b52d-9966-4f23-9444-b660e1c030f0",
+      "name": "CEK API"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "944efa20-e157-4664-83d9-953ed6ea231e",
+              "leftValue": "={{ $('WAHA Trigger').item.json.payload.fromMe }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        19136,
+        3664
+      ],
+      "id": "6374863d-babc-4b8b-b71a-7a113e244fe7",
+      "name": "ME or NOT"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1aea3e17-7a6e-4885-957e-33bcd4204a90",
+              "leftValue": "={{ $('WAHA Trigger').item.json.payload.media.url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        20704,
+        3760
+      ],
+      "id": "b31a0ecb-12b4-4c81-9be6-3561c8d654fb",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('WAHA Trigger').item.json.payload.media.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "apikey"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        22720,
+        3696
+      ],
+      "id": "1f0e27b8-d2b5-43bb-9320-052945b063c2",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "={{ $('WAHA Trigger').item.json.payload.body }}",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        23168,
+        3600
+      ],
+      "id": "b65d9fee-5fd4-4088-901d-3ea090a48de2",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eDUp0Sb5vGEopF3y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Text",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "text": "={{ $json.content.parts[0].text }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        23968,
+        3600
+      ],
+      "id": "b8675446-90e1-4fc1-bcb4-5b538003d1a3",
+      "name": "Send a text message1",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "PROSES GAMBAR",
+        "height": 208,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        23248,
+        3552
+      ],
+      "typeVersion": 1,
+      "id": "8bd8137b-f327-4770-8ba8-46dbae31a1b4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "PROSES TEXT",
+        "height": 800,
+        "width": 5728,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        21648,
+        3872
+      ],
+      "typeVersion": 1,
+      "id": "8a7c4d2b-d1ad-4be5-8371-54b9e456abc6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "LABELING",
+        "height": 240,
+        "width": 1312,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        19424,
+        3488
+      ],
+      "typeVersion": 1,
+      "id": "ff04938b-f4d1-4d2a-9a84-d01b973bd945",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "08e00eeb-8d66-4188-86be-935f34b1314c",
+              "leftValue": "={{ $('WAHA Trigger').item.json.payload.media.mimetype }}",
+              "rightValue": "audio/ogg",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        22944,
+        3696
+      ],
+      "id": "4e29ba13-5c48-41bd-bf17-30439c0541f8",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "Kamu adalah mesin transkripsi. Tugasmu: Dengarkan file audio user. Output: Tuliskan ulang apa yang diucapkan user dalam teks.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        23168,
+        3840
+      ],
+      "id": "bbe433f9-bf93-4b6f-b33f-cff0fd6688dc",
+      "name": "Analyze audio",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eDUp0Sb5vGEopF3y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Start Typing",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        23456,
+        3600
+      ],
+      "id": "d7754ab0-7649-4373-8d5e-eceaec7a763c",
+      "name": "Start Typing2",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Stop Typing",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        23744,
+        3600
+      ],
+      "id": "02f1dbd9-59cb-4380-87b5-690376837387",
+      "name": "Stop Typing2",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst aiOutput = items[0].json.output;\nconst agentData = $('AI Agent2').item.json;\nlet finalMessageForUser = aiOutput;\nlet welcomeImageUrl = null;\nlet bookingData = { booking: false, escalate: false, extracted_name: null, extracted_requirement: null, lead_temperature: null };\nlet promptTokens = agentData?.response_metadata?.tokenUsage?.promptTokens || agentData?.usage_metadata?.prompt_token_count || 0;\nlet completionTokens = agentData?.response_metadata?.tokenUsage?.completionTokens || agentData?.usage_metadata?.candidates_token_count || 0;\n\nif (promptTokens === 0 || completionTokens === 0) {\n    const ctx = $('Finalize Context').first().json;\n    const userMessage = ($('Set Prod Mode').isExecuted ? $('Set Prod Mode').first().json.message : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').first().json.message : \"\"));\n    const fullInputText = (ctx.finalSystemPrompt || \"\") + (ctx.finalKnowledge || \"\") + userMessage;\n    promptTokens = Math.ceil(fullInputText.length / 4);\n    completionTokens = Math.ceil((aiOutput || \"\").length / 4);\n}\nlet totalTokens = promptTokens + completionTokens;\n\ntry {\n    if (!aiOutput) throw new Error(\"Output kosong\");\n\n    // 1. Tangkap output JSON Booking/Escalate/CRM jika ada\n    let jsonString = null;\n    const mdMatch = aiOutput.match(/```(?:json)?\\s*(\\{[\\s\\S]*?\\})\\s*```/i);\n    if (mdMatch) {\n        jsonString = mdMatch[1];\n    } else {\n        const lastBrace = aiOutput.lastIndexOf('}');\n        const firstBrace = aiOutput.lastIndexOf('{', lastBrace);\n        if (firstBrace !== -1 && lastBrace !== -1 && (aiOutput.substring(firstBrace, lastBrace + 1).includes('\"extracted_name\"') || aiOutput.substring(firstBrace, lastBrace + 1).includes('\"escalate\"'))) {\n            jsonString = aiOutput.substring(firstBrace, lastBrace + 1);\n        } else {\n            const match = aiOutput.match(/\\{[\\s\\S]*\\}/);\n            if (match) jsonString = match[0];\n        }\n    }\n\n    if (jsonString) {\n        jsonString = jsonString.replace(/^json\\s*/i, \"\").replace(/$/i, \"\");\n        jsonString = jsonString.replace(/\\\\(?![\"\\\\/bfnrtu])/g, \"\\\\\\\\\");\n        try {\n            const parsed = JSON.parse(jsonString);\n            if (parsed.booking && String(parsed.booking).toLowerCase() === 'true') {\n                bookingData.booking = true;\n                bookingData.topic = parsed.topic;\n                bookingData.clientEmail = parsed.clientEmail;\n                let time = parsed.startTime ? parsed.startTime.replace(' ', 'T') : '';\n                if (time && time.split(':').length === 2) { time = time.includes('+') ? time.split('+')[0] + ':00+' + time.split('+')[1] : time + ':00'; }\n                if (time && !time.includes('+') && !time.endsWith('Z')) time += '+07:00';\n                bookingData.startTime = time;\n            }\n            if (parsed.escalate && String(parsed.escalate).toLowerCase() === 'true') { bookingData.escalate = true; }\n            if (parsed.extracted_name) { bookingData.extracted_name = parsed.extracted_name; }\n            \n            if (parsed.extracted_requirement) { bookingData.extracted_requirement = parsed.extracted_requirement; }\n            if (parsed.lead_temperature) { bookingData.lead_temperature = parsed.lead_temperature; }\n\n        } catch(e) { /* JSON parse failed, continue */ }\n        \n        finalMessageForUser = aiOutput.replace(/json[\\s\\S]*/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/\\{[\\s\\S]*\\}/g, \"\").trim();\n        finalMessageForUser = finalMessageForUser.replace(/\\x60/g, \"\").trim();\n    }\n\n    // 2. FALLBACK: Parse user's original message for CRM data\n    if (!bookingData.extracted_name || !bookingData.extracted_requirement) {\n        const userMsg = ($('Set Prod Mode').isExecuted ? $('Set Prod Mode').first().json.message : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').first().json.message : \"\")) || \"\";\n\n        // Detect name\n        if (!bookingData.extracted_name) {\n            const namePatterns = [\n                /(?:nama\\s+saya|saya|aku|ini|perkenalkan|gue|gw|gua)\\s+([A-Za-z][A-Za-z\\s]{1,30}?)(?:[,\\.!?]|\\s+(?:butuh|mau|ingin|perlu|cari|dari|dan|yang|lagi|pengen|minta))/i,\n                /(?:nama\\s+saya|saya|aku|ini|perkenalkan|gue|gw|gua)\\s+([A-Za-z][A-Za-z\\s]{1,30})$/i,\n            ];\n            for (const pattern of namePatterns) {\n                const match = userMsg.match(pattern);\n                if (match && match[1]) {\n                    const name = match[1].trim();\n                    if (name.length >= 2 && name.length <= 30) {\n                        bookingData.extracted_name = name.charAt(0).toUpperCase() + name.slice(1);\n                        break;\n                    }\n                }\n            }\n        }\n\n        // Detect requirement\n        if (!bookingData.extracted_requirement) {\n            const reqPatterns = [\n                /(?:butuh|mau|ingin|perlu|cari|pengen|minta|tertarik)\\s+(.{5,100}?)(?:\\.|\\n|$)/i,\n                /(?:untuk|buat)\\s+(.{5,100}?)(?:\\.|\\n|$)/i,\n            ];\n            for (const pattern of reqPatterns) {\n                const match = userMsg.match(pattern);\n                if (match && match[1]) {\n                    bookingData.extracted_requirement = match[1].trim();\n                    break;\n                }\n            }\n        }\n\n        // FALLBACK 3: Ekstrak nama dari sapaan AI sendiri (misal \"Halo Jul!\", \"Hai Budi 👋\")\n        if (!bookingData.extracted_name && finalMessageForUser) {\n            const aiGreetPatterns = [\n                /(?:halo|hai|hi|hey|hello|hallo)(?:\\s+(?:juga|lagi))?[,!]?\\s+([A-Za-z][A-Za-z]{1,20})(?:\\s*[!👋🙌✋.,]|\\s+(?:Ada|Apa|Senang|Makasih|Terima|Selamat|Dengan|Gimana))/i,\n                /(?:halo|hai|hi|hey|hello|hallo)(?:\\s+(?:juga|lagi))?[,!]?\\s+(?:Kak|Mas|Mba|Mbak|Bang|Pak|Bu)?\\s*([A-Za-z][A-Za-z]{1,20})(?:\\s*[!👋🙌✋.,])/i,\n            ];\n            for (const pattern of aiGreetPatterns) {\n                const match = finalMessageForUser.match(pattern);\n                if (match && match[1]) {\n                    const name = match[1].trim();\n                    const excludeWords = ['ada', 'apa', 'yang', 'bisa', 'ini', 'itu', 'saya', 'kami', 'kamu', 'dengan', 'lagi', 'juga', 'vlow', 'agent'];\n                    if (name.length >= 2 && name.length <= 20 && !excludeWords.includes(name.toLowerCase())) {\n                        bookingData.extracted_name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();\n                        break;\n                    }\n                }\n            }\n        }\n    }\n\n    // 3. INLINE CRM UPDATE - Use n8n helper!\n    \n    // SMART LEAD API CALL\n    if (bookingData.lead_temperature) {\n        try {\n            const sqlData = $('Execute a SQL query').first().json;\n            const platformId = sqlData.platform_id || '';\n            const chatId = $('Set Prod Mode').isExecuted \n                ? $('Set Prod Mode').first().json.chatId \n                : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').first().json.chatId : '');\n            \n            const sessionId = $('Set Prod Mode').isExecuted \n                ? $('Set Prod Mode').first().json.wahaSession \n                : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').first().json.metaSessionId : '');\n            \n            if (sessionId && chatId) {\n                const leadPayload = {\n                    platformId: platformId,\n                    sessionId: sessionId,\n                    chatId: chatId,\n                    temperature: bookingData.lead_temperature\n                };\n                \n                if (this.helpers && this.helpers.httpRequest) {\n                    await this.helpers.httpRequest({\n                        method: 'POST',\n                        url: 'https://api.vlow-ai.com/api/handover/lead-qualification',\n                        body: leadPayload,\n                        json: true\n                    });\n                } else if (this.helpers && this.helpers.request) {\n                    await this.helpers.request({\n                        method: 'POST',\n                        uri: 'https://api.vlow-ai.com/api/handover/lead-qualification',\n                        body: leadPayload,\n                        json: true\n                    });\n                }\n            }\n        } catch (leadErr) {\n            console.log(\"Lead update error\", leadErr.message);\n        }\n    }\n    if (bookingData.extracted_name || bookingData.extracted_requirement) {\n        try {\n            const sqlData = $('Execute a SQL query').first().json;\n            const platformId = sqlData.platform_id || '';\n            const chatId = $('Set Prod Mode').isExecuted \n                ? $('Set Prod Mode').first().json.chatId \n                : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').first().json.chatId : '');\n            \n            if (platformId && chatId) {\n                const crmPayload = {\n                    platformId: platformId,\n                    chatId: chatId,\n                    customName: bookingData.extracted_name || '',\n                    requirements: bookingData.extracted_requirement || ''\n                };\n                \n                if (this.helpers && this.helpers.httpRequest) {\n                    await this.helpers.httpRequest({\n                        method: 'POST',\n                        url: 'https://api.vlow-ai.com/api/crm/profile',\n                        body: crmPayload,\n                        json: true\n                    });\n                    bookingData.crm_updated = true;\n                } else if (this.helpers && this.helpers.request) {\n                    await this.helpers.request({\n                        method: 'POST',\n                        uri: 'https://api.vlow-ai.com/api/crm/profile',\n                        body: crmPayload,\n                        json: true\n                    });\n                    bookingData.crm_updated = true;\n                } else {\n                    bookingData.crm_error = \"No HTTP helper found in n8n context\";\n                }\n            }\n        } catch (crmErr) {\n            bookingData.crm_error = crmErr.message;\n        }\n    }\n\n    // 4. TANGKAP SEMUA LINK GAMBAR/FILE\n    const mdRegex = /\\[([^]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/gi;\n    const rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/gi;\n    const minioRegex = /https?:\\/\\/minio[^\\s]*/gi;\n\n    const firstMd = finalMessageForUser.match(/\\[([^]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i);\n    const firstRaw = finalMessageForUser.match(/(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i);\n    \n    if (firstMd) { welcomeImageUrl = firstMd[2]; }\n    else if (firstRaw) { welcomeImageUrl = firstRaw[1]; }\n    \n    finalMessageForUser = finalMessageForUser.replace(mdRegex, \"\");\n    finalMessageForUser = finalMessageForUser.replace(rawRegex, \"\");\n    finalMessageForUser = finalMessageForUser.replace(minioRegex, \"\");\n    finalMessageForUser = finalMessageForUser.replace(/\\[[^\\]]*\\]\\(\\)/g, \"\");\n    finalMessageForUser = finalMessageForUser.replace(/\\n{3,}/g, \"\\n\\n\").trim();\n\n    // 5. Fallback WELCOME_IMAGE_URL\n    const imgMatch = finalMessageForUser.match(/WELCOME_IMAGE_URL:\\s*(\\S+)/i);\n    if (imgMatch && imgMatch[1]) {\n        welcomeImageUrl = imgMatch[1].trim();\n        finalMessageForUser = finalMessageForUser.replace(/WELCOME_IMAGE_URL:\\s*\\S+/i, \"\").trim();\n    }\n\n} catch (error) { \n    bookingData.error = error.message; \n}\n\nreturn [{ \n    json: { \n        ...bookingData, \n        welcome_image_url: welcomeImageUrl, waha_image_url: welcomeImageUrl,\n        text_for_wa: finalMessageForUser, \n        output: finalMessageForUser, \n        tokens: { prompt: promptTokens, completion: completionTokens, total: totalTokens } \n    } \n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        23968,
+        3920
+      ],
+      "id": "0112a257-6b72-49c3-8f84-114e8d83ef10",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').first().json.payload.body : ($('Parse Meta Payload').isExecuted ? $('Parse Meta Payload').first().json.body : '') }} | {{ $('Finalize Context').isExecuted ? $('Finalize Context').first().json.message : '' }}",
+        "options": {
+          "systemMessage": "={{ $('Finalize Context').item.json.finalSystemPrompt }}\n\nCONTEXT:\n{{ $('Finalize Context').item.json.finalKnowledge }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        23392,
+        4016
+      ],
+      "id": "bc8efb77-91f5-4862-8727-f8128e9bedae",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        23408,
+        4240
+      ],
+      "id": "c5794dbf-6b93-4746-b910-06682edd7cd8",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eDUp0Sb5vGEopF3y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $if($('WAHA Trigger').isExecuted, $('WAHA Trigger').item.json.session, $if($('Parse Meta Payload').isExecuted, 'meta_' + $('Parse Meta Payload').item.json.from, 'trigger-kosong')) }} | {{ $if($('Finalize Context').isExecuted, $('Finalize Context').item.json.sessionId, 'Context-kosong') }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        23536,
+        4240
+      ],
+      "id": "a026e0e8-8d81-42aa-bec8-c9dd1ab64ef7",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/simulator-chat",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        20928,
+        4400
+      ],
+      "id": "aa5facab-b45b-4c83-a8b8-fb5eca1f3931",
+      "name": "Webhook (Simulator Mode)",
+      "webhookId": "3bcbcc00-e3c0-462d-81de-66c395f40d8a"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.body\nreturn {\n    json: {\n        mode: 'simulation',\n        message: input.message,\n        sessionId: input.sessionId,\n        agentConfig: input.agentConfig \n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        21152,
+        4400
+      ],
+      "id": "f8bf410d-9bed-415d-b663-1e303a724b6f",
+      "name": "Set Sim Mode"
+    },
+    {
+      "parameters": {
+        "jsCode": "const trigger = $('WAHA Trigger').item.json;\nconst payload = trigger.payload || {};\nlet senderId = payload.from || \"\";\nif (payload.author) { senderId = payload.author; }\nconst message = payload.body || \"\";\nif (!senderId) { throw new Error('Sender ID tidak ditemukan dari WAHA Trigger'); }\nreturn { json: { mode: 'production', message: message, sessionId: senderId, chatId: senderId, platform: 'waha', wahaSession: trigger.session, agentConfig: null } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        21152,
+        4016
+      ],
+      "id": "3f2c0835-ddbf-4741-bd5a-a387f6561def",
+      "name": "Set Prod Mode"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        21376,
+        4112
+      ],
+      "id": "0932691f-33b1-48e1-8d47-d2699e4a0714",
+      "name": "Merge Inputs"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mode }}",
+                    "rightValue": "production",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "16220bec-4619-4e30-9b0a-a94eb62dfcd3"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bae44cd0-951f-4dbd-88b1-dc3f76c753eb",
+                    "leftValue": "={{ $json.mode }}",
+                    "rightValue": "simulation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        21600,
+        4112
+      ],
+      "id": "605ffdd2-ab17-4947-9e0f-b5b3d2d05f52",
+      "name": "Is Production?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const originalData = $('Merge Inputs').item.json;\nconst data = items[0].json;\nlet finalPrompt = \"\";\nlet finalKnowledge = \"\";\nlet finalFollowup = null;\n\nif (originalData.mode === 'production') {\n    finalPrompt = data.system_prompt || \"\";\n    finalKnowledge = data.knowledge || \"\";\n    finalFollowup = data.followup_config || null;\n    \n    // Tambahkan instruksi GAMBAR otomatis jika knowledge mengandung 'Attached File'\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', dan user MEMINTA atau MEMBUTUHKAN gambar/file tersebut, SERTAKAN URL file di response-mu dalam format markdown: [nama_file](URL).\\n\";\n        finalPrompt += \"Sistem akan OTOMATIS mengirim file tersebut sebagai attachment terpisah dan menghapus URL dari pesan teks.\\n\";\n        finalPrompt += \"Jika user TIDAK meminta gambar/file, cukup jawab dengan teks saja tanpa menyertakan URL.\\n\";\n        finalPrompt += \"JANGAN escalate jika informasi (termasuk gambar) sudah tersedia di CONTEXT.\";\n    }\n    \n    // Parse handover_config (might be string from Postgres)\n    let hc = data.handover_config;\n    if (typeof hc === 'string') {\n        try { hc = JSON.parse(hc); } catch(e) { hc = null; }\n    }\n    \n    if (hc && hc.enabled) {\n        const rules = [];\n        rules.push(\"\\nPENTING - ATURAN ESCALATION:\");\n        rules.push('Kamu WAJIB menyertakan JSON {\"escalate\": true, \"reason\": \"<alasan>\"} di BARIS TERAKHIR response-mu jika salah satu kondisi berikut terpenuhi:');\n\n        if (hc.escalationPrompt && hc.escalationPrompt.trim()) {\n            rules.push(\"\");\n            rules.push(\"KONDISI ESCALATION:\");\n            hc.escalationPrompt.trim().split('\\n').forEach(line => {\n                if (line.trim()) rules.push(\"• \" + line.trim());\n            });\n        }\n        \n        rules.push(\"\");\n        rules.push(\"PENTING: JANGAN escalate jika pertanyaan user BISA dijawab dari CONTEXT yang tersedia (termasuk gambar/file yang terlampir).\");\n        rules.push(\"\");\n        rules.push(\"FORMAT OUTPUT SAAT ESCALATION:\");\n        rules.push('Balas user dengan sopan, lalu DI BARIS TERAKHIR tulis: {\"escalate\": true, \"reason\": \"<alasan singkat>\"}');\n        rules.push(\"\");\n        rules.push(\"CONTOH OUTPUT ESCALATION:\");\n        rules.push('Mohon maaf, saya belum memiliki informasi mengenai hal tersebut. Saya akan menghubungkan Anda dengan tim kami.');\n        rules.push('{\"escalate\": true, \"reason\": \"Pertanyaan di luar knowledge base\"}');\n        rules.push(\"\");\n        rules.push(\"Jika TIDAK perlu escalation, JANGAN sertakan JSON escalate di response.\");\n        \n        finalPrompt += \"\\n\\n\" + rules.join(\"\\n\");\n    }\n} else {\n    finalPrompt = data.agentConfig?.systemInstruction || \"\";\n    finalKnowledge = data.agentConfig?.knowledgeBase || \"\";\n    finalFollowup = data.agentConfig?.followupConfig || null;\n    \n    // Add file instruction for simulator mode (mirrors production path)\n    if (finalKnowledge.includes('Attached File')) {\n        finalPrompt += \"\\n\\nATURAN GAMBAR/FILE:\\n\";\n        finalPrompt += \"Jika CONTEXT mengandung 'Attached File (nama): URL', dan user MEMINTA atau MEMBUTUHKAN gambar/file tersebut, SERTAKAN URL file di response-mu dalam format markdown: [nama_file](URL).\\n\";\n        finalPrompt += \"Sistem akan OTOMATIS mengirim file tersebut sebagai attachment terpisah dan menghapus URL dari pesan teks.\\n\";\n        finalPrompt += \"Jika user TIDAK meminta gambar/file, cukup jawab dengan teks saja tanpa menyertakan URL.\";\n    }\n}\n\n\n// Parse leadQualificationConfig\nlet lqc = data.leadQualificationConfig || data.agentConfig?.leadQualificationConfig;\nif (typeof lqc === 'string') {\n    try { lqc = JSON.parse(lqc); } catch(e) { lqc = null; }\n}\n\nif (lqc && lqc.enabled) {\n    finalPrompt += \"\\n\\nATURAN SMART LEAD QUALIFICATION (WAJIB):\\n\";\n    finalPrompt += \"Kamu WAJIB mendeteksi suhu minat user berdasarkan percakapan. Tambahkan key 'lead_temperature' ke dalam blok JSON di akhir response-mu.\\n\";\n    finalPrompt += \"Nilai 'lead_temperature' HARUS salah satu dari: 'COLD', 'WARM', 'HOT'.\\n\";\n    finalPrompt += \"- COLD: User baru menyapa, basa-basi, atau bertanya hal yang sangat mendasar.\\n\";\n    finalPrompt += \"- WARM: User bertanya detail spesifikasi, harga, atau menunjukkan minat.\\n\";\n    finalPrompt += \"- HOT: User sudah mau transfer, minta rekening, minta jadwal meeting, atau sangat siap bertransaksi.\\n\";\n    finalPrompt += \"Jika tidak ada JSON lain yang harus dibuat (seperti CRM atau escalate), buat JSON baru khusus untuk lead_temperature: {\\\"lead_temperature\\\": \\\"COLD|WARM|HOT\\\"}\\n\";\n    finalPrompt += \"Jika sudah membuat JSON untuk CRM atau escalate, cukup tambahkan key lead_temperature di dalam JSON yang sama.\\n\";\n}\n\n// Tambahan AI CRM Extraction\nfinalPrompt += \"\\n\\nATURAN EKSTRAKSI CRM (WAJIB):\\n\";\nfinalPrompt += \"Setiap kali user menyebutkan NAMA-nya (misal: 'saya Budi', 'nama saya Rina', 'ini Andi') atau KEBUTUHAN-nya (misal: 'butuh chatbot', 'mau buat website', 'cari jasa AI'), kamu WAJIB menambahkan blok JSON berikut di BARIS PALING AKHIR response-mu:\\n\";\nfinalPrompt += '{\"extracted_name\": \"<nama user>\", \"extracted_requirement\": \"<inti kebutuhan>\"}\\n';\nfinalPrompt += \"Jika hanya nama yang terdeteksi, isi extracted_requirement dengan null. Jika hanya kebutuhan, isi extracted_name dengan null.\\n\";\nfinalPrompt += \"Jika TIDAK ada nama atau kebutuhan terdeteksi, JANGAN sertakan JSON ini.\\n\";\nfinalPrompt += \"PENTING: Jika ada perintah escalate DAN ekstraksi CRM, GABUNGKAN semuanya ke dalam SATU blok objek JSON di akhir pesan. JANGAN membuat dua blok JSON.\";\n\nreturn { json: { ...originalData, ...data, finalSystemPrompt: finalPrompt, finalKnowledge: finalKnowledge, followupConfig: finalFollowup } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        22048,
+        4112
+      ],
+      "id": "bfed2468-7b17-4ad7-8a73-d4ea0b930c64",
+      "name": "Finalize Context"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Finalize Context').item.json.mode }}",
+                    "rightValue": "production",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b92e5b5d-a707-460e-9e51-eedcbc635601"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3c836921-b58c-4929-bb97-7492312515bd",
+                    "leftValue": "={{ $('Finalize Context').item.json.mode }}",
+                    "rightValue": "simulation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        23744,
+        4016
+      ],
+      "id": "d4a9fdfe-9fc0-4982-88c1-1474bd4d8b92",
+      "name": "Is Simulator?"
+    },
+    {
+      "parameters": {
+        "resource": "Labels",
+        "operation": "Put Chat Labels",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "labels": "[\n  {\n    \"id\": \"2\"\n  }\n]",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        25984,
+        4032
+      ],
+      "id": "6faae782-1105-4bb2-99e7-432940997fc2",
+      "name": "Save labels for the chat2",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Contacts",
+        "operation": "Get",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "contactId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        25760,
+        4032
+      ],
+      "id": "1bc89aab-54d1-41ce-b7ac-ed1c5b8a09cc",
+      "name": "Get contact basic info3",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Start Typing",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        25760,
+        4368
+      ],
+      "id": "6cadd597-22aa-486c-817c-354a6d8f1fd0",
+      "name": "Start Typing",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Stop Typing",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.me.id }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        26432,
+        4512
+      ],
+      "id": "18b5f01a-b796-4a29-abdf-9f150aa8c699",
+      "name": "Stop Typing",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f11dcd72-b2c0-46b0-b644-638c307a5d23",
+              "leftValue": "={{ $('Code in JavaScript').item.json.booking }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        26208,
+        4368
+      ],
+      "id": "21f512e3-493b-4674-875d-fbd4469ac844",
+      "name": "SCHEDULE"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $('AI Agent2').item.json.output.length/25 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        25984,
+        4368
+      ],
+      "id": "b0676df1-0b6d-48cd-aaf3-c865c3620398",
+      "name": "Wait4",
+      "webhookId": "3c8d1cb9-9c7f-4d0e-b199-3c159ec30a3c"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "unosega@gmail.com",
+          "mode": "list",
+          "cachedResultName": "unosega@gmail.com"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        26432,
+        4208
+      ],
+      "id": "6766158c-17bb-4857-a4b0-f636ebe6c105",
+      "name": "Create an event",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Text",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "text": "={{ $json.text_for_wa }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        27552,
+        4208
+      ],
+      "id": "ce112ad5-5204-4ab7-ac58-b127c1554535",
+      "name": "Send a text message8",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "09e1f07e-3b98-4f2e-8a47-7d1b66b1f6a1",
+              "leftValue": "={{ $('Code in JavaScript').item.json.welcome_image_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        26656,
+        4512
+      ],
+      "id": "fc43b4d0-e092-4eee-9beb-169277bf7408",
+      "name": "HAS WELCOME IMAGE"
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Image",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        27328,
+        4416
+      ],
+      "id": "6259a2d3-a5aa-48e0-9b58-46d563c4c91d",
+      "name": "Send welcome image1",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Text",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "text": "={{ $('Code in JavaScript').item.json.text_for_wa }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        27552,
+        4512
+      ],
+      "id": "f6cc8165-7664-437c-ad63-a94217b34220",
+      "name": "Send a text message4",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        18912,
+        3664
+      ],
+      "id": "6e4b996e-e1bd-4f1f-a1c0-4b3bd28859e3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1b0a2f26-9b21-4d9b-8c65-4ebcd6e7b1a5",
+              "leftValue": "={{ $json.isActive !== false }}",
+              "rightValue": "=true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        22272,
+        4112
+      ],
+      "id": "7a6a7ab7-a933-41a1-b478-6da2920df401",
+      "name": "IS ACTIVE?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "22a5b3c1-6d9c-4b6b-9f6c-2df96c4f7a12",
+              "leftValue": "={{ $('Code in JavaScript').item.json.welcome_image_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        26656,
+        4208
+      ],
+      "id": "37a505f7-c5fd-4386-8e76-6529b8eccd65",
+      "name": "HAS WELCOME IMAGE (BOOKING)"
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Image",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        27328,
+        4128
+      ],
+      "id": "52a2a813-0dec-4366-9bae-787f44d9d019",
+      "name": "Send welcome image (booking)",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d90bec43-5aef-444a-a692-bec64d775031",
+              "leftValue": "={{ $json.escalate }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        25536,
+        4272
+      ],
+      "id": "cbb3af34-5dbb-4051-9d1e-c8379ebef109",
+      "name": "IF ESCALATE"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/analytics/log",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agentId\": \"{{ $('Fetch Config DB').item.json.agentId }}\",\n  \"platformId\": \"{{ $('Fetch Config DB').item.json.platformId }}\",\n  \"sessionId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}\",\n  \"chatId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.payload.from : ($('Parse Meta Payload').isExecuted ? $('Parse Meta Payload').item.json.from : '') }}\",\n  \"userMessage\": \"{{ $('Set Prod Mode').isExecuted ? $('Set Prod Mode').item.json.message : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.message : '') }}\",\n  \"aiResponse\": {{ JSON.stringify($('Code in JavaScript').item.json.text_for_wa || '') }},\n  \"isHandoff\": \"{{ $('Code in JavaScript').item.json.escalate || false }}\",\n  \"mode\": \"production\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        27776,
+        4208
+      ],
+      "id": "b5c7138e-506f-45ca-a120-aa7ee61ed70a",
+      "name": "Log Conversation"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/analytics/log",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agentId\": \"{{ $('IS ACTIVE?').item.json.agent_id }}\",\n  \"sessionId\": \"{{ $('IS ACTIVE?').item.json.sessionId }}\",\n  \"chatId\": \"{{ $('IS ACTIVE?').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('IS ACTIVE?').item.json.message || \"\") }},\n  \"aiResponse\": {{ JSON.stringify($('Code in JavaScript').item.json.text_for_wa || \"\") }},\n  \"mode\": \"production\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        27776,
+        4512
+      ],
+      "id": "c1cc812d-293b-4b70-8583-96c9af05a42b",
+      "name": "Log Conversation (Alt)"
+    },
+    {
+      "parameters": {},
+      "type": "@devlikeapro/n8n-nodes-waha.wahaTrigger",
+      "typeVersion": 202502,
+      "position": [
+        18688,
+        3280
+      ],
+      "id": "ba4742c6-7606-4003-937c-96b4d17560fe",
+      "name": "WAHA Trigger",
+      "webhookId": "20d16051-147e-4463-a36c-d98a15cf35ff"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  a.\"id\" AS agent_id,\n  cp.\"id\" AS platform_id,\n  cp.\"phoneNumberId\" AS \"phoneNumberId\",\n  cp.\"systemUserAccessToken\" AS \"systemUserAccessToken\",\n  a.\"name\" AS agent_name,\n  a.\"systemInstruction\" AS system_prompt,\n  a.\"welcomeMessage\" AS greeting,\n  a.\"welcomeImageUrl\" AS welcome_image,\n  a.\"followupConfig\" AS followup_config,\n  a.\"handoverConfig\" AS handover_config,\n  a.\"leadQualificationConfig\" AS \"leadQualificationConfig\",\n  COALESCE(a.\"knowledgeBase\", '') || E'\\n\\n' || \n  COALESCE(\n    (\n      SELECT string_agg(\n        '=== ' || ks.title || ' ===' || E'\\n' || ks.description || \n        CASE WHEN ks.\"fileUrl\" IS NOT NULL \n          THEN E'\\nAttached File (' || COALESCE(ks.\"fileName\", 'file') || '): ' || ks.\"fileUrl\"\n          ELSE '' \n        END,\n        E'\\n\\n'\n      )\n      FROM \"KnowledgeSources\" ks\n      WHERE ks.\"agentId\" = a.id\n    ),\n    ''\n  ) AS knowledge\nFROM \"ConnectedPlatforms\" cp\nJOIN \"Agents\" a ON cp.\"agentId\" = a.id\nWHERE cp.\"sessionId\" = '{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        21824,
+        4016
+      ],
+      "id": "36edf615-3376-40b5-b4d9-8c22dac045aa",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "HOsKCOW1hSA3Ltkd",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Contacts",
+        "operation": "Get",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "contactId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        20032,
+        3568
+      ],
+      "id": "575a90c2-8502-4221-bbc6-c4bea60a40ad",
+      "name": "Get contact basic info1",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/handover/activate-n8n",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chatId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.payload.from : ($('Parse Meta Payload').isExecuted ? $('Parse Meta Payload').item.json.from : '') }}\",\n  \"sessionId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}\",\n  \"triggeredBy\": \"ai_escalate\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        26208,
+        4032
+      ],
+      "id": "06e54128-64d1-4a2f-b95c-28d7dd0ea6b2",
+      "name": "Activate Handover",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/handover/check-keyword",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chatId\": \"{{ $json.chatId }}\",\n  \"sessionId\": \"{{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}\",\n  \"message\": \"{{ $json.message }}\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        22496,
+        4112
+      ],
+      "id": "b06ded0a-b762-4a79-aadb-91e419ebfd46",
+      "name": "Check Keyword",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "hnd-kw-cond-001",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        22720,
+        4112
+      ],
+      "id": "05e5b1e4-b5ad-4bb3-96a4-2b24111013ea",
+      "name": "IF Keyword Match"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.vlow-ai.com/api/handover/status/{{ encodeURIComponent($('Merge Inputs').item.json.chatId) }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        22944,
+        4112
+      ],
+      "id": "8ffecc6a-e6ef-45d7-8dc7-7285d450f594",
+      "name": "Check Handover Status",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "hnd-status-cond-001",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "human",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        23168,
+        4112
+      ],
+      "id": "4cbcb44d-00e2-4f46-ba76-c44bdc3f0ddd",
+      "name": "IF Human Mode"
+    },
+    {
+      "parameters": {
+        "content": "HANDOVER CHECK",
+        "height": 260,
+        "width": 880,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        22848,
+        4000
+      ],
+      "typeVersion": 1,
+      "id": "2c209fa7-3194-4df5-a712-153a7ed77eeb",
+      "name": "Sticky Note Handover"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/handover/activate-n8n",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chatId\": \"{{ $(\\\"WAHA Trigger\\\").item.json.payload.to || $(\\\"WAHA Trigger\\\").item.json.payload.chatId || $(\\\"WAHA Trigger\\\").item.json.payload.from }}\",\n  \"sessionId\": \"{{ $(\\\"WAHA Trigger\\\").item.json.session }}\",\n  \"triggeredBy\": \"manual_reply\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        19808,
+        3568
+      ],
+      "id": "30251a0d-0cd2-4c7b-9b46-18949c5aa722",
+      "name": "Auto Label Human",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.vlow-ai.com/api/agents/integration/config",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        20480,
+        3568
+      ],
+      "id": "384f2ecc-43c7-4e0a-936f-8f892fe3f18d",
+      "name": "Fetch Handover Config",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.vlow-ai.com/api/agents/integration/config",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('WAHA Trigger').isExecuted ? $('WAHA Trigger').item.json.session : ($('Meta Set Prod Mode').isExecuted ? $('Meta Set Prod Mode').item.json.metaSessionId : '') }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        20032,
+        3760
+      ],
+      "id": "5b4ebed4-d286-4c19-980b-8a1a34f9595a",
+      "name": "Fetch Label Config",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const contactData = $('Get contact basic info').item.json;\nconst configData = items[0].json;\nconst chatLabels = contactData.labels || [];\n\n// Parse handoverConfig\nlet hc = configData.handoverConfig;\nif (typeof hc === 'string') { try { hc = JSON.parse(hc); } catch(e) { hc = {}; } }\nhc = hc || {};\n\nconst humanLabelId = String(hc.handoverLabelId || '1');\n\n// Check if any of the chat's labels match the human label ID\nconst hasHumanLabel = chatLabels.some(l => {\n  const labelId = typeof l === 'object' ? String(l.id) : String(l);\n  return labelId === humanLabelId;\n});\n\nreturn [{ json: { ...contactData, hasHumanLabel, humanLabelId, chatLabels } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20256,
+        3760
+      ],
+      "id": "f6ac6127-d0b1-40f5-8a54-4478e1448116",
+      "name": "CEK LABEL Logic"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cek-label-human-cond",
+              "leftValue": "={{ $json.hasHumanLabel }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        20480,
+        3760
+      ],
+      "id": "81ccd5fa-ebdf-49c9-8c7a-461541635961",
+      "name": "CEK LABEL"
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiOutput = items[0].json.output || \"\";\nlet text = aiOutput;\nlet imageUrl = null;\n\nconst mdRegex = /\\[([^\\]]*)\\]\\((https?:\\/\\/[^\\s)]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s)]*)?)\\)/i;\nconst rawRegex = /(https?:\\/\\/[^\\s]+\\.(?:png|jpg|jpeg|gif|webp|pdf)(?:\\?[^\\s]*)?)/i;\n\nconst mdMatch = text.match(mdRegex);\nif (mdMatch) {\n    imageUrl = mdMatch[2];\n    text = text.replace(mdMatch[0], \"\").trim();\n} else {\n    const rawMatch = text.match(rawRegex);\n    if (rawMatch) {\n        imageUrl = rawMatch[1];\n        text = text.replace(rawMatch[0], \"\").trim();\n    }\n}\n\nreturn [{ json: { output: text, welcome_image_url: imageUrl } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        23968,
+        4112
+      ],
+      "id": "53f178ae-b880-412a-975a-74abf99b6831",
+      "name": "Process Sim Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e7c2e9b0-4f51-4f1b-85d8-c89b7888b64e",
+              "leftValue": "={{ $json.welcome_image_url }}",
+              "operator": {
+                "type": "string",
+                "operation": "isNotEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        24416,
+        4208
+      ],
+      "id": "3a1f9147-f468-4255-810a-70697de94545",
+      "name": "Check If Image Exists"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e7c2e9b0-4f51-4f1b-85d8-c89b7888b64e",
+              "leftValue": "={{ $('Code in JavaScript').item.json.waha_image_url }}",
+              "rightValue": ".pdf",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        24640,
+        4272
+      ],
+      "id": "512acaea-9409-4ffe-8e42-6e34445ef2d8",
+      "name": "Check If is PDF"
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Image",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "file": "={\n  \"mimetype\": \"image/jpeg\",\n  \"filename\": \"image.jpg\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        25312,
+        4176
+      ],
+      "id": "8d76fd4e-65d9-4bbc-8adb-d93f15a632e1",
+      "name": "WAHA Send Image",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send File",
+        "session": "={{ $('WAHA Trigger').item.json.session }}",
+        "chatId": "={{ $('WAHA Trigger').item.json.payload.from }}",
+        "file": "={\n  \"mimetype\": \"application/pdf\",\n  \"filename\": \"{{ ($('Code in JavaScript').item.json.waha_image_url || 'document.pdf').split('/').pop().split('?')[0] || 'document.pdf' }}\",\n  \"data\": \"{{$json.base64Data}}\"\n}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        25312,
+        4368
+      ],
+      "id": "1898d84c-3361-4bfb-b1b3-73d0f2120aa1",
+      "name": "WAHA Send File",
+      "credentials": {
+        "wahaApi": {
+          "id": "EAjwwejArle7S4Fw",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ (() => { const imgUrl = $('Code in JavaScript').item.json.waha_image_url || ''; if (!imgUrl || !imgUrl.includes('minio.dayamedialangit.co.id')) return imgUrl; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return 'https://api.vlow-ai.com/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        26880,
+        4416
+      ],
+      "id": "4ae3b999-22f5-4c0b-a5de-451c615c7dfb",
+      "name": "Download Image"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        27104,
+        4416
+      ],
+      "id": "af644e8e-837a-4385-8994-457195c0b2aa",
+      "name": "To Base64"
+    },
+    {
+      "parameters": {
+        "url": "={{ (() => { const imgUrl = $('Code in JavaScript').item.json.waha_image_url || ''; if (!imgUrl || !imgUrl.includes('minio.dayamedialangit.co.id')) return imgUrl; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return 'https://api.vlow-ai.com/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        26880,
+        4128
+      ],
+      "id": "da066c06-0217-44db-b778-888bac748489",
+      "name": "Download Image (Booking)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        27104,
+        4128
+      ],
+      "id": "ef5164c4-fc1d-44b2-a242-fe92ff756453",
+      "name": "To Base64 (Booking)"
+    },
+    {
+      "parameters": {
+        "url": "={{ (() => { const imgUrl = $('Code in JavaScript').item.json.waha_image_url || ''; if (!imgUrl || !imgUrl.includes('minio.dayamedialangit.co.id')) return imgUrl; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return 'https://api.vlow-ai.com/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        24864,
+        4176
+      ],
+      "id": "ea6c50ee-160c-4c43-9155-89866358e230",
+      "name": "Download Image (Escalate)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        25088,
+        4176
+      ],
+      "id": "0a4630f1-a158-47d7-9527-870cfab72e17",
+      "name": "To Base64 (Escalate)"
+    },
+    {
+      "parameters": {
+        "url": "={{ (() => { const imgUrl = $('Code in JavaScript').item.json.waha_image_url || ''; if (!imgUrl || !imgUrl.includes('minio.dayamedialangit.co.id')) return imgUrl; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return 'https://api.vlow-ai.com/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        24864,
+        4368
+      ],
+      "id": "ed8e4c89-307f-4d8a-b060-8fd07f17e66d",
+      "name": "Download File (Escalate)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get actual binary buffer from N8N storage (not the filesystem reference)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst base64 = buffer.toString('base64');\nreturn [{ json: { base64Data: base64 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        25088,
+        4368
+      ],
+      "id": "7a2b25ff-8866-439c-8cac-df5d72c3cb0c",
+      "name": "To Base64 (File)"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/meta-cloud-webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        20480,
+        4208
+      ],
+      "id": "ab11f7b8-ed4b-4d37-b530-24c7b89f5b64",
+      "name": "Meta Cloud Webhook",
+      "webhookId": "meta-cloud-combined-001"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Parse Meta Cloud API webhook payload\nconst body = $json.body || $json;\nconst entry = body.entry || [];\n\nif (!entry.length) return { json: { skip: true } };\n\nconst changes = entry[0]?.changes || [];\nif (!changes.length) return { json: { skip: true } };\n\nconst value = changes[0]?.value;\nif (!value || !value.messages || !value.messages.length) {\n  return { json: { skip: true } };\n}\n\nconst msg = value.messages[0];\nconst contacts = value.contacts || [];\nconst contact = contacts.find(c => c.wa_id === msg.from) || {};\nconst metadata = value.metadata || {};\n\nlet messageBody = '';\nswitch (msg.type) {\n  case 'text': messageBody = msg.text?.body || ''; break;\n  case 'image': messageBody = msg.image?.caption || ''; break;\n  case 'video': messageBody = msg.video?.caption || ''; break;\n  case 'audio': messageBody = ''; break;\n  case 'location': messageBody = '📍 Lokasi: ' + (msg.location?.latitude || '') + ', ' + (msg.location?.longitude || ''); break;\n  case 'document': messageBody = msg.document?.caption || msg.document?.filename || ''; break;\n  default: messageBody = '(' + msg.type + ')';\n}\n\nreturn {\n  json: {\n    skip: false,\n    phoneNumberId: metadata.phone_number_id,\n    from: msg.from,\n    messageId: msg.id,\n    timestamp: msg.timestamp,\n    type: msg.type,\n    body: messageBody,\n    contactName: contact.profile?.name || msg.from,\n    sessionId: 'meta_' + metadata.phone_number_id\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        20704,
+        4208
+      ],
+      "id": "1fb49e53-de24-43dc-9d17-a3e0bff00a29",
+      "name": "Parse Meta Payload"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "meta-skip-check",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        20928,
+        4208
+      ],
+      "id": "426dc14b-6d4b-44c8-b699-590a9f54595e",
+      "name": "Has Message?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const trigger = $('Parse Meta Payload').item.json;\nconst senderId = trigger.from || '';\nconst message = trigger.body || '';\n\nif (!senderId) { throw new Error('Sender ID tidak ditemukan dari Meta webhook'); }\n\nreturn {\n  json: {\n    mode: 'production',\n    message: message,\n    sessionId: senderId,\n    chatId: senderId,\n    platform: 'meta_cloud',\n    phoneNumberId: trigger.phoneNumberId,\n    metaSessionId: trigger.sessionId,\n    contactName: trigger.contactName,\n    agentConfig: null\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        21152,
+        4208
+      ],
+      "id": "30d90c4c-1a4a-4074-b524-4bda7af70189",
+      "name": "Meta Set Prod Mode"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Finalize Context').item.json.platform }}",
+                    "rightValue": "meta_cloud",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "is-meta"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "is-waha",
+                    "leftValue": "={{ $('Finalize Context').item.json.platform }}",
+                    "rightValue": "waha",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        24192,
+        3904
+      ],
+      "id": "93b2a21c-c134-4c07-bd35-591935bd2125",
+      "name": "Which Platform?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "meta-esc-check",
+              "leftValue": "={{ $json.escalate || false }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        24640,
+        3744
+      ],
+      "id": "a654f937-5845-4869-b554-9e4693332676",
+      "name": "Meta IF ESCALATE"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/handover/activate-n8n",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chatId\": \"{{ $('Parse Meta Payload').item.json.from }}\",\n  \"sessionId\": \"{{ $('Meta Set Prod Mode').item.json.metaSessionId }}\",\n  \"triggeredBy\": \"ai_escalate\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        24864,
+        3696
+      ],
+      "id": "7c273e9e-82c7-4e9f-a993-36cd310d98a6",
+      "name": "Meta Activate Handover",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": {{ JSON.stringify($('Code in JavaScript').first().json.text_for_wa || $('Code in JavaScript').first().json.output || '') }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        25088,
+        3744
+      ],
+      "id": "c0a62704-b487-4e56-b007-e0ca3a86c232",
+      "name": "Meta Send Text"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "meta-img-check",
+              "leftValue": "={{ $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url ? true : false) : false }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        25312,
+        3680
+      ],
+      "id": "6aa77552-2a93-47f5-b203-93c279a89567",
+      "name": "Meta HAS IMAGE?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"image\",\n  \"image\": {\n    \"id\": \"{{ $('Meta Upload Media').first().json.id }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        26208,
+        3840
+      ],
+      "id": "90b1a1fc-2fd7-4cc9-8b69-145df9a7a0d2",
+      "name": "Meta Send Image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/analytics/log",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"agentId\": \"{{ $('Execute a SQL query').isExecuted ? $('Execute a SQL query').first().json.agent_id : '' }}\",\n  \"sessionId\": \"{{ $('Meta Set Prod Mode').item.json.metaSessionId }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"userMessage\": {{ JSON.stringify($('Meta Set Prod Mode').item.json.message || '') }},\n  \"aiResponse\": {{ JSON.stringify($('Code in JavaScript').first().json.text_for_wa || $('Code in JavaScript').first().json.output || '') }},\n  \"isHandoff\": \"{{ $('Code in JavaScript').first().json.escalate || false }}\",\n  \"mode\": \"production\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        26656,
+        3680
+      ],
+      "id": "feaeaf26-5630-4fd6-bf41-2f2f0da0dd2f",
+      "name": "Meta Log Conversation"
+    },
+    {
+      "parameters": {
+        "content": "META CLOUD API PATH",
+        "height": 200,
+        "width": 8200,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        21552,
+        4928
+      ],
+      "typeVersion": 1,
+      "id": "73ed48a0-3e41-4e7e-8c7d-7640ea62d325",
+      "name": "Sticky Note Meta Cloud"
+    },
+    {
+      "parameters": {
+        "content": "PLATFORM ROUTER",
+        "height": 200,
+        "width": 300,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        23920,
+        4256
+      ],
+      "typeVersion": 1,
+      "id": "c951aa84-527d-4bf5-9058-9b593cce7c30",
+      "name": "Sticky Note Router"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/webhooks/n8n/outgoing-message",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"phoneNumberId\": \"{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"body\": {{ JSON.stringify($('Code in JavaScript').first().json.text_for_wa || $('Code in JavaScript').first().json.output || 'AI Reply') }},\n  \"waMessageId\": \"{{ $json.messages ? $json.messages[0].id : 'n8n_' + Date.now() }}\",\n  \"type\": \"text\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        25312,
+        3888
+      ],
+      "id": "0fd2383a-3466-4a96-8374-9fa008fe0f65",
+      "name": "Save AI Reply",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/webhooks/n8n/outgoing-message",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"phoneNumberId\": \"{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}\",\n  \"chatId\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"body\": \"{{ (() => { const imgUrl = $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : ''; if (!imgUrl) return ''; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return '/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}\",\n  \"waMessageId\": \"{{ $json.messages[0].id }}\",\n  \"type\": \"image\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        26432,
+        3744
+      ],
+      "id": "4f335d8e-d0d6-4fb6-84b1-3b61ed019076",
+      "name": "Vlow Save Image DB"
+    },
+    {
+      "parameters": {
+        "url": "={{ (() => { const imgUrl = $('Code in JavaScript').isExecuted ? ($('Code in JavaScript').first().json.welcome_image_url || '') : ''; if (!imgUrl) return ''; const parts = imgUrl.replace('https://minio.dayamedialangit.co.id/', '').split('/'); const bucket = parts.shift(); const object = parts.join('/'); return 'https://login.vlow-ai.com/api/agents/knowledge/proxy-image?bucket=' + encodeURIComponent(bucket) + '&object=' + encodeURIComponent(object); })() }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        25536,
+        3744
+      ],
+      "id": "fbe1de45-96b5-468f-898c-808ae0900610",
+      "name": "Meta DL Image",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/media",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "messaging_product",
+              "value": "whatsapp"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "type",
+              "value": "={{ ($('Code in JavaScript').first().json.welcome_image_url || '').toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        25760,
+        3744
+      ],
+      "id": "83b8012f-385a-4fff-85e6-dfd8f03aa44c",
+      "name": "Meta Upload Media"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "pdf-check-v3",
+              "leftValue": "={{ ($('Code in JavaScript').first().json.welcome_image_url || '').toLowerCase() }}",
+              "rightValue": ".pdf",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        25984,
+        3744
+      ],
+      "id": "ebd1cbf5-903a-4d87-abe6-ab4bd84dbbff",
+      "name": "Meta Is PDF?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Meta Set Prod Mode').item.json.chatId }}\",\n  \"type\": \"document\",\n  \"document\": {\n    \"id\": \"{{ $('Meta Upload Media').first().json.id }}\",\n    \"filename\": \"{{ ($('Code in JavaScript').first().json.welcome_image_url || 'document.pdf').split('/').pop() }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        26208,
+        3648
+      ],
+      "id": "cca0e3d6-0eaf-4bca-8691-c64214c49f12",
+      "name": "Meta Send Document"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.phoneNumberId || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.phoneNumberId || '') : '') }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fetch Config DB').isExecuted ? ($('Fetch Config DB').first().json.systemUserAccessToken || '') : ($('Execute a SQL query').isExecuted ? ($('Execute a SQL query').first().json.systemUserAccessToken || '') : '') }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"status\": \"read\",\n  \"message_id\": \"{{ $('Parse Meta Payload').first().json.messageId }}\",\n  \"typing_indicator\": {\n    \"type\": \"text\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        24416,
+        3744
+      ],
+      "id": "3b5ea219-1dc1-4536-bbc0-0e1feb8f4703",
+      "name": "Meta Start Typing",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "cond-crm-1",
+              "leftValue": "={{ $('Code in JavaScript').first().json.extracted_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "cond-crm-2",
+              "leftValue": "={{ $('Code in JavaScript').first().json.extracted_requirement }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        24192,
+        4128
+      ],
+      "id": "abe1a12c-9f33-4bcb-a19f-ae107d5ccb4a",
+      "name": "Has Extracted CRM Data?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vlow-ai.com/api/crm/profile",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"platformId\": \"{{ $('Execute a SQL query').first().json.platform_id }}\",\n  \"chatId\": \"{{ $('Set Prod Mode').isExecuted ? $('Set Prod Mode').first().json.chatId : $('Meta Set Prod Mode').first().json.chatId }}\",\n  \"customName\": \"{{ $('Code in JavaScript').first().json.extracted_name }}\",\n  \"requirements\": \"{{ $('Code in JavaScript').first().json.extracted_requirement }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        24464,
+        3984
+      ],
+      "id": "f5322821-f487-4092-a5bf-1dab731d0fc7",
+      "name": "Update CRM Profile"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [
+        21760,
+        4928
+      ],
+      "id": "cedb677d-2de2-4fde-99a7-724a6d84bbe1",
+      "name": "AI Transform"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [
+        21968,
+        4928
+      ],
+      "id": "8a547741-38d3-492a-8463-557a52a48628",
+      "name": "AI Transform1"
+    }
+  ],
+  "connections": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Set Prod Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get contact basic info": {
+      "main": [
+        [
+          {
+            "node": "CEK GRUP ATAU BUKAN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK GRUP ATAU BUKAN": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Fetch Label Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK DARI IKLAN": {
+      "main": [
+        [],
+        [
+          {
+            "node": "CEK BOT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK BOT": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Auto Label Human",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK LABEL1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Fetch Handover Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK API": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get contact basic info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ME or NOT": {
+      "main": [
+        [
+          {
+            "node": "CEK DARI IKLAN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CEK API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Start Typing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Typing2": {
+      "main": [
+        [
+          {
+            "node": "Stop Typing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stop Typing2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Which Platform?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Is Simulator?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook (Simulator Mode)": {
+      "main": [
+        [
+          {
+            "node": "Set Sim Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Sim Mode": {
+      "main": [
+        [
+          {
+            "node": "Merge Inputs",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set Prod Mode": {
+      "main": [
+        [
+          {
+            "node": "Merge Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Inputs": {
+      "main": [
+        [
+          {
+            "node": "Is Production?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Production?": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Finalize Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalize Context": {
+      "main": [
+        [
+          {
+            "node": "IS ACTIVE?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Simulator?": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Process Sim Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save labels for the chat2": {
+      "main": [
+        [
+          {
+            "node": "Activate Handover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get contact basic info3": {
+      "main": [
+        [
+          {
+            "node": "Save labels for the chat2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Typing": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stop Typing": {
+      "main": [
+        [
+          {
+            "node": "HAS WELCOME IMAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SCHEDULE": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop Typing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "SCHEDULE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "HAS WELCOME IMAGE (BOOKING)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message8": {
+      "main": [
+        [
+          {
+            "node": "Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HAS WELCOME IMAGE": {
+      "main": [
+        [
+          {
+            "node": "Check If is PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send welcome image1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message4": {
+      "main": [
+        [
+          {
+            "node": "Log Conversation (Alt)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "ME or NOT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IS ACTIVE?": {
+      "main": [
+        [
+          {
+            "node": "Check Keyword",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HAS WELCOME IMAGE (BOOKING)": {
+      "main": [
+        [
+          {
+            "node": "Download Image (Booking)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send welcome image (booking)": {
+      "main": [
+        [
+          {
+            "node": "Send a text message8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF ESCALATE": {
+      "main": [
+        [
+          {
+            "node": "Get contact basic info3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Start Typing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Conversation": {
+      "main": [
+        [
+          {
+            "node": "Has Extracted CRM Data?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Conversation (Alt)": {
+      "main": [
+        [
+          {
+            "node": "Has Extracted CRM Data?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAHA Trigger": {
+      "main": [
+        [],
+        [],
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Finalize Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get contact basic info1": {
+      "main": [
+        [
+          {
+            "node": "CEK LABEL1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Keyword": {
+      "main": [
+        [
+          {
+            "node": "IF Keyword Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Keyword Match": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Check Handover Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Handover Status": {
+      "main": [
+        [
+          {
+            "node": "IF Human Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Human Mode": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto Label Human": {
+      "main": [
+        [
+          {
+            "node": "Get contact basic info1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Handover Config": {
+      "main": [
+        [
+          {
+            "node": "Save labels for the chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Label Config": {
+      "main": [
+        [
+          {
+            "node": "CEK LABEL Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK LABEL Logic": {
+      "main": [
+        [
+          {
+            "node": "CEK LABEL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CEK LABEL": {
+      "main": [
+        [],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Image Exists": {
+      "main": [
+        [
+          {
+            "node": "Check If is PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If is PDF": {
+      "main": [
+        [
+          {
+            "node": "Download File (Escalate)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Image (Escalate)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAHA Send Image": {
+      "main": [
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAHA Send File": {
+      "main": [
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "To Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64": {
+      "main": [
+        [
+          {
+            "node": "Send welcome image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image (Booking)": {
+      "main": [
+        [
+          {
+            "node": "To Base64 (Booking)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64 (Booking)": {
+      "main": [
+        [
+          {
+            "node": "Send welcome image (booking)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Image (Escalate)": {
+      "main": [
+        [
+          {
+            "node": "To Base64 (Escalate)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64 (Escalate)": {
+      "main": [
+        [
+          {
+            "node": "WAHA Send Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File (Escalate)": {
+      "main": [
+        [
+          {
+            "node": "To Base64 (File)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To Base64 (File)": {
+      "main": [
+        [
+          {
+            "node": "WAHA Send File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Cloud Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Meta Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Meta Payload": {
+      "main": [
+        [
+          {
+            "node": "Has Message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Message?": {
+      "main": [
+        [
+          {
+            "node": "Meta Set Prod Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Set Prod Mode": {
+      "main": [
+        [
+          {
+            "node": "Merge Inputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Which Platform?": {
+      "main": [
+        [
+          {
+            "node": "Meta Start Typing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check If Image Exists",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check If Image Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta IF ESCALATE": {
+      "main": [
+        [
+          {
+            "node": "Meta Activate Handover",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Meta Send Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Activate Handover": {
+      "main": [
+        [
+          {
+            "node": "Meta Send Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Send Text": {
+      "main": [
+        [
+          {
+            "node": "Meta HAS IMAGE?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save AI Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta HAS IMAGE?": {
+      "main": [
+        [
+          {
+            "node": "Meta DL Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Meta Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Send Image": {
+      "main": [
+        [
+          {
+            "node": "Vlow Save Image DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Log Conversation": {
+      "main": [
+        [
+          {
+            "node": "Has Extracted CRM Data?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vlow Save Image DB": {
+      "main": [
+        [
+          {
+            "node": "Meta Log Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta DL Image": {
+      "main": [
+        [
+          {
+            "node": "Meta Upload Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Upload Media": {
+      "main": [
+        [
+          {
+            "node": "Meta Is PDF?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Is PDF?": {
+      "main": [
+        [
+          {
+            "node": "Meta Send Document",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Meta Send Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Send Document": {
+      "main": [
+        [
+          {
+            "node": "Vlow Save Image DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta Start Typing": {
+      "main": [
+        [
+          {
+            "node": "Meta IF ESCALATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Extracted CRM Data?": {
+      "main": [
+        [
+          {
+            "node": "Update CRM Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Transform": {
+      "main": [
+        [
+          {
+            "node": "AI Transform1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "name": "NEW VLOW AI WORKFLOW"
+}
