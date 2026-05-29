@@ -290,6 +290,7 @@ export const updateAgent = async (req, res, next) => {
       isActive,
       followupConfig,
       handoverConfig,
+      leadQualificationConfig,
     } = req.body;
 
     if (Array.isArray(transferCondition)) {
@@ -321,6 +322,17 @@ export const updateAgent = async (req, res, next) => {
       }
     }
 
+    // Parse leadQualificationConfig (JSONB)
+    let parsedLeadQualification = null;
+    if (leadQualificationConfig) {
+      try {
+        parsedLeadQualification =
+          typeof leadQualificationConfig === "string" ? JSON.parse(leadQualificationConfig) : leadQualificationConfig;
+      } catch (e) {
+        console.error("Error parsing leadQualificationConfig", e);
+      }
+    }
+
     // Update
     if (name) agent.name = name;
     if (description !== undefined) agent.description = description;
@@ -338,6 +350,11 @@ export const updateAgent = async (req, res, next) => {
     // Update Handover Config (JSONB)
     if (parsedHandover) {
       agent.handoverConfig = parsedHandover;
+    }
+
+    // Update Lead Qualification Config (JSONB)
+    if (parsedLeadQualification) {
+      agent.leadQualificationConfig = parsedLeadQualification;
     }
 
     agent.welcomeImageUrl = newWelcomeImageUrl;
