@@ -7,6 +7,7 @@ import {
     getBatchHandoverStatus,
     checkKeyword,
     autoReleaseExpired,
+    updateLeadTemperature,
 } from "../controllers/handoverController.js";
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.get("/batch-status", protect, getBatchHandoverStatus);
 router.post("/activate-n8n", activateHandover); // Public route for n8n escalation
 router.get("/status/:chatId", getHandoverStatus);
 router.post("/check-keyword", checkKeyword);
+router.post("/lead-qualification", updateLeadTemperature);
 
 // Manual trigger for auto-release (can also be called via cron)
 router.post("/auto-release", async (req, res) => {

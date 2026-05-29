@@ -64,6 +64,17 @@ const Agent = sequelize.define("Agent", {
       prompt: "Halo, apakah ada yang bisa saya bantu lagi?", // Default prompt
     },
   },
+  // --- SMART LEAD QUALIFICATION ---
+  leadQualificationConfig: {
+    type: DataTypes.JSONB,
+    allowNull: false,
+    defaultValue: {
+      enabled: false,
+      coldLabelId: null,
+      warmLabelId: null,
+      hotLabelId: null,
+    },
+  },
   // --- INTEGRATION ---
   whatsappNumber: {
     type: DataTypes.STRING,

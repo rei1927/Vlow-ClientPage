@@ -17,6 +17,7 @@ import {
   FaClock,
   FaChartBar,
   FaSpinner,
+  FaThermometerHalf,
 } from "react-icons/fa";
 import { FiShield } from "react-icons/fi";
 import toast from "react-hot-toast";
@@ -32,6 +33,7 @@ import GeneralTab from "./tabs/GeneralTab";
 import KnowledgeTab from "./tabs/KnowledgeTab";
 import FollowupTab from "./tabs/FollowupTab";
 import HandoverTab from "./tabs/HandoverTab";
+import SmartLeadTab from "./tabs/SmartLeadTab";
 import EvaluationTab from "./tabs/EvaluationTab";
 import ChatPreview from "../../components/agents/ChatPreview";
 import SubscriptionWarning from "../../components/common/SubscriptionWarning";
@@ -82,6 +84,12 @@ const AgentBuilder = () => {
     autoReleaseMinutes: 30,
     handoverLabelId: null,
     aiLabelId: null,
+  });
+  const [leadQualificationConfig, setLeadQualificationConfig] = useState({
+    enabled: false,
+    coldLabelId: null,
+    warmLabelId: null,
+    hotLabelId: null,
   });
 
   const knowledgeBaseText = useMemo(() => {
@@ -139,6 +147,12 @@ const AgentBuilder = () => {
       setPendingKnowledge([]);
       setHandoffConfig(getDefaultHandoffConfig());
       setShouldRemoveImage(false);
+      setLeadQualificationConfig({
+        enabled: false,
+        coldLabelId: null,
+        warmLabelId: null,
+        hotLabelId: null,
+      });
     }
     return () => dispatch(resetAgentState());
   }, [id, isEditMode, dispatch]);
@@ -169,6 +183,9 @@ const AgentBuilder = () => {
       if (currentAgent.handoverConfig) {
         setHandoverConfig(currentAgent.handoverConfig);
       }
+      if (currentAgent.leadQualificationConfig) {
+        setLeadQualificationConfig(currentAgent.leadQualificationConfig);
+      }
     } else {
       setFollowupConfig({ isEnabled: false, delay: 15, unit: "minutes", prompt: "", isAdvancedFollowup: false, targetLabels: [] });
       setHandoffConfig(getDefaultHandoffConfig());
@@ -179,6 +196,12 @@ const AgentBuilder = () => {
         autoReleaseMinutes: 30,
         handoverLabelId: null,
         aiLabelId: null,
+      });
+      setLeadQualificationConfig({
+        enabled: false,
+        coldLabelId: null,
+        warmLabelId: null,
+        hotLabelId: null,
       });
     }
   }, [currentAgent, isEditMode]);
@@ -265,6 +288,7 @@ const AgentBuilder = () => {
       }
 
       dataToSend.append("followupConfig", JSON.stringify(followupConfig));
+      dataToSend.append("leadQualificationConfig", JSON.stringify(leadQualificationConfig));
       dataToSend.append("transferCondition", serializeHandoffConfig(handoffConfig));
       dataToSend.append("handoverConfig", JSON.stringify(handoverConfig));
 
@@ -396,6 +420,7 @@ const AgentBuilder = () => {
               { id: "knowledge", label: "Knowledge Resources", icon: <FaDatabase /> },
               { id: "followups", label: "Follow-ups", icon: <FaClock /> },
               { id: "handover", label: "Handover", icon: <FiShield /> },
+              { id: "smart-lead", label: "Smart Lead", icon: <FaThermometerHalf /> },
               { id: "evaluation", label: "Evaluation", icon: <FaChartBar /> },
             ].map((tab) => (
               <button
@@ -450,6 +475,9 @@ const AgentBuilder = () => {
                 )}
                 {activeTab === "handover" && (
                   <HandoverTab config={handoverConfig} setConfig={setHandoverConfig} platformId={id} />
+                )}
+                {activeTab === "smart-lead" && (
+                  <SmartLeadTab config={leadQualificationConfig} setConfig={setLeadQualificationConfig} platformId={id} />
                 )}
                 {activeTab === "evaluation" && <EvaluationTab agentId={id} />}
               </>

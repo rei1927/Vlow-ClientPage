@@ -323,3 +323,67 @@ export const autoReleaseExpired = async () => {
         return 0;
     }
 };
+
+// @desc    Update lead temperature (Smart Lead Qualification)
+// @route   POST /api/handover/lead-qualification
+// @access  Public (called by n8n)
+export const updateLeadTemperature = async (req, res, next) => {
+    try {
+        const { chatId, sessionId, temperature } = req.body;
+        
+        if (!chatId || !sessionId || !temperature) {
+            return res.status(200).json({ success: false, message: "Missing required fields for lead qualification" });
+        }
+
+        const platform = await ConnectedPlatform.findOne({
+            where: { sessionId },
+            include: [{ model: Agent }],
+        });
+
+        if (!platform?.Agent) {
+            return res.status(200).json({ success: false, message: "Platform/Agent not found" });
+        }
+
+        const leadConfig = platform.Agent.leadQualificationConfig || {};
+        if (!leadConfig.enabled) {
+            return res.status(200).json({ success: true, message: "Lead qualification disabled" });
+        }
+
+        const tempUpper = temperature.toUpperCase();
+        let targetLabelId = null;
+
+        if (tempUpper === "HOT") targetLabelId = leadConfig.hotLabelId;
+        else if (tempUpper === "WARM") targetLabelId = leadConfig.warmLabelId;
+        else if (tempUpper === "COLD") targetLabelId = leadConfig.coldLabelId;
+
+        if (!targetLabelId) {
+             return res.status(200).json({ success: true, message: `No label configured for temperature: ${tempUpper}` });
+        }
+
+        // Add the target label, and remove the other two if they exist.
+        const labelsToRemove = [leadConfig.coldLabelId, leadConfig.warmLabelId, leadConfig.hotLabelId]
+            .filter(id => id && id !== targetLabelId);
+            
+        // Remove old labels
+        for (const labelId of labelsToRemove) {
+             try { await wahaService.updateChatLabels(sessionId, chatId, String(labelId), "remove"); } catch(e) {}
+        }
+        
+        // Add new label
+        try { await wahaService.updateChatLabels(sessionId, chatId, String(targetLabelId), "add"); } catch(e) {}
+
+        console.log(`🌡️ [Smart Lead] Chat ${chatId} updated to ${tempUpper}`);
+
+        // If HOT, trigger handover!
+        if (tempUpper === "HOT") {
+             console.log(`🔥 [Smart Lead] Chat ${chatId} is HOT! Triggering Handover.`);
+             req.body.triggeredBy = "ai_lead_hot";
+             // Optional: Set responseMessage to notify user
+             return activateHandover(req, res, next);
+        }
+
+        return res.status(200).json({ success: true, message: "Lead temperature updated" });
+    } catch (error) {
+        next(error);
+    }
+};
