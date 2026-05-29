@@ -662,6 +662,7 @@ export const getIntegrationConfig = async (req, res, next) => {
       handoffConfig,
       agent.welcomeMessage,
       agent.welcomeImageUrl,
+      agent.leadQualificationConfig
     );
 
     // 3. Return JSON Config siap pakai untuk n8n
@@ -717,6 +718,7 @@ export const testChatAgent = async (req, res, next) => {
       transferCondition,
       req.body.welcomeMessage,
       req.body.welcomeImageUrl,
+      req.body.leadQualificationConfig
     );
 
     const payload = {

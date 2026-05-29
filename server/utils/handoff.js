@@ -89,10 +89,26 @@ const appendWelcomeRules = (basePrompt, welcomeMessage, welcomeImageUrl) => {
   return `${basePrompt}\n\n${rules.join("\n")}`;
 };
 
-const buildAgentSystemPrompt = (basePrompt, handoffConfig, welcomeMessage, welcomeImageUrl) => {
+const buildLeadQualificationPrompt = (basePrompt, leadConfig) => {
+  if (!leadConfig || !leadConfig.enabled) return basePrompt;
+
+  const rules = [];
+  rules.push("LEAD QUALIFICATION RULES:");
+  rules.push("Kamu HARUS mendeteksi suhu minat prospek dari percakapan dan menyertakan {\"lead_temperature\": \"<suhu>\"} di response JSON pada baris terakhir.");
+  rules.push("Pilih suhu berikut (gunakan UPPERCASE):");
+  if (leadConfig.coldLabelId) rules.push("- COLD: Saat prospek baru menyapa, basa-basi, atau tanya hal dasar.");
+  if (leadConfig.warmLabelId) rules.push("- WARM: Saat prospek mulai tanya spesifikasi, harga, atau detail lebih lanjut.");
+  if (leadConfig.hotLabelId) rules.push("- HOT: Saat prospek siap beli, minta invoice, janji meeting, atau menunjukkan minat sangat kuat.");
+  rules.push("Contoh JSON: {\"lead_temperature\": \"WARM\"}");
+
+  return `${basePrompt}\n\n${rules.join("\n")}`;
+};
+
+const buildAgentSystemPrompt = (basePrompt, handoffConfig, welcomeMessage, welcomeImageUrl, leadQualificationConfig) => {
   const base = basePrompt || "Kamu adalah asisten virtual yang membantu.";
   const withWelcome = appendWelcomeRules(base, welcomeMessage, welcomeImageUrl);
-  return buildHandoffSystemPrompt(withWelcome, handoffConfig);
+  const withHandoff = buildHandoffSystemPrompt(withWelcome, handoffConfig);
+  return buildLeadQualificationPrompt(withHandoff, leadQualificationConfig);
 };
 
 export { normalizeHandoffConfig, buildHandoffSystemPrompt, buildAgentSystemPrompt };
