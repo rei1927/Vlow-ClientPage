@@ -11,11 +11,48 @@ import {
     FaWhatsapp,
     FaSync,
     FaHandPaper,
+    FaPhoneAlt,
+    FaMapMarkerAlt,
+    FaEnvelope,
+    FaUserTie,
+    FaChevronDown,
+    FaPlus,
 } from "react-icons/fa";
 import { FiShield } from "react-icons/fi";
 import { getPlatforms } from "../../features/platforms/platformSlice";
 import axiosInstance from "../../api/axiosInstance";
 import toast from "react-hot-toast";
+import { parsePhoneNumber } from 'libphonenumber-js';
+
+const getCountryFromPhone = (phone) => {
+    if (!phone) return "Unknown";
+    
+    // Pastikan diawali dengan '+' agar dikenali sebagai format internasional
+    let formattedPhone = phone;
+    if (!formattedPhone.startsWith('+')) {
+        formattedPhone = '+' + formattedPhone;
+    }
+
+    try {
+        const phoneNumber = parsePhoneNumber(formattedPhone);
+        if (phoneNumber && phoneNumber.country) {
+            const countryCode = phoneNumber.country; // e.g., 'ID', 'US'
+            
+            // Ambil nama negara secara dinamis menggunakan API bawaan browser
+            const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+            const countryName = regionNames.of(countryCode);
+            
+            // Generate Emoji Bendera dari kode 2 huruf
+            const flagEmoji = String.fromCodePoint(...[...countryCode.toUpperCase()].map(c => c.charCodeAt() + 127397));
+            
+            return `${countryName} ${flagEmoji}`;
+        }
+    } catch (err) {
+        // Abaikan error parsing
+    }
+    
+    return "International 🌍";
+};
 
 const ChatDashboard = () => {
     const dispatch = useDispatch();
@@ -453,10 +490,10 @@ const ChatDashboard = () => {
     }, [wahaChats, activeChat]);
 
     return (
-        <div className="h-[calc(100vh-100px)] flex flex-col md:flex-row bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] overflow-hidden shadow-sm animate-fade-in">
+        <div className="h-[calc(100vh-64px)] w-full flex flex-col md:flex-row bg-[var(--color-surface)] overflow-hidden animate-fade-in">
 
             {/* Sidebar - Chat List */}
-            <div className="w-full md:w-1/3 border-r border-[var(--color-border)] flex flex-col bg-[var(--color-bg)]">
+            <div className="w-full md:w-1/3 lg:w-1/4 border-r border-[var(--color-border)] flex flex-col bg-[var(--color-bg)]">
                 {/* Header Chat List */}
                 <div className="p-4 border-b border-[var(--color-border)] flex flex-col gap-3 bg-[var(--color-surface)] relative">
                     <div className="flex justify-between items-center">
@@ -624,7 +661,7 @@ const ChatDashboard = () => {
             </div>
 
             {/* Main Chat Area */}
-            <div className="w-full md:w-2/3 flex flex-col bg-[#EFEAE2] dark:bg-[#0b141a] relative">
+            <div className="w-full md:w-2/3 lg:w-1/2 flex flex-col bg-[var(--color-bg)] relative border-r border-[var(--color-border)]">
                 {currentActiveChat ? (
                     <>
                         {/* Chat Header */}
@@ -884,6 +921,107 @@ const ChatDashboard = () => {
                         <div className="mt-8 flex items-center justify-center gap-2 text-xs text-[var(--color-text-muted)]">
                             <FaCheckDouble /> Terhubung dengan WhatsApp secara End-to-End
                         </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Overview Panel (Right Side) */}
+            <div className="hidden lg:flex w-full lg:w-1/4 flex-col bg-[var(--color-surface)] overflow-y-auto">
+                <div className="p-4 border-b border-[var(--color-border)] flex justify-between items-center sticky top-0 bg-[var(--color-surface)] z-10">
+                    <h2 className="text-lg font-bold text-[var(--color-text)] flex items-center gap-2">
+                        Overview <FaChevronDown className="text-xs text-[var(--color-text-muted)]" />
+                    </h2>
+                </div>
+                
+                {currentActiveChat ? (
+                    <div className="p-4 flex flex-col gap-6">
+                        {/* User Profile Section */}
+                        <div className="flex flex-col">
+                            <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">User Information</h3>
+                            <div className="flex items-center gap-3 mb-5">
+                                <FaUserCircle className="text-5xl text-gray-400 flex-shrink-0" />
+                                <div className="min-w-0 flex-1">
+                                    <h4 className="font-bold text-base text-[var(--color-text)] truncate">
+                                        {currentActiveChat.name || String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id).split('@')[0]}
+                                    </h4>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-3 text-sm">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
+                                        <FaPhoneAlt className="text-xs" /> <span>Phone</span>
+                                    </div>
+                                    <span className="font-medium text-[var(--color-text)]">
+                                        {String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id).split('@')[0]}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
+                                        <FaUserTie className="text-xs" /> <span>Visitor Type</span>
+                                    </div>
+                                    <span className="font-medium text-[var(--color-text)]">New Lead</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-2 text-[var(--color-text-muted)]">
+                                        <FaMapMarkerAlt className="text-xs" /> <span>Location</span>
+                                    </div>
+                                    <span className="font-medium text-[var(--color-text)]">
+                                        {getCountryFromPhone(String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id))}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="text-[var(--color-primary)] text-sm font-semibold cursor-pointer hover:underline mt-2">
+                            See All
+                        </div>
+
+                        <div className="border-t border-[var(--color-border)] pt-5">
+                            <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">Email</h3>
+                            <div className="flex items-center gap-2">
+                                <FaEnvelope className="text-blue-500 text-sm" />
+                                <span className="text-sm font-medium text-blue-500 hover:underline cursor-pointer">
+                                    contact@customer.com
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="border-t border-[var(--color-border)] pt-5">
+                            <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">User Ticket</h3>
+                            <button className="flex items-center gap-2 text-sm text-[var(--color-primary)] font-semibold hover:bg-[var(--color-primary)]/10 px-2 py-1.5 rounded transition-colors -ml-2">
+                                <FaPlus /> Create Ticket
+                            </button>
+                        </div>
+
+                        <div className="border-t border-[var(--color-border)] pt-5">
+                            <div className="flex justify-between items-center cursor-pointer">
+                                <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">Tags</h3>
+                                <FaChevronDown className="text-xs text-[var(--color-text-muted)]" />
+                            </div>
+                            {isBusiness && Array.isArray(currentActiveChat.labels) && currentActiveChat.labels.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-3">
+                                    {currentActiveChat.labels.map((lbl, i) => (
+                                        <span
+                                            key={i}
+                                            className="px-2 py-1 rounded text-xs font-medium border"
+                                            style={{
+                                                backgroundColor: lbl.color ? `${lbl.color}20` : 'var(--color-bg)',
+                                                color: lbl.color || 'var(--color-text-muted)',
+                                                borderColor: lbl.color ? `${lbl.color}50` : 'var(--color-border)'
+                                            }}
+                                        >
+                                            {lbl.name}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                    </div>
+                ) : (
+                    <div className="flex-1 flex items-center justify-center text-[var(--color-text-muted)] text-sm p-4 text-center">
+                        Pilih chat untuk melihat rincian pelanggan.
                     </div>
                 )}
             </div>

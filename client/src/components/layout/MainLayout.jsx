@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser, reset } from "../../features/auth/authSlice";
 import axiosInstance from "../../api/axiosInstance";
@@ -15,8 +15,11 @@ const MainLayout = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { user, isLoading, isImpersonating } = useSelector((state) => state.auth);
+
+  const isChatPage = location.pathname.includes('/chat');
 
   // Centralized usage state (shared between Header & QuotaOverlay)
   const [usage, setUsage] = useState({
@@ -94,9 +97,9 @@ const MainLayout = () => {
         `}
       >
         {/* Page Content */}
-        <main className="flex-1 px-4 pt-6 pb-21 sm:px-6 lg:px-8 overflow-y-auto bg-[var(--color-bg)]">
+        <main className={`flex-1 overflow-y-auto bg-[var(--color-bg)] ${isChatPage ? 'p-0' : 'px-4 pt-6 pb-21 sm:px-6 lg:px-8'}`}>
           {/* CONTAINER */}
-          <div className="max-w-7xl mx-auto w-full">
+          <div className={`${isChatPage ? 'w-full h-full' : 'max-w-7xl mx-auto w-full'}`}>
             <Outlet />
           </div>
         </main>
