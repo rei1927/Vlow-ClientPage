@@ -75,8 +75,8 @@ const CRMDashboard = () => {
         if (searchKeyword.trim() !== "") {
             const keyword = searchKeyword.toLowerCase();
             list = list.filter(chat => {
-                const chatName = (chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0]).toLowerCase();
-                const phone = String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0];
+                const phone = chat.realPhoneNumber ? chat.realPhoneNumber.split('@')[0] : String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0];
+                const chatName = (chat.name || phone).toLowerCase();
                 return chatName.includes(keyword) || phone.includes(keyword);
             });
         }
@@ -109,11 +109,11 @@ const CRMDashboard = () => {
         // Prepare CSV Rows
         const rows = filteredChats.map(chat => {
             const rawId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id;
-            let extractedPhone = String(rawId).split('@')[0];
+            let extractedPhone = chat.realPhoneNumber ? chat.realPhoneNumber.split('@')[0] : String(rawId).split('@')[0];
             let displayName = chat.customName || chat.name || extractedPhone;
             
             // Re-apply same logic for Meta IDs to match table display
-            const isLikelySystemId = /^\d{13,20}$/.test(extractedPhone);
+            const isLikelySystemId = !chat.realPhoneNumber && /^\d{13,20}$/.test(extractedPhone);
             const isNamePhoneFormat = /^[\+\d\s\-\(\)]{8,20}$/.test(displayName);
             let displayPhone = extractedPhone;
             
@@ -299,11 +299,11 @@ const CRMDashboard = () => {
                             <tbody className="divide-y divide-[var(--color-border)]">
                                 {paginatedChats.map((chat, idx) => {
                                     const rawId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id;
-                                    let extractedPhone = String(rawId).split('@')[0];
+                                    let extractedPhone = chat.realPhoneNumber ? chat.realPhoneNumber.split('@')[0] : String(rawId).split('@')[0];
                                     let displayName = chat.customName || chat.name || extractedPhone;
                                     
                                     // Handle Meta Cloud API anomaly where ID is PSID and Name is Phone Number
-                                    const isLikelySystemId = /^\d{13,20}$/.test(extractedPhone);
+                                    const isLikelySystemId = !chat.realPhoneNumber && /^\d{13,20}$/.test(extractedPhone);
                                     const isNamePhoneFormat = /^[\+\d\s\-\(\)]{8,20}$/.test(displayName);
                                     let displayPhone = extractedPhone;
                                     
