@@ -90,7 +90,7 @@ const MainLayout = () => {
       {/* Main Content */}
       <div
         className={`
-          flex flex-col min-h-screen pt-14 sm:pt-16
+          flex flex-col ${isImpersonating ? 'min-h-[calc(100vh-40px)]' : 'min-h-screen'} pt-14 sm:pt-16
           lg:pl-20
           transition-all duration-300 ease-in-out
           ${isImpersonating ? "mt-10" : ""}

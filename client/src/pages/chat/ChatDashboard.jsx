@@ -57,6 +57,7 @@ const getCountryFromPhone = (phone) => {
 const ChatDashboard = () => {
     const dispatch = useDispatch();
     const { platforms, isLoading: platformsLoading } = useSelector((state) => state.platforms);
+    const { isImpersonating } = useSelector((state) => state.auth);
 
     const [selectedPlatform, setSelectedPlatform] = useState(null);
     const [chats, setChats] = useState([]);
@@ -490,7 +491,7 @@ const ChatDashboard = () => {
     }, [wahaChats, activeChat]);
 
     return (
-        <div className="h-[calc(100vh-64px)] w-full flex flex-col md:flex-row bg-[var(--color-surface)] overflow-hidden animate-fade-in">
+        <div className={`w-full flex flex-col md:flex-row bg-[var(--color-surface)] overflow-hidden animate-fade-in ${isImpersonating ? 'h-[calc(100vh-104px)]' : 'h-[calc(100vh-64px)]'}`}>
 
             {/* Sidebar - Chat List */}
             <div className="w-full md:w-1/3 lg:w-1/4 border-r border-[var(--color-border)] flex flex-col bg-[var(--color-bg)]">
