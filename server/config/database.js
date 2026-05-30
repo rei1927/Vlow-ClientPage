@@ -1,14 +1,20 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 import logger from "../utils/logger.js";
+import fs from "fs";
 
 dotenv.config();
 
 let dbHost = process.env.DB_HOST || "postgres";
-// Force override if Portainer mistakenly injects localhost in production
-if (process.env.NODE_ENV === "production" && (dbHost === "localhost" || dbHost === "127.0.0.1" || dbHost === "::1")) {
+console.log("DEBUG: process.env.DB_HOST =", process.env.DB_HOST);
+console.log("DEBUG: process.env.NODE_ENV =", process.env.NODE_ENV);
+
+// Force override if running in Docker and host is set to localhost
+const isDocker = fs.existsSync("/.dockerenv");
+if (isDocker && (dbHost === "localhost" || dbHost === "127.0.0.1" || dbHost === "::1")) {
   dbHost = "postgres";
 }
+console.log("DEBUG: final dbHost =", dbHost);
 
 const sequelize = new Sequelize(
   process.env.DB_NAME || "vlow_db",
