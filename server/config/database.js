@@ -14,7 +14,14 @@ const isDocker = fs.existsSync("/.dockerenv");
 if (isDocker && (dbHost === "localhost" || dbHost === "127.0.0.1" || dbHost === "::1")) {
   dbHost = "postgres";
 }
+
+// Local postgres container does not support SSL
+if (dbHost === "postgres") {
+  process.env.DB_SSL = "false";
+}
+
 console.log("DEBUG: final dbHost =", dbHost);
+console.log("DEBUG: DB_SSL =", process.env.DB_SSL);
 
 const sequelize = new Sequelize(
   process.env.DB_NAME || "vlow_db",
