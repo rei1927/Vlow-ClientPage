@@ -23,11 +23,11 @@ services:
     environment:
       - PORT=5000
       - NODE_ENV=production
-      # Database (Supabase)
-      - DB_HOST=${DB_HOST}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
-      - DB_NAME=${DB_NAME}
+      # Database (PostgreSQL)
+      - DB_HOST=${DB_HOST:-postgres}
+      - DB_USER=${DB_USER:-vlow}
+      - DB_PASS=${DB_PASS:-vlow_secret}
+      - DB_NAME=${DB_NAME:-vlow_db}
       - DB_SSL=${DB_SSL:-true}
       # MinIO (External Network)
       - MINIO_ENDPOINT=minio-api.dayamedialangit.co.id
