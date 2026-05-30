@@ -115,7 +115,7 @@ const sidebarStyles = `
 `;
 
 const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user, isImpersonating } = useSelector((state) => state.auth);
   const location = useLocation();
   const [broadcastOpen, setBroadcastOpen] = useState(false);
 
@@ -166,6 +166,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
           flex flex-col justify-between overflow-hidden
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0
+          ${isImpersonating ? "mt-10" : ""}
         `}
         style={{ height: 'calc(100vh - 3.5rem)' }}
       >

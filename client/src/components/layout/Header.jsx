@@ -7,14 +7,13 @@ import UserDropdown from "../UserDropdown";
 const defaultUsage = { conversations: 0, aiResponses: 0, maxConversations: 1000, maxAiResponses: 1000, isLoading: true };
 
 const Header = ({ toggleSidebar, onLogout, usage = defaultUsage }) => {
-  const { user } = useSelector((state) => state.auth);
+  const { user, isImpersonating } = useSelector((state) => state.auth);
   const themeMode = useSelector((state) => state.theme?.mode ?? "light");
   const dispatch = useDispatch();
   const isDark = themeMode === "dark";
 
-
   return (
-    <header className="fixed top-0 left-0 right-0 z-[60] bg-[var(--color-surface)]/95 backdrop-blur-sm border-b border-[var(--color-border)] h-14 sm:h-16 px-3 sm:px-6 flex items-center justify-between shadow-sm transition-all">
+    <header className={`fixed ${isImpersonating ? 'top-10' : 'top-0'} left-0 right-0 z-[60] bg-[var(--color-surface)]/95 backdrop-blur-sm border-b border-[var(--color-border)] h-14 sm:h-16 px-3 sm:px-6 flex items-center justify-between shadow-sm transition-all`}>
       <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
         <button
           onClick={toggleSidebar}
