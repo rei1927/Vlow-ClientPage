@@ -672,7 +672,7 @@ const ChatDashboard = () => {
                                 <div className="min-w-0">
                                     <h2 className="font-bold text-[var(--color-text)] truncate">{currentActiveChat.name || String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id).split('@')[0]}</h2>
                                     <p className="text-xs text-[var(--color-text-muted)] max-w-xs truncate">
-                                        {String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id)}
+                                        {String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id).split('@')[0]}
                                     </p>
 
                                     {/* Small Label Badges under Header Name */}
