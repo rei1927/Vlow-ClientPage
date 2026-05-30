@@ -300,7 +300,7 @@ export const getChats = async (sessionId) => {
         headers: HEADERS,
         timeout: 15000,
       }),
-      axios.get(`${WAHA_URL}/api/${sessionId}/lids`, {
+      axios.get(`${WAHA_URL}/api/${sessionId}/lids?limit=100000`, {
         headers: HEADERS,
         timeout: 15000,
       }).catch(err => {
@@ -311,19 +311,37 @@ export const getChats = async (sessionId) => {
     
     const chats = chatsResponse.data;
     const lids = lidsResponse.data;
+    const lidMap = {};
     
     if (lids && Array.isArray(lids) && lids.length > 0) {
-      const lidMap = {};
       lids.forEach(item => {
         if (item.lid && item.pn) lidMap[item.lid] = item.pn;
       });
-      chats.forEach(chat => {
-        const chatId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id || chat.id.user) : String(chat.id);
-        if (chatId.includes('lid') && lidMap[chatId]) {
-          chat.realPhoneNumber = lidMap[chatId];
-        }
-      });
     }
+    
+    // Process chats and resolve missing LIDs dynamically
+    await Promise.all(chats.map(async (chat) => {
+      const chatId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id || chat.id.user) : String(chat.id);
+      
+      if (chatId.includes('lid')) {
+        if (lidMap[chatId]) {
+          chat.realPhoneNumber = lidMap[chatId];
+        } else {
+          // Fallback: Fetch specific LID from WAHA memory
+          try {
+            const specificLidRes = await axios.get(`${WAHA_URL}/api/${sessionId}/lids/${encodeURIComponent(chatId)}`, {
+              headers: HEADERS,
+              timeout: 5000,
+            });
+            if (specificLidRes.data && specificLidRes.data.pn) {
+              chat.realPhoneNumber = specificLidRes.data.pn;
+            }
+          } catch (lidErr) {
+            console.error(`[WAHA] Failed to resolve LID ${chatId}:`, lidErr.message);
+          }
+        }
+      }
+    }));
     
     return chats;
   } catch (error) {
