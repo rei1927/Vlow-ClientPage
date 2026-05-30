@@ -967,7 +967,11 @@ const ChatDashboard = () => {
                                         <FaMapMarkerAlt className="text-xs" /> <span>Location</span>
                                     </div>
                                     <span className="font-medium text-[var(--color-text)]">
-                                        {getCountryFromPhone(String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id))}
+                                        {getCountryFromPhone(
+                                            currentActiveChat.name && currentActiveChat.name.startsWith('+') 
+                                                ? currentActiveChat.name 
+                                                : String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id)
+                                        )}
                                     </span>
                                 </div>
                             </div>
