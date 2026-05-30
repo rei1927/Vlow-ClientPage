@@ -374,7 +374,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
                 <div className="form-control">
                   <div className="label flex items-center justify-between pb-1">
                     <span className="text-xs font-bold text-[var(--color-text-muted)] uppercase">
-                      URL Webhook WAHA N8N <span className="text-red-500">*</span>
+                      URL Webhook N8N <span className="text-red-500">*</span>
                     </span>
                     <button 
                       type="button" 
@@ -408,7 +408,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, initialData, isLoading }) =>
                     />
                   </div>
                   <span className="text-[10px] text-[var(--color-text-muted)] mt-1">
-                    *Wajib diisi. Harus berupa link URL (http atau https) untuk webhook WAHA n8n.
+                    *Wajib diisi. Harus berupa link URL (http atau https) untuk webhook n8n.
                   </span>
                 </div>
               )}

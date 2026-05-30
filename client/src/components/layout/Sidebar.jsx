@@ -124,6 +124,12 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
       ? "bg-[var(--sidebar-active)] text-white shadow-md"
       : "text-white/80 hover:bg-white/10 hover:text-white";
 
+  React.useEffect(() => {
+    if (!location.pathname.startsWith('/broadcast')) {
+      setBroadcastOpen(false);
+    }
+  }, [location.pathname]);
+
   const handleMenuClick = () => {
     if (isOpen) toggleSidebar();
   };
@@ -141,7 +147,7 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
       show: user?.role !== "admin",
       subItems: [
         { to: "/broadcast/meta", label: "Official (Meta)" },
-        { to: "/broadcast/unofficial", label: "Unofficial (WAHA)" }
+        { to: "/broadcast/unofficial", label: "Unofficial" }
       ]
     },
     { to: "/ai-agents", icon: FaRobot, label: "AI Agents", show: user?.role !== "admin" },

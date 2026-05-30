@@ -164,7 +164,7 @@ const UnofficialBroadcast = () => {
     <FeatureAccessGuard feature="broadcast">
       <div className="p-6 text-[var(--color-text)] min-h-[calc(100vh-100px)] animate-fade-in">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold">Unofficial Broadcast (WAHA)</h1>
+          <h1 className="text-2xl font-bold">Unofficial Broadcast</h1>
           <p className="text-[var(--color-text-muted)] text-sm mt-1">
             Kirim pesan massal secara berurutan dengan jeda waktu langsung dari browser Anda. 
             <span className="text-yellow-500 font-semibold ml-1">Jangan tutup halaman ini selama proses berjalan.</span>
@@ -181,12 +181,12 @@ const UnofficialBroadcast = () => {
                 <div>
                   <label className="block text-sm font-medium mb-1">Pilih Device Pengirim</label>
                   <select 
-                    value={selectedPlatform}
+                    value={selectedPlatform || ""}
                     onChange={(e) => setSelectedPlatform(e.target.value)}
                     disabled={status === "RUNNING" || status === "PAUSED"}
                     className="w-full bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl px-4 py-2 text-sm focus:border-blue-500 outline-none"
                   >
-                    <option value="">-- Pilih Device (WAHA) --</option>
+                    <option value="">-- Pilih Device --</option>
                     {platforms.map(p => (
                       <option key={p.id} value={p.id}>{p.name} ({p.phoneNumber})</option>
                     ))}

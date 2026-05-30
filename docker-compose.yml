@@ -64,7 +64,7 @@ services:
 
   # Database (PostgreSQL Local)
   postgres:
-    image: postgres:17-alpine
+    image: postgres:15
     container_name: vlow_postgres
     restart: always
     ports:
@@ -74,18 +74,7 @@ services:
       - POSTGRES_PASSWORD=vlow_secret
       - POSTGRES_DB=vlow_db
     volumes:
-      - postgres_data_17:/var/lib/postgresql/data
-
-  # Database Migrator (Temporary service to copy Supabase -> Local)
-  db_migrator:
-    image: postgres:17-alpine
-    container_name: vlow_db_migrator
-    depends_on:
-      - postgres
-    environment:
-      - PGPASSWORD=${DB_PASS}
-    command: >
-      sh -c "until pg_isready -h postgres -p 5432 -U vlow; do echo 'Waiting for local postgres...'; sleep 2; done; echo 'Starting Migration from Supabase to Local...' && pg_dump -h ${DB_HOST} -p 5432 -U ${DB_USER} -d ${DB_NAME} -F p --clean --if-exists | PGPASSWORD=vlow_secret psql -h postgres -p 5432 -U vlow -d vlow_db && echo 'MIGRATION_COMPLETE' || echo 'MIGRATION_FAILED'"
+      - postgres_data:/var/lib/postgresql/data
 
   # MinIO (Object Storage)
   minio:

@@ -628,9 +628,9 @@ const ConnectedPlatforms = () => {
                       </div>
                     </div>
                   </div>
-                  <div>
-                    <h3 className="text-gray-200 font-bold text-lg mb-2 group-hover:text-white transition-colors">Linked Device (WAHA)</h3>
-                    <p className="text-gray-400 text-xs leading-relaxed">Scan a QR code from your existing WhatsApp app. Best for quick setup and personal numbers.</p>
+                  <div className="flex-1">
+                    <h3 className="text-gray-200 font-bold text-lg mb-2 group-hover:text-white transition-colors">Linked Device</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">Hubungkan WhatsApp secara gratis dengan scan QR Code layaknya WhatsApp Web. Cocok untuk CS manual.</p>
                   </div>
                 </div>
               </div>
