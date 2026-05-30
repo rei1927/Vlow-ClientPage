@@ -4,12 +4,18 @@ import logger from "../utils/logger.js";
 
 dotenv.config();
 
+let dbHost = process.env.DB_HOST || "postgres";
+// Force override if Portainer mistakenly injects localhost in production
+if (process.env.NODE_ENV === "production" && (dbHost === "localhost" || dbHost === "127.0.0.1" || dbHost === "::1")) {
+  dbHost = "postgres";
+}
+
 const sequelize = new Sequelize(
   process.env.DB_NAME || "vlow_db",
   process.env.DB_USER || "vlow",
   process.env.DB_PASS || "vlow_secret",
   {
-  host: process.env.DB_HOST || "postgres",
+  host: dbHost,
   dialect: "postgres", // Explicitly set for production
   logging: (msg) => logger.debug(msg),
   dialectOptions: {
