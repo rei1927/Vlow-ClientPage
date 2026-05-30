@@ -24,6 +24,13 @@ import axiosInstance from "../../api/axiosInstance";
 import toast from "react-hot-toast";
 import { parsePhoneNumber } from 'libphonenumber-js';
 
+const getDisplayPhone = (chat) => {
+    if (!chat) return "";
+    if (chat.realPhoneNumber) return chat.realPhoneNumber.split('@')[0];
+    const idStr = String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id || chat.id.user) : chat.id);
+    return idStr.split('@')[0];
+};
+
 const getCountryFromPhone = (phone) => {
     if (!phone) return "Unknown";
     
@@ -463,7 +470,7 @@ const ChatDashboard = () => {
         if (searchKeyword.trim() !== "") {
             const keyword = searchKeyword.toLowerCase();
             list = list.filter(chat => {
-                const chatName = (chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0]).toLowerCase();
+                const chatName = (chat.name || getDisplayPhone(chat)).toLowerCase();
                 const lastMsg = (chat.lastMessage?.body || chat.lastMessage?.text || chat.lastMessage?.message?.conversation || chat.lastMessage?.message?.extendedTextMessage?.text || "").toLowerCase();
                 return chatName.includes(keyword) || lastMsg.includes(keyword);
             });
@@ -611,7 +618,7 @@ const ChatDashboard = () => {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-baseline mb-1">
-                                        <h3 className="font-bold text-[var(--color-text)] text-sm truncate">{chat.name || String(typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id) : chat.id).split('@')[0]}</h3>
+                                        <h3 className="font-bold text-[var(--color-text)] text-sm truncate">{chat.name || getDisplayPhone(chat)}</h3>
                                         <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
                                             {(() => {
                                                 const chatIdStr = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.user) : String(chat.id);
@@ -670,9 +677,9 @@ const ChatDashboard = () => {
                             <div className="flex items-center gap-3 w-3/4">
                                 <FaUserCircle className="text-4xl text-gray-400 flex-shrink-0" />
                                 <div className="min-w-0">
-                                    <h2 className="font-bold text-[var(--color-text)] truncate">{currentActiveChat.name || String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id).split('@')[0]}</h2>
+                                    <h2 className="font-bold text-[var(--color-text)] truncate">{currentActiveChat.name || getDisplayPhone(currentActiveChat)}</h2>
                                     <p className="text-xs text-[var(--color-text-muted)] max-w-xs truncate">
-                                        {String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id).split('@')[0]}
+                                        {getDisplayPhone(currentActiveChat)}
                                     </p>
 
                                     {/* Small Label Badges under Header Name */}
@@ -943,7 +950,7 @@ const ChatDashboard = () => {
                                 <FaUserCircle className="text-5xl text-gray-400 flex-shrink-0" />
                                 <div className="min-w-0 flex-1">
                                     <h4 className="font-bold text-base text-[var(--color-text)] truncate">
-                                        {currentActiveChat.name || String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id).split('@')[0]}
+                                        {currentActiveChat.name || getDisplayPhone(currentActiveChat)}
                                     </h4>
                                 </div>
                             </div>
@@ -954,7 +961,7 @@ const ChatDashboard = () => {
                                         <FaPhoneAlt className="text-xs" /> <span>Phone</span>
                                     </div>
                                     <span className="font-medium text-[var(--color-text)]">
-                                        {String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id).split('@')[0]}
+                                        {getDisplayPhone(currentActiveChat)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center">
@@ -971,7 +978,7 @@ const ChatDashboard = () => {
                                         {getCountryFromPhone(
                                             currentActiveChat.name && currentActiveChat.name.startsWith('+') 
                                                 ? currentActiveChat.name 
-                                                : String(typeof currentActiveChat.id === 'object' ? (currentActiveChat.id._serialized || currentActiveChat.id.id) : currentActiveChat.id)
+                                                : getDisplayPhone(currentActiveChat)
                                         )}
                                     </span>
                                 </div>

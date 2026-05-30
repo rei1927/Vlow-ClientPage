@@ -295,11 +295,37 @@ export const updateChatLabels = async (sessionId, chatId, labelId, action = "add
 
 export const getChats = async (sessionId) => {
   try {
-    const response = await axios.get(`${WAHA_URL}/api/${sessionId}/chats`, {
-      headers: HEADERS,
-      timeout: 15000,
-    });
-    return response.data;
+    const [chatsResponse, lidsResponse] = await Promise.all([
+      axios.get(`${WAHA_URL}/api/${sessionId}/chats`, {
+        headers: HEADERS,
+        timeout: 15000,
+      }),
+      axios.get(`${WAHA_URL}/api/${sessionId}/lids`, {
+        headers: HEADERS,
+        timeout: 15000,
+      }).catch(err => {
+        console.warn("WAHA Get Lids Warning (ignored):", err.message);
+        return { data: [] };
+      })
+    ]);
+    
+    const chats = chatsResponse.data;
+    const lids = lidsResponse.data;
+    
+    if (lids && Array.isArray(lids) && lids.length > 0) {
+      const lidMap = {};
+      lids.forEach(item => {
+        if (item.lid && item.pn) lidMap[item.lid] = item.pn;
+      });
+      chats.forEach(chat => {
+        const chatId = typeof chat.id === 'object' ? (chat.id._serialized || chat.id.id || chat.id.user) : String(chat.id);
+        if (chatId.includes('lid') && lidMap[chatId]) {
+          chat.realPhoneNumber = lidMap[chatId];
+        }
+      });
+    }
+    
+    return chats;
   } catch (error) {
     const rawError = error?.response?.data ? JSON.stringify(error.response.data) : error.message;
     console.error("WAHA Get Chats Error:", rawError);
