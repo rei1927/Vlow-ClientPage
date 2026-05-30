@@ -767,7 +767,7 @@ const ChatDashboard = () => {
                         </div>
 
                         {/* Chat Messages */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4 relative bg-opacity-50">
+                        <div className="flex-1 overflow-y-auto px-4 pb-4 pt-1 space-y-3 relative bg-opacity-50">
                             {/* Fake WhatsApp Web Background Pattern */}
                             <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: `url("https://web.whatsapp.com/img/bg-chat-tile-dark_a4be512e7195b6b733d9110b408f075d.png")`, backgroundRepeat: 'repeat' }}></div>
 
@@ -829,7 +829,7 @@ const ChatDashboard = () => {
                                             )}
 
                                             <div className={`flex relative z-10 ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                                <div className={`max-w-[85%] md:max-w-[75%] rounded-lg p-3 shadow-sm relative ${isMe ? 'bg-[#d9fdd3] dark:bg-[#005c4b] text-[#111b21] dark:text-[#e9edef] rounded-tr-none' : 'bg-white dark:bg-[#202c33] text-[#111b21] dark:text-[#e9edef] rounded-tl-none'}`}>
+                                                <div className={`max-w-[92%] md:max-w-[85%] lg:max-w-[80%] rounded-lg p-3 shadow-sm relative ${isMe ? 'bg-[#d9fdd3] dark:bg-[#005c4b] text-[#111b21] dark:text-[#e9edef] rounded-tr-none' : 'bg-white dark:bg-[#202c33] text-[#111b21] dark:text-[#e9edef] rounded-tl-none'}`}>
 
                                                     {msg.type === 'image' && safeBody && (safeBody.startsWith('http') || safeBody.startsWith('/api/')) ? (
                                                         <div>
