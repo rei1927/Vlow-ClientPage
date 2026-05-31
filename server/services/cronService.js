@@ -7,6 +7,7 @@ import ConversationLog from '../models/ConversationLog.js';
 import { sendTextMessage } from './wahaService.js';
 import { sendCloudMessage } from './metaService.js';
 import axios from 'axios';
+import CustomerProfile from '../models/CustomerProfile.js';
 
 const stripHtml = (html) => {
     if (!html) return "";
@@ -195,7 +196,60 @@ async function checkAndSendFollowups() {
     }
 }
 
+async function syncProfilePictures() {
+    try {
+        const platforms = await ConnectedPlatform.findAll({ where: { provider: 'waha', status: 'WORKING' } });
+        if (platforms.length === 0) return;
+
+        for (const platform of platforms) {
+            // Find 10 missing profile pics per platform
+            const missingProfiles = await CustomerProfile.findAll({
+                where: {
+                    platformId: platform.id,
+                    profilePicUrl: null
+                },
+                limit: 10
+            });
+
+            if (missingProfiles.length === 0) continue;
+
+            for (const profile of missingProfiles) {
+                try {
+                    let contactId = profile.chatId;
+                    if (!contactId.includes('@')) {
+                        contactId = contactId + '@c.us';
+                    }
+                    
+                    const res = await axios.get(`${WAHA_URL}/api/contacts/profile-picture?session=${platform.sessionId}&contactId=${encodeURIComponent(contactId)}`, { 
+                        headers: HEADERS,
+                        timeout: 5000 
+                    });
+                    
+                    if (res.data && res.data.profilePictureURL) {
+                        profile.profilePicUrl = res.data.profilePictureURL;
+                    } else {
+                        profile.profilePicUrl = 'NOT_FOUND';
+                    }
+                    await profile.save();
+                    
+                    // Delay 1 second to avoid rate limits
+                    await new Promise(r => setTimeout(r, 1000));
+                } catch (e) {
+                    profile.profilePicUrl = 'NOT_FOUND';
+                    await profile.save();
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+            }
+        }
+    } catch (error) {
+        console.error("[CRON] Error in syncProfilePictures:", error.message);
+    }
+}
+
 export function initCron() {
-    console.log("[CRON] Initializing Follow-up Scheduler (Runs every minute)");
-    cron.schedule('* * * * *', checkAndSendFollowups);
+    console.log("[CRON] Initializing Follow-up Scheduler & Profile Sync (Runs every minute)");
+    cron.schedule('* * * * *', () => {
+        checkAndSendFollowups();
+        syncProfilePictures();
+    });
 }

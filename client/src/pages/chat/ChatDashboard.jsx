@@ -613,8 +613,12 @@ const ChatDashboard = () => {
                                 onClick={() => setActiveChat(chat)}
                                 className={`flex items-start gap-3 p-4 cursor-pointer transition-colors border-b border-[var(--color-border)]/50 ${activeChat?.id === chat.id ? 'bg-[var(--color-primary)]/10' : 'hover:bg-[var(--color-surface)]'}`}
                             >
-                                <div className="relative mt-1">
-                                    <FaUserCircle className="text-4xl text-gray-400" />
+                                <div className="relative mt-1 flex-shrink-0">
+                                    {chat.profilePicUrl && chat.profilePicUrl !== 'NOT_FOUND' ? (
+                                        <img src={chat.profilePicUrl} alt="Avatar" className="w-9 h-9 rounded-full object-cover" referrerPolicy="no-referrer" />
+                                    ) : (
+                                        <FaUserCircle className="text-4xl text-gray-400" />
+                                    )}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-baseline mb-1">
@@ -675,7 +679,11 @@ const ChatDashboard = () => {
                         {/* Chat Header */}
                         <div className="p-4 bg-[var(--color-surface)] border-b border-[var(--color-border)] flex items-center justify-between z-50 shadow-sm relative">
                             <div className="flex items-center gap-3 w-3/4">
-                                <FaUserCircle className="text-4xl text-gray-400 flex-shrink-0" />
+                                {currentActiveChat.profilePicUrl && currentActiveChat.profilePicUrl !== 'NOT_FOUND' ? (
+                                    <img src={currentActiveChat.profilePicUrl} alt="Avatar" className="w-9 h-9 rounded-full object-cover flex-shrink-0" referrerPolicy="no-referrer" />
+                                ) : (
+                                    <FaUserCircle className="text-4xl text-gray-400 flex-shrink-0" />
+                                )}
                                 <div className="min-w-0">
                                     <h2 className="font-bold text-[var(--color-text)] truncate">{currentActiveChat.name || getDisplayPhone(currentActiveChat)}</h2>
                                     <p className="text-xs text-[var(--color-text-muted)] max-w-xs truncate">
@@ -947,7 +955,11 @@ const ChatDashboard = () => {
                         <div className="flex flex-col">
                             <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">User Information</h3>
                             <div className="flex items-center gap-3 mb-5">
-                                <FaUserCircle className="text-5xl text-gray-400 flex-shrink-0" />
+                                {currentActiveChat.profilePicUrl && currentActiveChat.profilePicUrl !== 'NOT_FOUND' ? (
+                                    <img src={currentActiveChat.profilePicUrl} alt="Avatar" className="w-12 h-12 rounded-full object-cover flex-shrink-0" referrerPolicy="no-referrer" />
+                                ) : (
+                                    <FaUserCircle className="text-5xl text-gray-400 flex-shrink-0" />
+                                )}
                                 <div className="min-w-0 flex-1">
                                     <h4 className="font-bold text-base text-[var(--color-text)] truncate">
                                         {currentActiveChat.name || getDisplayPhone(currentActiveChat)}

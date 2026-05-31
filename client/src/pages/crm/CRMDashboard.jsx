@@ -326,9 +326,13 @@ const CRMDashboard = () => {
                                             </td>
                                             <td className="px-6 py-3 border-r border-[var(--color-border)]">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)] font-bold">
-                                                        {displayName.charAt(0).toUpperCase()}
-                                                    </div>
+                                                    {chat.profilePicUrl && chat.profilePicUrl !== 'NOT_FOUND' ? (
+                                                        <img src={chat.profilePicUrl} alt={displayName} className="w-8 h-8 rounded-full object-cover" referrerPolicy="no-referrer" />
+                                                    ) : (
+                                                        <div className="w-8 h-8 rounded-full bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-primary)] font-bold">
+                                                            {displayName.charAt(0).toUpperCase()}
+                                                        </div>
+                                                    )}
                                                     <div>
                                                         <span className="font-semibold text-[var(--color-text)] group-hover:text-[var(--color-primary)] transition-colors">
                                                             {displayName}

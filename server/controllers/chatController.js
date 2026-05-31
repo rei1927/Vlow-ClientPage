@@ -155,6 +155,7 @@ export const getChats = async (req, res, next) => {
                     if (profile) {
                         if (profile.customName) chat.customName = profile.customName;
                         if (profile.requirements) chat.requirements = profile.requirements;
+                        if (profile.profilePicUrl && profile.profilePicUrl !== 'NOT_FOUND') chat.profilePicUrl = profile.profilePicUrl;
                     }
                     return chat;
                 });
@@ -188,6 +189,13 @@ export const getChats = async (req, res, next) => {
                 if (profile) {
                     if (profile.customName) chat.customName = profile.customName;
                     if (profile.requirements) chat.requirements = profile.requirements;
+                    if (profile.profilePicUrl && profile.profilePicUrl !== 'NOT_FOUND') chat.profilePicUrl = profile.profilePicUrl;
+                } else {
+                    // Create a dummy record in the background so cron job can sync it later
+                    CustomerProfile.findOrCreate({
+                        where: { platformId: platform.id, chatId: rawId },
+                        defaults: { profilePicUrl: null }
+                    }).catch(err => console.log("[WAHA] Async profile creation failed:", err.message));
                 }
                 return chat;
             });

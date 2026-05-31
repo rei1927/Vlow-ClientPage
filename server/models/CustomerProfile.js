@@ -32,6 +32,11 @@ const CustomerProfile = sequelize.define("CustomerProfile", {
         type: DataTypes.TEXT,
         allowNull: true,
     },
+    // Cached Profile Picture URL
+    profilePicUrl: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
 }, {
     indexes: [
         {
