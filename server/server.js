@@ -206,38 +206,6 @@ const startServer = async () => {
       }
     }, 24 * 60 * 60 * 1000); // Run every 24 hours
 
-    // Migrate existing WAHA sessions to use webhook proxy
-    try {
-      const { updateSessionWebhook } = await import("./services/wahaService.js");
-      
-      let internalIp = "172.17.0.1";
-      try {
-        const dns = await import("dns/promises");
-        const res = await dns.lookup("vlow_server");
-        if (res && res.address) internalIp = res.address;
-      } catch (e) {
-        console.warn("DNS lookup failed, fallback to", internalIp);
-      }
-
-      const backendBaseUrl = process.env.WAHA_WEBHOOK_PROXY_URL || `http://${internalIp}:5000`;
-      
-      if (backendBaseUrl) {
-        let proxyUrl = `${backendBaseUrl}/api/webhooks/waha`;
-        if (proxyUrl.includes("vlow_server")) proxyUrl = proxyUrl.replace("vlow_server", internalIp);
-        const wahaPlatforms = await ConnectedPlatform.findAll({
-          where: { provider: "waha", status: "WORKING" },
-        });
-        for (const p of wahaPlatforms) {
-          await updateSessionWebhook(p.sessionId, proxyUrl);
-        }
-        if (wahaPlatforms.length > 0) {
-          logger.info(`[Migration] Updated ${wahaPlatforms.length} WAHA session(s) webhook → proxy`);
-        }
-      }
-    } catch (e) {
-      logger.warn(`[Migration] WAHA webhook migration skipped: ${e.message}`);
-    }
-
     app.listen(PORT, () => {
       logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
     });
