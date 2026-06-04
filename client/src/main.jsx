@@ -15,3 +15,4 @@ createRoot(document.getElementById("root")).render(
   </StrictMode>,
 );
 // cache buster 1
+console.log("Cache buster 2");
