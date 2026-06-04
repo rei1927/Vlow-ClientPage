@@ -35,6 +35,7 @@ import FollowupTab from "./tabs/FollowupTab";
 import HandoverTab from "./tabs/HandoverTab";
 import SmartLeadTab from "./tabs/SmartLeadTab";
 import EvaluationTab from "./tabs/EvaluationTab";
+import AdvancedSettingsTab from "./tabs/AdvancedSettingsTab";
 import ChatPreview from "../../components/agents/ChatPreview";
 import SubscriptionWarning from "../../components/common/SubscriptionWarning";
 
@@ -90,6 +91,9 @@ const AgentBuilder = () => {
     coldLabelId: null,
     warmLabelId: null,
     hotLabelId: null,
+  });
+  const [advancedConfig, setAdvancedConfig] = useState({
+    aiHistoryLimit: 50,
   });
 
   const knowledgeBaseText = useMemo(() => {
@@ -153,6 +157,7 @@ const AgentBuilder = () => {
         warmLabelId: null,
         hotLabelId: null,
       });
+      setAdvancedConfig({ aiHistoryLimit: 50 });
     }
     return () => dispatch(resetAgentState());
   }, [id, isEditMode, dispatch]);
@@ -186,6 +191,9 @@ const AgentBuilder = () => {
       if (currentAgent.leadQualificationConfig) {
         setLeadQualificationConfig(currentAgent.leadQualificationConfig);
       }
+      if (currentAgent.advancedConfig) {
+        setAdvancedConfig(currentAgent.advancedConfig);
+      }
     } else {
       setFollowupConfig({ isEnabled: false, delay: 15, unit: "minutes", prompt: "", isAdvancedFollowup: false, targetLabels: [] });
       setHandoffConfig(getDefaultHandoffConfig());
@@ -203,8 +211,9 @@ const AgentBuilder = () => {
         warmLabelId: null,
         hotLabelId: null,
       });
+      setAdvancedConfig({ aiHistoryLimit: 50 });
     }
-  }, [currentAgent, isEditMode]);
+  }, [isEditMode, currentAgent, shouldRemoveImage]);
 
   // Separate effect to handle image removal
   useEffect(() => {
@@ -291,6 +300,7 @@ const AgentBuilder = () => {
       dataToSend.append("leadQualificationConfig", JSON.stringify(leadQualificationConfig));
       dataToSend.append("transferCondition", serializeHandoffConfig(handoffConfig));
       dataToSend.append("handoverConfig", JSON.stringify(handoverConfig));
+      dataToSend.append("advancedConfig", JSON.stringify(advancedConfig));
 
       let agentId = id;
       if (isEditMode) {
@@ -422,6 +432,7 @@ const AgentBuilder = () => {
               { id: "handover", label: "Handover", icon: <FiShield /> },
               { id: "smart-lead", label: "Smart Lead", icon: <FaThermometerHalf /> },
               { id: "evaluation", label: "Evaluation", icon: <FaChartBar /> },
+              { id: "advanced", label: "Advanced", icon: <FaBrain /> },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -479,7 +490,12 @@ const AgentBuilder = () => {
                 {activeTab === "smart-lead" && (
                   <SmartLeadTab config={leadQualificationConfig} setConfig={setLeadQualificationConfig} platformId={id} />
                 )}
-                {activeTab === "evaluation" && <EvaluationTab agentId={id} />}
+                <div className={activeTab === "evaluation" ? "block" : "hidden"}>
+                  <EvaluationTab platformId={id} />
+                </div>
+                <div className={activeTab === "advanced" ? "block animate-fadeIn" : "hidden"}>
+                  <AdvancedSettingsTab config={advancedConfig} setConfig={setAdvancedConfig} />
+                </div>
               </>
             )}
           </div>

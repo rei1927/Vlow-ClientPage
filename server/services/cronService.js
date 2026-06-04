@@ -246,10 +246,23 @@ async function syncProfilePictures() {
     }
 }
 
+let isFollowupRunning = false;
+
 export function initCron() {
     console.log("[CRON] Initializing Follow-up Scheduler & Profile Sync (Runs every minute)");
-    cron.schedule('* * * * *', () => {
-        checkAndSendFollowups();
-        syncProfilePictures();
+    cron.schedule('* * * * *', async () => {
+        if (isFollowupRunning) {
+            console.log("[CRON] Previous check still running, skipping this minute.");
+            return;
+        }
+        isFollowupRunning = true;
+        try {
+            await checkAndSendFollowups();
+            await syncProfilePictures();
+        } catch (err) {
+            console.error("[CRON] Error in schedule:", err);
+        } finally {
+            isFollowupRunning = false;
+        }
     });
 }

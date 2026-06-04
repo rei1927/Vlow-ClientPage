@@ -75,6 +75,14 @@ const Agent = sequelize.define("Agent", {
       hotLabelId: null,
     },
   },
+  // --- ADVANCED CONFIG ---
+  advancedConfig: {
+    type: DataTypes.JSONB,
+    allowNull: false,
+    defaultValue: {
+      aiHistoryLimit: 50,
+    },
+  },
   // --- INTEGRATION ---
   whatsappNumber: {
     type: DataTypes.STRING,

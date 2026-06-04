@@ -291,6 +291,7 @@ export const updateAgent = async (req, res, next) => {
       followupConfig,
       handoverConfig,
       leadQualificationConfig,
+      advancedConfig,
     } = req.body;
 
     if (Array.isArray(transferCondition)) {
@@ -333,6 +334,17 @@ export const updateAgent = async (req, res, next) => {
       }
     }
 
+    // Parse advancedConfig (JSONB)
+    let parsedAdvancedConfig = null;
+    if (advancedConfig) {
+      try {
+        parsedAdvancedConfig =
+          typeof advancedConfig === "string" ? JSON.parse(advancedConfig) : advancedConfig;
+      } catch (e) {
+        console.error("Error parsing advancedConfig", e);
+      }
+    }
+
     // Update
     if (name) agent.name = name;
     if (description !== undefined) agent.description = description;
@@ -355,6 +367,11 @@ export const updateAgent = async (req, res, next) => {
     // Update Lead Qualification Config (JSONB)
     if (parsedLeadQualification) {
       agent.leadQualificationConfig = parsedLeadQualification;
+    }
+
+    // Update Advanced Config (JSONB)
+    if (parsedAdvancedConfig) {
+      agent.advancedConfig = parsedAdvancedConfig;
     }
 
     agent.welcomeImageUrl = newWelcomeImageUrl;
@@ -676,6 +693,7 @@ export const getIntegrationConfig = async (req, res, next) => {
       isActive: agent.isActive,
       followupConfig: agent.followupConfig || { isEnabled: false },
       handoverConfig: agent.handoverConfig || { enabled: false },
+      advancedConfig: agent.advancedConfig || { aiHistoryLimit: 50 },
       platformId: platform.id,
     });
   } catch (error) {
