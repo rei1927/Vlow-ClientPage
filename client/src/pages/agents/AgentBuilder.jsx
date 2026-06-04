@@ -35,7 +35,7 @@ import FollowupTab from "./tabs/FollowupTab";
 import HandoverTab from "./tabs/HandoverTab";
 import SmartLeadTab from "./tabs/SmartLeadTab";
 import EvaluationTab from "./tabs/EvaluationTab";
-import AdvancedSettingsTab from "./tabs/AdvancedSettingsTab";
+
 import ChatPreview from "../../components/agents/ChatPreview";
 import SubscriptionWarning from "../../components/common/SubscriptionWarning";
 
@@ -432,7 +432,7 @@ const AgentBuilder = () => {
               { id: "handover", label: "Handover", icon: <FiShield /> },
               { id: "smart-lead", label: "Smart Lead", icon: <FaThermometerHalf /> },
               { id: "evaluation", label: "Evaluation", icon: <FaChartBar /> },
-              { id: "advanced", label: "Advanced", icon: <FaBrain /> },
+
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -467,6 +467,8 @@ const AgentBuilder = () => {
                     handoffConfig={handoffConfig}
                     setHandoffConfig={setHandoffConfig}
                     onRemoveImage={handleRemoveImage}
+                    advancedConfig={advancedConfig}
+                    setAdvancedConfig={setAdvancedConfig}
                   />
                 </div>
 
@@ -493,9 +495,7 @@ const AgentBuilder = () => {
                 <div className={activeTab === "evaluation" ? "block" : "hidden"}>
                   <EvaluationTab platformId={id} />
                 </div>
-                <div className={activeTab === "advanced" ? "block animate-fadeIn" : "hidden"}>
-                  <AdvancedSettingsTab config={advancedConfig} setConfig={setAdvancedConfig} />
-                </div>
+
               </>
             )}
           </div>
