@@ -169,6 +169,11 @@ const UnofficialBroadcast = () => {
             Kirim pesan massal secara berurutan dengan jeda waktu langsung dari browser Anda. 
             <span className="text-yellow-500 font-semibold ml-1">Jangan tutup halaman ini selama proses berjalan.</span>
           </p>
+          <div className="mt-4 p-4 bg-orange-500/10 border-l-4 border-orange-500 rounded-r-lg">
+            <p className="text-sm text-orange-700 dark:text-orange-400 leading-relaxed">
+              <strong>Penting (Do With Your Own Risk):</strong> Harap pastikan nomor WhatsApp yang digunakan untuk pengiriman telah aktif beroperasi selama lebih dari 3 bulan dan digunakan secara reguler. Penggunaan nomor baru atau tidak aktif secara signifikan meningkatkan potensi risiko pemblokiran (banned) oleh pihak WhatsApp. Penggunaan fitur ini sepenuhnya menjadi tanggung jawab Anda.
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
