@@ -66,3 +66,7 @@
 .dark .ql-editor.ql-blank::before {
   color: var(--color-text-muted);
 }
+
+/* Cache buster to force new filename */
+.force-cache-break-001 { opacity: 0.99; }
+
