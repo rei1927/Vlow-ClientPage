@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { getPlatforms } from "../../features/platforms/platformSlice";
 import { FaHome, FaUsers, FaRobot, FaNetworkWired, FaTimes, FaSignOutAlt, FaComments, FaBullhorn, FaHeartbeat, FaAddressBook, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const sidebarStyles = `
@@ -116,23 +117,42 @@ const sidebarStyles = `
 
 const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
   const { user, isImpersonating } = useSelector((state) => state.auth);
+  const { platforms } = useSelector((state) => state.platforms) || { platforms: [] };
   const location = useLocation();
+  const dispatch = useDispatch();
   const [broadcastOpen, setBroadcastOpen] = useState(false);
+
+  useEffect(() => {
+    if (!location.pathname.startsWith('/broadcast')) {
+      setBroadcastOpen(false);
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (user?.role !== "admin") {
+      dispatch(getPlatforms());
+    }
+  }, [dispatch, user?.role]);
 
   const isActive = (path) =>
     location.pathname === path
       ? "bg-[var(--sidebar-active)] text-white shadow-md"
       : "text-white/80 hover:bg-white/10 hover:text-white";
 
-  React.useEffect(() => {
-    if (!location.pathname.startsWith('/broadcast')) {
-      setBroadcastOpen(false);
-    }
-  }, [location.pathname]);
-
   const handleMenuClick = () => {
     if (isOpen) toggleSidebar();
   };
+
+  const isMetaConnected = platforms?.some(p => p.provider === "meta" && p.status === "WORKING");
+  const isWahaConnected = platforms?.some(p => p.provider === "waha" && p.status === "WORKING");
+
+  const broadcastSubItems = [];
+  if (isMetaConnected) {
+    broadcastSubItems.push({ to: "/broadcast/meta", label: "Official (Meta)" });
+  }
+  if (isWahaConnected) {
+    broadcastSubItems.push({ to: "/broadcast/unofficial", label: "Unofficial" });
+  }
 
   const menuItems = [
     { to: "/dashboard", icon: FaHome, label: "Dashboard", show: true },
@@ -144,11 +164,8 @@ const Sidebar = ({ isOpen, toggleSidebar, onLogoutClick }) => {
       to: "/broadcast", 
       icon: FaBullhorn, 
       label: "Broadcast", 
-      show: user?.role !== "admin",
-      subItems: [
-        { to: "/broadcast/meta", label: "Official (Meta)" },
-        { to: "/broadcast/unofficial", label: "Unofficial" }
-      ]
+      show: user?.role !== "admin" && broadcastSubItems.length > 0,
+      subItems: broadcastSubItems
     },
     { to: "/ai-agents", icon: FaRobot, label: "AI Agents", show: user?.role !== "admin" },
     { to: "/platforms", icon: FaNetworkWired, label: "Connected Platforms", show: user?.role !== "admin" },
