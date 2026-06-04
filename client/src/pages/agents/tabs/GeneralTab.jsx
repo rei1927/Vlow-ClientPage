@@ -102,30 +102,26 @@ const GeneralTab = ({
 
         {showAdvanced && (
           <div className="mt-6 space-y-6 animate-[fadeIn_0.3s_ease-out]">
-            <div className="bg-gradient-to-r from-gray-800 to-gray-900 border border-gray-700 rounded-xl p-6 shadow-md relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                <FaBrain className="text-8xl text-white" />
-              </div>
-              
-              <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                <FaBrain className="text-purple-400" /> Advanced Settings
+            <div className="bg-[var(--color-bg)]/60 border border-[var(--color-border)] rounded-2xl p-5 shadow-sm relative overflow-hidden">
+              <h3 className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-2 flex items-center gap-2">
+                Advanced Settings
               </h3>
-              <p className="text-gray-400 text-sm mb-6 max-w-2xl">
+              <p className="text-[var(--color-text-muted)] text-xs mb-6 max-w-2xl">
                 Konfigurasi tingkat lanjut untuk mengontrol seberapa pintar dan responsif AI Agent Anda dalam berinteraksi.
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* AI History Limit */}
-                <div className="bg-gray-900/50 rounded-lg p-5 border border-gray-700/50">
+                <div className="bg-[var(--color-surface)] rounded-xl p-5 border border-[var(--color-border)] shadow-sm">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-indigo-500/20 rounded-lg">
-                      <FaHistory className="text-indigo-400" />
+                    <div className="p-2 bg-[var(--color-primary)]/10 rounded-lg">
+                      <FaHistory className="text-[var(--color-primary)]" />
                     </div>
-                    <label className="block text-sm font-medium text-gray-200">
+                    <label className="block text-sm font-semibold text-[var(--color-text)]">
                       AI History Limit
                     </label>
                   </div>
-                  <p className="text-xs text-gray-400 mb-3">
+                  <p className="text-xs text-[var(--color-text-muted)] mb-4">
                     Batas jumlah pesan terakhir (dari user dan AI) yang akan diingat oleh AI dalam satu sesi percakapan. Angka yang lebih kecil menghemat kuota Token.
                   </p>
                   <input
@@ -135,22 +131,22 @@ const GeneralTab = ({
                     max="200"
                     value={advancedConfig?.aiHistoryLimit || 50}
                     onChange={handleAdvancedChange}
-                    className="w-full bg-gray-800 text-white rounded-lg border-gray-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors p-2.5"
+                    className="input input-bordered w-full rounded-lg bg-[var(--color-bg)] border-[var(--color-border)] text-[var(--color-text)] focus:ring-1 focus:ring-[var(--color-primary)] transition-colors p-2.5"
                     placeholder="Contoh: 50"
                   />
                 </div>
 
                 {/* Placeholder for future settings */}
-                <div className="bg-gray-900/50 rounded-lg p-5 border border-gray-700/50 opacity-50 cursor-not-allowed">
+                <div className="bg-[var(--color-surface)] rounded-xl p-5 border border-[var(--color-border)] shadow-sm opacity-50 cursor-not-allowed">
                    <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 bg-gray-500/20 rounded-lg">
-                      <FaToggleOff className="text-gray-400" />
+                      <FaToggleOff className="text-gray-500" />
                     </div>
-                    <label className="block text-sm font-medium text-gray-200">
+                    <label className="block text-sm font-semibold text-[var(--color-text)]">
                       Fitur Lainnya
                     </label>
                   </div>
-                  <p className="text-xs text-gray-400 mb-3">
+                  <p className="text-xs text-[var(--color-text-muted)] mb-3">
                     Fitur tingkat lanjut lainnya seperti AI Temperature, Message Await, dll akan segera hadir.
                   </p>
                 </div>
