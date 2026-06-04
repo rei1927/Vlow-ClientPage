@@ -56,19 +56,19 @@ const BroadcastTab = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4 text-white">Mulai Siaran (Broadcast)</h2>
-      <p className="text-sm text-white/70 mb-6">
+      <h2 className="text-xl font-semibold mb-4 text-[var(--color-text)]">Mulai Siaran (Broadcast)</h2>
+      <p className="text-sm text-[var(--color-text-muted)] mb-6">
         Konfigurasi dan mulai jalankan kampanye broadcast Anda ke semua penerima.
         Pastikan Anda telah menyimpan penerima Anda di tab "Recipients".
       </p>
       
-      <div className="bg-[var(--sidebar-bg)] p-5 rounded-lg border border-white/10 mb-6">
+      <div className="bg-[var(--color-surface)] p-5 rounded-lg border border-[var(--color-border)] mb-6">
         <div className="mb-4">
-          <label className="block text-sm text-white/70 mb-2">Pilih Template Pesan Meta</label>
+          <label className="block text-sm text-[var(--color-text-muted)] mb-2">Pilih Template Pesan Meta</label>
           <select 
             value={selectedTemplate}
             onChange={(e) => setSelectedTemplate(e.target.value)}
-            className="w-full bg-[var(--input-bg)] text-white border border-white/20 rounded-lg p-3 focus:outline-none focus:border-blue-500"
+            className="w-full bg-[var(--color-bg)] text-[var(--color-text)] border border-[var(--color-border)] rounded-lg p-3 focus:outline-none focus:border-[var(--color-primary)]"
           >
             <option value="">-- Pilih Template --</option>
             {templates.map(t => (
@@ -79,7 +79,7 @@ const BroadcastTab = () => {
           </select>
         </div>
 
-        <div className="text-xs text-white/50 mt-4 bg-black/20 p-3 rounded">
+        <div className="text-xs text-[var(--color-text-muted)] mt-4 bg-[var(--color-bg)] p-3 rounded">
           <p>Daftar tunggu pengiriman akan diproses secara masal ke kontak yang tersimpan.</p>
         </div>
       </div>
@@ -88,8 +88,7 @@ const BroadcastTab = () => {
         <button
           onClick={handleStartBroadcast}
           disabled={loadingMsg !== ""}
-          className="bg-[var(--gradient-btn-start)] hover:bg-[var(--gradient-btn-end)] disabled:opacity-50 disabled:scale-100 text-white font-semibold py-3 px-8 rounded-xl shadow-lg border border-white/20 transition-all hover:scale-105"
-          style={{ background: 'linear-gradient(135deg, #FF6B6B 0%, #C0392B 100%)' }}
+          className="bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white font-semibold py-3 px-8 rounded-xl shadow-sm border border-transparent transition-all"
         >
           {loadingMsg || "Kirim Broadcast Sekarang"}
         </button>

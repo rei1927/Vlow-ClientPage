@@ -95,15 +95,15 @@ const TemplatesTab = () => {
     <div>
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-xl font-semibold mb-1 text-white">Manajemen Template Meta</h2>
-          <p className="text-sm text-white/70">
+          <h2 className="text-xl font-semibold mb-1 text-[var(--color-text)]">Manajemen Template Meta</h2>
+          <p className="text-sm text-[var(--color-text-muted)]">
             Sinkronkan dan lihat template pesan yang disetujui dari Meta Business Manager Anda.
           </p>
         </div>
         <div className="flex gap-2">
           <button 
             onClick={() => setIsCreateModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-5 rounded-lg transition-colors"
+            className="bg-[var(--color-primary)] hover:opacity-80 text-white font-medium py-2 px-5 rounded-lg transition-colors"
           >
             Buat Template
           </button>
@@ -118,34 +118,34 @@ const TemplatesTab = () => {
       </div>
       
       {loading ? (
-        <div className="text-center p-8 border border-white/10 rounded-lg bg-[var(--sidebar-bg)]">
-          <p className="text-white/50">Memuat template...</p>
+        <div className="text-center p-8 border border-[var(--color-border)] rounded-lg bg-[var(--color-surface)]">
+          <p className="text-[var(--color-text-muted)]">Memuat template...</p>
         </div>
       ) : templates.length === 0 ? (
-        <div className="text-center p-8 border border-dashed border-white/20 rounded-lg bg-[var(--sidebar-bg)]">
-          <p className="text-white/50">Belum ada template tersinkronisasi. Klik "Sync dari Meta".</p>
+        <div className="text-center p-8 border border-dashed border-[var(--color-border)] rounded-lg bg-[var(--color-surface)]">
+          <p className="text-[var(--color-text-muted)]">Belum ada template tersinkronisasi. Klik "Sync dari Meta".</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {templates.map(t => (
-            <div key={t.id} className="p-4 bg-[var(--sidebar-bg)] border border-white/10 rounded-lg shadow">
+            <div key={t.id} className="p-4 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg shadow-sm">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-white truncate max-w-[70%]" title={t.name}>{t.name}</h3>
+                <h3 className="font-semibold text-[var(--color-text)] truncate max-w-[70%]" title={t.name}>{t.name}</h3>
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs px-2 py-1 rounded-full ${t.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                  <span className={`text-xs px-2 py-1 rounded-full ${t.status === 'APPROVED' ? 'bg-green-500/20 text-green-600 dark:text-green-400' : 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400'}`}>
                     {t.status}
                   </span>
                   <button 
                     onClick={() => handleDeleteTemplate(t.id, t.name)}
-                    className="text-red-400 hover:text-red-500 transition-colors p-1"
+                    className="text-red-500 hover:opacity-70 transition-colors p-1"
                     title="Hapus Template"
                   >
                     <FaTrash size={14} />
                   </button>
                 </div>
               </div>
-              <p className="text-xs text-white/50 mb-2">Bahasa: {t.language} | Kategori: {t.category}</p>
-              <div className="text-sm text-white/80 p-3 bg-black/20 rounded max-h-32 overflow-y-auto">
+              <p className="text-xs text-[var(--color-text-muted)] mb-2">Bahasa: {t.language} | Kategori: {t.category}</p>
+              <div className="text-sm text-[var(--color-text)] p-3 bg-[var(--color-bg)] rounded max-h-32 overflow-y-auto border border-[var(--color-border)]">
                 {/* Mencoba menampilkan body jika ada dalam komponen */}
                 {t.components?.find(c => c.type === 'BODY')?.text || "Template detail tersembunyi."}
               </div>
