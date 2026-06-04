@@ -451,9 +451,9 @@ const ConnectedPlatforms = () => {
 
               {/* Tabs */}
               <div className="flex justify-center mb-10">
-                <div className="bg-[#F3F4F6] dark:bg-[#1f2937] p-1.5 rounded-xl flex items-center text-[13px] font-bold w-fit shadow-inner">
-                  <button className="px-8 py-2 rounded-lg bg-white dark:bg-[#374151] shadow border border-gray-100 dark:border-gray-600 text-[var(--color-text)] transition-all">Basic</button>
-                  <button className="px-8 py-2 rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 cursor-not-allowed transition-all">Flow</button>
+                <div className="bg-[var(--color-bg)] border border-[var(--color-border)] p-1.5 rounded-xl flex items-center text-[13px] font-bold w-fit shadow-inner">
+                  <button className="px-8 py-2 rounded-lg bg-[var(--color-surface)] shadow border border-[var(--color-border)] text-[var(--color-text)] transition-all">Basic</button>
+                  <button className="px-8 py-2 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] cursor-not-allowed transition-all">Flow</button>
                 </div>
               </div>
 
@@ -462,14 +462,14 @@ const ConnectedPlatforms = () => {
                 {/* AI Agent Selection */}
                 <div className="mb-8">
                   <label className="text-[13px] font-bold text-[var(--color-text)] mb-3 flex items-center gap-2">
-                    AI Agent <a href="#" className="text-blue-500 hover:text-blue-600 transition-colors"><FaCog size={12} /></a>
+                    AI Agent <a href="#" className="text-[var(--color-primary)] hover:opacity-80 transition-opacity"><FaCog size={12} /></a>
                   </label>
                   <div className="relative">
-                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-500 bg-blue-100/50 w-7 h-7 rounded-full flex items-center justify-center">
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-primary)] bg-[var(--color-primary)]/10 w-7 h-7 rounded-full flex items-center justify-center">
                       <FaRobot size={13} className="" />
                     </div>
                     <select
-                      className="w-full pl-14 pr-10 py-3.5 bg-white dark:bg-[#1f2937] border border-[var(--color-border)] rounded-xl text-sm font-medium text-[var(--color-text)] appearance-none outline-none focus:border-blue-300 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/30 transition-all shadow-sm cursor-pointer"
+                      className="w-full pl-14 pr-10 py-3.5 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl text-sm font-medium text-[var(--color-text)] appearance-none outline-none focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary)]/20 transition-all shadow-sm cursor-pointer"
                       value={selectedAgentId || ""}
                       onChange={(e) => setSelectedAgentId(e.target.value)}
                     >
@@ -488,8 +488,8 @@ const ConnectedPlatforms = () => {
                 <div className="mb-8">
                   <label className="block text-[13px] font-bold text-[var(--color-text)] mb-3">Teams</label>
                   <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-4">
-                    <p className="text-[13px] text-gray-500 dark:text-gray-400">You don't have any division yet. Create it now</p>
-                    <button className="text-[13px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/50 rounded-lg px-4 py-2 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 flex items-center gap-1.5 transition-colors shadow-sm">
+                    <p className="text-[13px] text-[var(--color-text-muted)]">You don't have any division yet. Create it now</p>
+                    <button className="text-[13px] font-bold text-[var(--color-primary)] border border-[var(--color-primary)]/50 rounded-lg px-4 py-2 bg-[var(--color-surface)] hover:bg-[var(--color-primary)]/10 flex items-center gap-1.5 transition-colors shadow-sm">
                       <FaPlus size={11} /> Create Division
                     </button>
                   </div>
@@ -498,11 +498,11 @@ const ConnectedPlatforms = () => {
                 {/* Human Agent */}
                 <div className="mb-8">
                   <label className="block text-[13px] font-bold text-[var(--color-text)] mb-3">Human Agent</label>
-                  <div className="w-full pl-3 pr-4 py-3 bg-white dark:bg-[#1f2937] border border-[var(--color-border)] rounded-xl flex items-center gap-2 shadow-sm relative">
-                    <div className="bg-[#F3F4F6] dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-600 outline-none text-[13px] font-bold flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[9px] font-black">R</div>
+                  <div className="w-full pl-3 pr-4 py-3 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl flex items-center gap-2 shadow-sm relative">
+                    <div className="bg-[var(--color-surface)] text-[var(--color-text)] px-3 py-1.5 rounded-md border border-[var(--color-border)] outline-none text-[13px] font-bold flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full bg-[var(--color-primary)]/20 text-[var(--color-primary)] flex items-center justify-center text-[9px] font-black">R</div>
                       Rei
-                      <span className="text-[14px] cursor-pointer text-gray-400 hover:text-gray-600 dark:hover:text-white ml-2">&times;</span>
+                      <span className="text-[14px] cursor-pointer text-[var(--color-text-muted)] hover:text-red-500 ml-2">&times;</span>
                     </div>
                     <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[var(--color-text-muted)]">
                       <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
@@ -514,7 +514,7 @@ const ConnectedPlatforms = () => {
                 <div className="mb-10">
                   <label className="block text-[13px] font-bold text-[var(--color-text)] mb-3">Chat Distribution Method</label>
                   <div className="relative">
-                    <select className="w-full px-4 py-3.5 bg-[#F9FAFB] dark:bg-[#1f2937] border border-[var(--color-border)] rounded-xl text-sm font-semibold text-[var(--color-text)] outline-none appearance-none cursor-pointer hover:bg-white transition-colors">
+                    <select className="w-full px-4 py-3.5 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl text-sm font-semibold text-[var(--color-text)] outline-none appearance-none cursor-pointer hover:bg-[var(--color-surface)] transition-colors">
                       <option>Least Assigned First</option>
                       <option>Round Robin</option>
                     </select>
