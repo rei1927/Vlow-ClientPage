@@ -5,7 +5,7 @@ import { body } from "express-validator";
 export const registerValidator = [
   body("name").notEmpty().withMessage("Nama wajib diisi"),
 
-  body("email").isEmail().withMessage("Format email tidak valid").normalizeEmail(),
+  body("email").isEmail().withMessage("Format email tidak valid").toLowerCase(),
 
   body("password")
     .isLength({ min: 8 })

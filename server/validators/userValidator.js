@@ -14,7 +14,7 @@ export const validateCreateUser = [
     .withMessage("Email wajib diisi")
     .isEmail()
     .withMessage("Format email tidak valid")
-    .normalizeEmail(),
+    .toLowerCase(),
 
   body("role").optional().isIn(["admin", "customer"]).withMessage("Role harus admin atau customer"),
 ];
