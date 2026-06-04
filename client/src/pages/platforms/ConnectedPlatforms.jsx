@@ -449,14 +449,6 @@ const ConnectedPlatforms = () => {
                 </p>
               </div>
 
-              {/* Tabs */}
-              <div className="flex justify-center mb-10">
-                <div className="bg-[var(--color-bg)] border border-[var(--color-border)] p-1.5 rounded-xl flex items-center text-[13px] font-bold w-fit shadow-inner">
-                  <button className="px-8 py-2 rounded-lg bg-[var(--color-surface)] shadow border border-[var(--color-border)] text-[var(--color-text)] transition-all">Basic</button>
-                  <button className="px-8 py-2 rounded-lg text-[var(--color-text-muted)] hover:text-[var(--color-text)] cursor-not-allowed transition-all">Flow</button>
-                </div>
-              </div>
-
               {/* Form Content */}
               <div className="max-w-xl mx-auto space-y-7 pb-10">
                 {/* AI Agent Selection */}
@@ -484,68 +476,7 @@ const ConnectedPlatforms = () => {
                   </div>
                 </div>
 
-                {/* Teams / Division */}
-                <div className="mb-8">
-                  <label className="block text-[13px] font-bold text-[var(--color-text)] mb-3">Teams</label>
-                  <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-4">
-                    <p className="text-[13px] text-[var(--color-text-muted)]">You don't have any division yet. Create it now</p>
-                    <button className="text-[13px] font-bold text-[var(--color-primary)] border border-[var(--color-primary)]/50 rounded-lg px-4 py-2 bg-[var(--color-surface)] hover:bg-[var(--color-primary)]/10 flex items-center gap-1.5 transition-colors shadow-sm">
-                      <FaPlus size={11} /> Create Division
-                    </button>
-                  </div>
-                </div>
 
-                {/* Human Agent */}
-                <div className="mb-8">
-                  <label className="block text-[13px] font-bold text-[var(--color-text)] mb-3">Human Agent</label>
-                  <div className="w-full pl-3 pr-4 py-3 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl flex items-center gap-2 shadow-sm relative">
-                    <div className="bg-[var(--color-surface)] text-[var(--color-text)] px-3 py-1.5 rounded-md border border-[var(--color-border)] outline-none text-[13px] font-bold flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-[var(--color-primary)]/20 text-[var(--color-primary)] flex items-center justify-center text-[9px] font-black">R</div>
-                      Rei
-                      <span className="text-[14px] cursor-pointer text-[var(--color-text-muted)] hover:text-red-500 ml-2">&times;</span>
-                    </div>
-                    <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[var(--color-text-muted)]">
-                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Chat Distribution Method */}
-                <div className="mb-10">
-                  <label className="block text-[13px] font-bold text-[var(--color-text)] mb-3">Chat Distribution Method</label>
-                  <div className="relative">
-                    <select className="w-full px-4 py-3.5 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-xl text-sm font-semibold text-[var(--color-text)] outline-none appearance-none cursor-pointer hover:bg-[var(--color-surface)] transition-colors">
-                      <option>Least Assigned First</option>
-                      <option>Round Robin</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-[var(--color-text-muted)]">
-                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Toggles */}
-                <div className="space-y-6 pt-6 font-sans">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-[13px] font-bold text-[var(--color-text)] flex items-center gap-2 tracking-wide">
-                        Customer Satisfaction Feature (CSAT) <a href="#" className="text-blue-500 hover:text-blue-600 transition-colors"><FaCog size={14} /></a>
-                      </h4>
-                      <p className="text-[12px] text-gray-500 mt-1.5">Send a review link to the chat after it is resolved by an agent.</p>
-                    </div>
-                    <input type="checkbox" className="toggle toggle-sm bg-gray-200 border-gray-200 [--tglbg:white] hover:bg-gray-300" />
-                  </div>
-
-                  <div className="flex items-center justify-between mt-8">
-                    <div className="pr-10">
-                      <h4 className="text-[13px] font-bold text-[var(--color-text)] tracking-wide">
-                        Reassign Chat When Agent is Offline
-                      </h4>
-                      <p className="text-[12px] text-gray-500 mt-1.5">Automatically reassign conversation to available agent when the assigned agent goes offline</p>
-                    </div>
-                    <input type="checkbox" className="toggle toggle-sm bg-gray-200 border-gray-200 [--tglbg:white] hover:bg-gray-300" />
-                  </div>
-                </div>
 
               </div>
             </div>
