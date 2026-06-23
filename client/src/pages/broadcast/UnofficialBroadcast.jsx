@@ -17,6 +17,10 @@ const UnofficialBroadcast = () => {
   // Broadcast state
   const [status, setStatus] = useState("IDLE"); // IDLE, RUNNING, PAUSED, FINISHED
   const [logs, setLogs] = useState([]);
+  const [reportData, setReportData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shouldStop, setShouldStop] = useState(false);
   const [shouldPause, setShouldPause] = useState(false);
@@ -105,6 +109,8 @@ const UnofficialBroadcast = () => {
     setShouldPause(false);
     setStats({ success: 0, failed: 0, total: numbers.length });
     setLogs([]);
+    setReportData([]);
+    setCurrentPage(1);
     setCurrentIndex(0);
 
     let currentSuccess = 0;
@@ -132,9 +138,12 @@ const UnofficialBroadcast = () => {
         });
         currentSuccess++;
         addLog(`Berhasil mengirim ke ${numbers[i]}`, "success");
+        setReportData(prev => [...prev, { number: numbers[i], status: "SUCCESS", time: new Date().toLocaleTimeString(), reason: "-" }]);
       } catch (err) {
         currentFailed++;
-        addLog(`Gagal mengirim ke ${numbers[i]}: ${err.response?.data?.message || err.message}`, "error");
+        const errorMessage = err.response?.data?.message || err.message;
+        addLog(`Gagal mengirim ke ${numbers[i]}: ${errorMessage}`, "error");
+        setReportData(prev => [...prev, { number: numbers[i], status: "FAILED", time: new Date().toLocaleTimeString(), reason: errorMessage }]);
       }
 
       setStats({ success: currentSuccess, failed: currentFailed, total: numbers.length });
@@ -159,6 +168,13 @@ const UnofficialBroadcast = () => {
   const shouldStopRef = React.useRef(shouldStop);
   useEffect(() => { shouldPauseRef.current = shouldPause; }, [shouldPause]);
   useEffect(() => { shouldStopRef.current = shouldStop; }, [shouldStop]);
+
+  // Pagination calculation
+  const totalPages = Math.ceil(reportData.length / itemsPerPage);
+  const currentReportData = reportData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <FeatureAccessGuard feature="broadcast">
@@ -361,6 +377,83 @@ const UnofficialBroadcast = () => {
           </div>
 
         </div>
+
+        {/* Laporan Pengiriman */}
+        {reportData.length > 0 && (
+          <div className="mt-8 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-sm overflow-hidden animate-fade-in">
+            <div className="p-5 border-b border-[var(--color-border)] flex justify-between items-center bg-[var(--color-bg)]/50">
+              <h2 className="text-lg font-semibold text-[var(--color-text)]">Laporan Pengiriman</h2>
+              <span className="text-sm px-3 py-1 bg-blue-500/10 text-blue-500 rounded-full font-medium border border-blue-500/20">
+                Total: {reportData.length} Data
+              </span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-[var(--color-text-muted)] whitespace-nowrap">
+                <thead className="bg-[var(--color-surface)] text-[var(--color-text)] uppercase font-semibold text-xs border-b border-[var(--color-border)]">
+                  <tr>
+                    <th className="px-6 py-4 w-16">No</th>
+                    <th className="px-6 py-4">Nomor WhatsApp</th>
+                    <th className="px-6 py-4 w-32">Status</th>
+                    <th className="px-6 py-4 w-64">Keterangan</th>
+                    <th className="px-6 py-4 w-32">Waktu</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--color-border)] bg-[var(--color-bg)]">
+                  {currentReportData.map((item, index) => (
+                    <tr key={index} className="hover:bg-[var(--color-surface)] transition-colors">
+                      <td className="px-6 py-4 font-medium text-[var(--color-text)]">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                      <td className="px-6 py-4 font-mono text-sm">{item.number}</td>
+                      <td className="px-6 py-4">
+                        {item.status === "SUCCESS" ? (
+                          <span className="inline-flex items-center px-2.5 py-1 bg-green-500/10 text-green-500 rounded-lg text-xs font-semibold border border-green-500/20">
+                            ✅ Berhasil
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-1 bg-red-500/10 text-red-500 rounded-lg text-xs font-semibold border border-red-500/20">
+                            ❌ Gagal
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="max-w-xs truncate" title={item.reason}>{item.reason}</div>
+                      </td>
+                      <td className="px-6 py-4 text-xs">{item.time}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="p-4 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-center justify-between gap-4 bg-[var(--color-surface)]">
+                <span className="text-sm text-[var(--color-text-muted)]">
+                  Menampilkan <span className="font-semibold text-[var(--color-text)]">{(currentPage - 1) * itemsPerPage + 1}</span> hingga <span className="font-semibold text-[var(--color-text)]">{Math.min(currentPage * itemsPerPage, reportData.length)}</span> dari <span className="font-semibold text-[var(--color-text)]">{reportData.length}</span> entri
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-border)] disabled:opacity-40 disabled:cursor-not-allowed transition-all text-sm font-medium text-[var(--color-text)]"
+                  >
+                    Sebelumnya
+                  </button>
+                  <span className="px-4 py-2 text-sm font-semibold bg-blue-500/10 text-blue-500 rounded-lg border border-blue-500/20 shadow-sm">
+                    {currentPage} / {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-border)] disabled:opacity-40 disabled:cursor-not-allowed transition-all text-sm font-medium text-[var(--color-text)]"
+                  >
+                    Selanjutnya
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
     </FeatureAccessGuard>
   );
